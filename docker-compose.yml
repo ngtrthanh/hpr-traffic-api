@@ -1,0 +1,12 @@
+services:
+  api-route-go:
+    build: .
+    ports:
+      - "5736:8081"
+    security_opt:
+      - apparmor:unconfined
+
+networks:
+  default:
+    external: true
+    name: api-route_default
