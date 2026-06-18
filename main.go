@@ -641,12 +641,22 @@ func main() {
 
 	mux.HandleFunc("/v1/stats", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]any{
-			"total_aircraft": len(aircraft),
-			"total_routes":   len(routes),
-			"total_airlines": len(byAirline),
-			"total_airports": len(byAirport),
-			"top_airlines":   topN(byAirline, 20),
-			"top_airports":   topN(byAirport, 20),
+			"aviation": map[string]any{
+				"aircraft": len(aircraft),
+				"routes":   len(routes),
+				"airlines": len(byAirline),
+				"airports": len(byAirport),
+			},
+			"maritime": map[string]any{
+				"ships":            len(ships),
+				"seaports":         len(seaports),
+				"sea_route_origins": len(seaRoutesByOrigin),
+				"ports_with_locode": len(portByLOCODE),
+				"countries":        len(portsByCountry),
+				"zones":            len(portsByZone),
+			},
+			"top_airlines": topN(byAirline, 20),
+			"top_airports": topN(byAirport, 20),
 		})
 	})
 
@@ -855,6 +865,207 @@ func main() {
 		} else {
 			notFound(w, "Ship not found")
 		}
+	})
+
+	// === MCP v1 ===
+
+	mcpManifest, _ := json.Marshal(map[string]any{
+		"name": "hpr-traffic-api", "version": "1.0.0",
+		"description": "Aviation and maritime traffic data API",
+		"tools": []map[string]any{
+			{"name": "lookup_flight_route", "description": "Get origin/destination for a flight callsign", "parameters": map[string]string{"callsign": "string"}},
+			{"name": "lookup_aircraft", "description": "Get aircraft info by Mode-S hex or registration", "parameters": map[string]string{"id": "string"}},
+			{"name": "lookup_ship", "description": "Get ship details by MMSI or callsign", "parameters": map[string]string{"id": "string"}},
+			{"name": "lookup_port", "description": "Get seaport details by LOCODE or WPI ID", "parameters": map[string]string{"id": "string"}},
+			{"name": "sea_distance", "description": "Get distances from a port to all connected destinations", "parameters": map[string]string{"port": "string"}},
+			{"name": "nearby_ports", "description": "Find seaports within radius of coordinates", "parameters": map[string]string{"lat": "number", "lon": "number", "radius_km": "number"}},
+			{"name": "search_sea_routes", "description": "Search for ports in the sea distance database", "parameters": map[string]string{"query": "string"}},
+		},
+	})
+
+	mux.HandleFunc("/v1/mcp/call", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var req struct {
+			Tool   string         `json:"tool"`
+			Params map[string]any `json:"parameters"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"invalid JSON"}`))
+			return
+		}
+		ps := func(k string) string {
+			if v, ok := req.Params[k]; ok {
+				return fmt.Sprintf("%v", v)
+			}
+			return ""
+		}
+		pf := func(k string) float64 {
+			if v, ok := req.Params[k]; ok {
+				if f, ok := v.(float64); ok {
+					return f
+				}
+			}
+			return 0
+		}
+		switch req.Tool {
+		case "lookup_flight_route":
+			cs := strings.ToUpper(ps("callsign"))
+			if rt, ok := routes[cs]; ok {
+				writeJSON(w, rt)
+			} else {
+				notFound(w, "Route not found")
+			}
+		case "lookup_aircraft":
+			id := strings.ToUpper(ps("id"))
+			if a, ok := aircraft[id]; ok {
+				writeJSON(w, a)
+			} else if hex, ok := regToModeS[id]; ok {
+				writeJSON(w, aircraft[hex])
+			} else {
+				notFound(w, "Aircraft not found")
+			}
+		case "lookup_ship":
+			id := strings.ToUpper(ps("id"))
+			if s, ok := ships[id]; ok {
+				writeJSON(w, s)
+			} else if s, ok := shipsByCallSign[id]; ok {
+				writeJSON(w, s)
+			} else {
+				notFound(w, "Ship not found")
+			}
+		case "lookup_port":
+			id := strings.ToUpper(ps("id"))
+			if p, ok := portByLOCODE[id]; ok {
+				writeJSON(w, p)
+			} else if p, ok := portByWPI[id]; ok {
+				writeJSON(w, p)
+			} else {
+				notFound(w, "Port not found")
+			}
+		case "sea_distance":
+			origin := ps("port")
+			key := strings.ToUpper(origin)
+			rts := seaRoutesByOrigin[key]
+			if len(rts) == 0 {
+				for k, v := range seaRoutesByOrigin {
+					if strings.EqualFold(k, origin) || strings.Contains(strings.ToUpper(k), key) {
+						rts = v
+						break
+					}
+				}
+			}
+			if len(rts) == 0 {
+				notFound(w, "Origin port not found")
+				return
+			}
+			var ports, junctions []SeaRoute
+			for _, rt := range rts {
+				if rt.Type == "junction" {
+					junctions = append(junctions, rt)
+				} else {
+					ports = append(ports, rt)
+				}
+			}
+			writeJSON(w, map[string]any{"origin": rts[0].Origin, "destinations": ports, "junctions": junctions})
+		case "nearby_ports":
+			lat, lon, radius := pf("lat"), pf("lon"), pf("radius_km")
+			if radius == 0 {
+				radius = 50
+			}
+			type portDist struct {
+				Port     *Seaport `json:"port"`
+				Distance float64  `json:"distance_km"`
+			}
+			var results []portDist
+			for i := range seaports {
+				d := haversineKm(lat, lon, seaports[i].Lat, seaports[i].Lon)
+				if d <= radius {
+					results = append(results, portDist{&seaports[i], math.Round(d*10) / 10})
+				}
+			}
+			sort.Slice(results, func(i, j int) bool { return results[i].Distance < results[j].Distance })
+			if len(results) > 20 {
+				results = results[:20]
+			}
+			writeJSON(w, map[string]any{"lat": lat, "lon": lon, "radius_km": radius, "count": len(results), "ports": results})
+		case "search_sea_routes":
+			q := strings.ToUpper(ps("query"))
+			var matches []string
+			for k := range seaRoutesByOrigin {
+				if strings.Contains(strings.ToUpper(k), q) {
+					matches = append(matches, k)
+				}
+			}
+			sort.Strings(matches)
+			if len(matches) > 50 {
+				matches = matches[:50]
+			}
+			writeJSON(w, map[string]any{"query": ps("query"), "count": len(matches), "ports": matches})
+		default:
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"unknown tool"}`))
+		}
+	})
+
+	mux.HandleFunc("/v1/mcp", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(mcpManifest)
+	})
+
+	// === Batch v1 ===
+
+	mux.HandleFunc("/v1/batch/routes", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var req struct {
+			Callsigns []string `json:"callsigns"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"invalid JSON"}`))
+			return
+		}
+		if len(req.Callsigns) > 100 {
+			req.Callsigns = req.Callsigns[:100]
+		}
+		results := make([]any, len(req.Callsigns))
+		for i, cs := range req.Callsigns {
+			if rt, ok := routes[strings.ToUpper(cs)]; ok {
+				results[i] = rt
+			}
+		}
+		writeJSON(w, results)
+	})
+
+	mux.HandleFunc("/v1/batch/ships", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var req struct {
+			MMSIs []string `json:"mmsis"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"invalid JSON"}`))
+			return
+		}
+		if len(req.MMSIs) > 100 {
+			req.MMSIs = req.MMSIs[:100]
+		}
+		results := make([]any, len(req.MMSIs))
+		for i, m := range req.MMSIs {
+			if s, ok := ships[m]; ok {
+				results[i] = s
+			}
+		}
+		writeJSON(w, results)
 	})
 
 	// === Apply middleware: logging → CORS → rate limit → mux ===
