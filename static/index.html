@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HPR Traffic API — Demo</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--port-major:#f97316;--port-large:#facc15;--port-medium:#22d3ee;--port-small:#94a3b8;--lane-major:#ef4444;--lane-middle:#f59e0b;--lane-minor:#6b7280}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+#map{position:absolute;inset:0}
+.panel{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:12px;backdrop-filter:blur(12px);padding:16px;z-index:10;max-height:80vh;overflow-y:auto}
+.panel h2{font-size:14px;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.stats-panel{top:12px;left:12px;width:240px}
+.stats-panel .stat{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stats-panel .stat span:last-child{color:var(--accent);font-weight:600}
+.search-panel{top:12px;left:50%;transform:translateX(-50%);width:360px;padding:10px 14px}
+.search-panel input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:14px;outline:none}
+.search-panel input:focus{border-color:var(--accent)}
+.search-panel .results{margin-top:8px;font-size:13px}
+.search-panel .results .item{padding:6px 4px;border-bottom:1px solid var(--border);cursor:pointer}
+.search-panel .results .item:hover{color:var(--accent)}
+.card-panel{bottom:12px;right:12px;width:320px;display:none}
+.card-panel.show{display:block}
+.card-panel .port-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.card-panel .port-meta{font-size:12px;color:var(--muted);margin-bottom:8px}
+.card-panel .field{display:flex;justify-content:space-between;padding:3px 0;font-size:13px}
+.card-panel .field span:first-child{color:var(--muted)}
+.legend{position:absolute;bottom:12px;left:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;z-index:10}
+.legend div{display:flex;align-items:center;gap:6px;margin:3px 0}
+.legend .dot{width:10px;height:10px;border-radius:50%}
+.legend .line{width:16px;height:3px;border-radius:2px}
+.brand{position:absolute;top:12px;right:12px;z-index:10;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px}
+.brand a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div class="panel stats-panel" id="stats"></div>
+
+<div class="panel search-panel">
+  <input type="text" id="search" placeholder="Search ports, ships (MMSI), flights (callsign)...">
+  <div class="results" id="results"></div>
+</div>
+
+<div class="panel card-panel" id="card"></div>
+
+<div class="legend">
+  <div><span class="dot" style="background:var(--port-major)"></span> Major port</div>
+  <div><span class="dot" style="background:var(--port-large)"></span> Large port</div>
+  <div><span class="dot" style="background:var(--port-medium)"></span> Medium port</div>
+  <div><span class="dot" style="background:var(--port-small)"></span> Small port</div>
+  <div style="margin-top:6px"><span class="line" style="background:var(--lane-major)"></span> Major lane</div>
+  <div><span class="line" style="background:var(--lane-middle)"></span> Middle lane</div>
+  <div><span class="line" style="background:var(--lane-minor)"></span> Minor lane</div>
+</div>
+
+<div class="brand">
+  <a href="https://hpradar.com">HPRadar</a> Traffic API
+</div>
+
+<script>
+const API='';
+const map=new maplibregl.Map({
+  container:'map',
+  style:{version:8,sources:{'carto':{type:'raster',tiles:['https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'],tileSize:256,attribution:'© CartoDB © OpenStreetMap'}},layers:[{id:'bg',type:'raster',source:'carto'}]},
+  center:[20,20],zoom:2,attributionControl:false
+});
+map.addControl(new maplibregl.NavigationControl(),'bottom-right');
+map.addControl(new maplibregl.AttributionControl({compact:true}));
+
+map.on('load',async()=>{
+  // Load shipping lanes
+  const lanes=await fetch(API+'/v1/shipping-lanes').then(r=>r.json());
+  map.addSource('lanes',{type:'geojson',data:lanes});
+  map.addLayer({id:'lanes-major',type:'line',source:'lanes',filter:['==',['get','type'],'Major'],paint:{'line-color':'#ef4444','line-width':1.5,'line-opacity':0.6}});
+  map.addLayer({id:'lanes-middle',type:'line',source:'lanes',filter:['==',['get','type'],'Middle'],paint:{'line-color':'#f59e0b','line-width':1,'line-opacity':0.4}});
+  map.addLayer({id:'lanes-minor',type:'line',source:'lanes',filter:['==',['get','type'],'Minor'],paint:{'line-color':'#6b7280','line-width':0.5,'line-opacity':0.3}});
+
+  // Load ports
+  const ports=await fetch(API+'/v1/ports/geojson').then(r=>r.json());
+  map.addSource('ports',{type:'geojson',data:ports});
+  map.addLayer({id:'ports',type:'circle',source:'ports',paint:{
+    'circle-radius':['match',['get','port_size'],'Major',6,'Large',4.5,'Medium',3,2],
+    'circle-color':['match',['get','port_size'],'Major','#f97316','Large','#facc15','Medium','#22d3ee','#94a3b8'],
+    'circle-stroke-width':0.5,'circle-stroke-color':'#fff','circle-opacity':0.85
+  }});
+
+  // Sea routes arc source
+  map.addSource('arcs',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'arcs',type:'line',source:'arcs',paint:{'line-color':'#58a6ff','line-width':1.5,'line-opacity':0.7}});
+
+  // Port click
+  map.on('click','ports',async(e)=>{
+    const p=e.features[0].properties;
+    showCard(p);
+    const name=p.name;
+    try{
+      const sr=await fetch(API+'/v1/sea-routes/from/'+encodeURIComponent(name)).then(r=>r.json());
+      if(sr.destinations)drawArcs(e.features[0].geometry.coordinates,sr.destinations,ports);
+    }catch(e){}
+  });
+  map.on('mouseenter','ports',()=>map.getCanvas().style.cursor='pointer');
+  map.on('mouseleave','ports',()=>map.getCanvas().style.cursor='');
+});
+
+function showCard(p){
+  const c=document.getElementById('card');
+  c.classList.add('show');
+  c.innerHTML=`<h2>Port Details</h2>
+    <div class="port-name">${p.name}</div>
+    <div class="port-meta">${p.country}${p.locode?' · '+p.locode:''}${p.zone_code?' · '+p.zone_code:''}</div>
+    ${field('Size',p.port_size)}${field('Max Vessel',p.max_vessel_size)}
+    ${p.channel_depth_m?field('Channel',p.channel_depth_m+'m'):''}
+    ${p.cargo_depth_m?field('Cargo Depth',p.cargo_depth_m+'m'):''}
+    ${p.wpi_id?field('WPI ID',p.wpi_id):''}`;
+}
+function field(k,v){return `<div class="field"><span>${k}</span><span>${v||'—'}</span></div>`}
+
+function drawArcs(origin,destinations,portsGeo){
+  const features=[];
+  for(const d of destinations.slice(0,30)){
+    // Find destination port coordinates
+    const dp=portsGeo.features.find(f=>f.properties.name===d.destination);
+    if(!dp)continue;
+    const dest=dp.geometry.coordinates;
+    features.push({type:'Feature',geometry:{type:'LineString',coordinates:[origin,dest]},properties:{distance:d.distance_nm}});
+  }
+  map.getSource('arcs').setData({type:'FeatureCollection',features});
+}
+
+// Stats
+(async()=>{
+  const s=await fetch(API+'/v1/stats').then(r=>r.json());
+  const el=document.getElementById('stats');
+  el.innerHTML=`<h2>Datasets</h2>`+
+    Object.entries(s).map(([k,v])=>`<div class="stat"><span>${k.replace(/_/g,' ')}</span><span>${typeof v==='number'?v.toLocaleString():v}</span></div>`).join('');
+})();
+
+// Search
+let searchTimeout;
+document.getElementById('search').addEventListener('input',(e)=>{
+  clearTimeout(searchTimeout);
+  const q=e.target.value.trim();
+  if(q.length<2){document.getElementById('results').innerHTML='';return}
+  searchTimeout=setTimeout(()=>doSearch(q),300);
+});
+
+async function doSearch(q){
+  const res=document.getElementById('results');
+  const items=[];
+  // Try port search
+  try{
+    const sr=await fetch(API+'/v1/sea-routes/search?q='+encodeURIComponent(q)).then(r=>r.json());
+    if(sr&&sr.length)sr.slice(0,5).forEach(p=>items.push({text:`🚢 ${p}`,type:'port',name:p}));
+  }catch(e){}
+  // Try as MMSI (all digits)
+  if(/^\d{5,}$/.test(q)){
+    try{
+      const ship=await fetch(API+'/v1/ships/'+q).then(r=>{if(r.ok)return r.json();return null});
+      if(ship)items.unshift({text:`🚢 ${ship.name} (${ship.mmsi})`,type:'ship',data:ship});
+    }catch(e){}
+  }
+  // Try as callsign
+  if(/^[A-Z]{2,4}\d/.test(q.toUpperCase())){
+    try{
+      const rt=await fetch(API+'/v1/routes/'+q.toUpperCase()).then(r=>{if(r.ok)return r.json();return null});
+      if(rt)items.unshift({text:`✈️ ${rt.callsign}: ${rt.airport_codes}`,type:'route',data:rt});
+    }catch(e){}
+  }
+  res.innerHTML=items.length?items.map(i=>`<div class="item" data-type="${i.type}" data-name="${i.name||''}">${i.text}</div>`).join(''):'<div style="color:var(--muted);padding:4px">No results</div>';
+}
+</script>
+</body>
+</html>

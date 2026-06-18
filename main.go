@@ -1,9 +1,11 @@
 package main
 
 import (
+	"embed"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"math"
 	"net/http"
@@ -14,6 +16,9 @@ import (
 	"sync"
 	"time"
 )
+
+//go:embed static/*
+var staticFiles embed.FS
 
 // ===================== MIDDLEWARE =====================
 
@@ -1066,6 +1071,37 @@ func main() {
 			}
 		}
 		writeJSON(w, results)
+	})
+
+	// === Ports GeoJSON (for map demo) ===
+	mux.HandleFunc("/v1/ports/geojson", func(w http.ResponseWriter, r *http.Request) {
+		type feat struct {
+			Type string         `json:"type"`
+			Geom map[string]any `json:"geometry"`
+			Prop map[string]any `json:"properties"`
+		}
+		features := make([]feat, 0, len(seaports))
+		for i := range seaports {
+			p := &seaports[i]
+			features = append(features, feat{
+				Type: "Feature",
+				Geom: map[string]any{"type": "Point", "coordinates": []float64{p.Lon, p.Lat}},
+				Prop: map[string]any{"name": p.Name, "country": p.Country, "port_size": p.PortSize, "locode": p.LOCODE, "zone_code": p.ZoneCode, "wpi_id": p.WPIID, "max_vessel_size": p.MaxVesselSize, "channel_depth_m": p.ChannelDepth, "cargo_depth_m": p.CargoDepth},
+			})
+		}
+		writeJSON(w, map[string]any{"type": "FeatureCollection", "features": features})
+	})
+
+	// === Static demo app ===
+	sub, _ := fs.Sub(staticFiles, "static")
+	fileServer := http.FileServer(http.FS(sub))
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" && r.URL.Path != "/index.html" {
+			http.NotFound(w, r)
+			return
+		}
+		r.URL.Path = "/"
+		fileServer.ServeHTTP(w, r)
 	})
 
 	// === Apply middleware: logging → CORS → rate limit → mux ===
