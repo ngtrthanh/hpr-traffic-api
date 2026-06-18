@@ -1,12 +1,16 @@
+name: hpr-api-route
 services:
   api-route-go:
+    container_name: hpr-api-route
     build: .
     ports:
-      - "5736:8081"
+      - "5737:8081"
     security_opt:
       - apparmor:unconfined
+    networks:
+      - hpradar-net
 
 networks:
-  default:
+  hpradar-net:
     external: true
-    name: api-route_default
+

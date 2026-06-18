@@ -1,3 +1,3 @@
-module api-route-go
+module hpr-traffic-api
 
-go 1.22
+go 1.24
