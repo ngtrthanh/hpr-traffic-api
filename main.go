@@ -1092,16 +1092,38 @@ func main() {
 		writeJSON(w, map[string]any{"type": "FeatureCollection", "features": features})
 	})
 
+	// === Airports GeoJSON (for map demo) ===
+	mux.HandleFunc("/v1/airports/geojson", func(w http.ResponseWriter, r *http.Request) {
+		type feat struct {
+			Type string         `json:"type"`
+			Geom map[string]any `json:"geometry"`
+			Prop map[string]any `json:"properties"`
+		}
+		features := make([]feat, 0, len(airports))
+		for _, a := range airports {
+			features = append(features, feat{
+				Type: "Feature",
+				Geom: map[string]any{"type": "Point", "coordinates": []float64{a.Lon, a.Lat}},
+				Prop: map[string]any{"icao": a.ICAO, "iata": a.IATA, "name": a.Name, "city": a.City, "country": a.Country, "route_count": len(byAirport[a.ICAO])},
+			})
+		}
+		writeJSON(w, map[string]any{"type": "FeatureCollection", "features": features})
+	})
+
 	// === Static demo app ===
 	sub, _ := fs.Sub(staticFiles, "static")
 	fileServer := http.FileServer(http.FS(sub))
+	mux.Handle("/css/", fileServer)
+	mux.Handle("/js/", fileServer)
+	mux.Handle("/mapstyles/", fileServer)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" && r.URL.Path != "/index.html" {
 			http.NotFound(w, r)
 			return
 		}
-		r.URL.Path = "/"
-		fileServer.ServeHTTP(w, r)
+		f, _ := staticFiles.ReadFile("static/index.html")
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write(f)
 	})
 
 	// === Apply middleware: logging → CORS → rate limit → mux ===
