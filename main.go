@@ -1,13 +1,18 @@
 package main
 
 import (
+	"container/heap"
+	"crypto/sha1"
 	"embed"
+	"encoding/base64"
+	"encoding/binary"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/fs"
 	"log"
 	"math"
+	"net"
 	"net/http"
 	"os"
 	"sort"
@@ -216,6 +221,8 @@ type Seaport struct {
 	VesselCountDryBulk int     `json:"vessel_count_dry_bulk,omitempty"`
 	VesselCountTanker  int     `json:"vessel_count_tanker,omitempty"`
 	IndustryTop1       string  `json:"industry_top1,omitempty"`
+	TEUThousands       int     `json:"teu_thousands,omitempty"`
+	CountryCode        string  `json:"country_code,omitempty"`
 }
 
 type SeaRoute struct {
@@ -239,6 +246,11 @@ type Ship struct {
 
 // ===================== DATA STORES =====================
 
+type SeaDistancePort struct {
+	Lat float64
+	Lon float64
+}
+
 var (
 	aircraft    map[string]Aircraft
 	regToModeS  map[string]string
@@ -254,6 +266,7 @@ var (
 	portsByCountry map[string][]*Seaport
 	portsByZone  map[string][]*Seaport
 	seaRoutesByOrigin map[string][]SeaRoute
+	seaDistancePorts  map[string]SeaDistancePort
 	shippingLanesJSON []byte
 	ships          map[string]*Ship
 	shipsByCallSign map[string]*Ship
@@ -397,6 +410,14 @@ func loadSeaports(path string) error {
 		vc, _ := strconv.Atoi(rec[17])
 		vb, _ := strconv.Atoi(rec[18])
 		vk, _ := strconv.Atoi(rec[19])
+		var teu int
+		if len(rec) > 21 && rec[21] != "" {
+			teu, _ = strconv.Atoi(rec[21])
+		}
+		var cc string
+		if len(rec) > 22 {
+			cc = rec[22]
+		}
 		sp := Seaport{
 			WPIID: rec[0], Name: rec[1], Country: rec[2], State: rec[3],
 			Lat: lat, Lon: lon,
@@ -405,7 +426,7 @@ func loadSeaports(path string) error {
 			TidalRange: tid, EntranceRestriction: rec[13],
 			LOCODE: rec[14], ZoneCode: rec[15],
 			VesselCountTotal: vt, VesselCountContainer: vc, VesselCountDryBulk: vb, VesselCountTanker: vk,
-			IndustryTop1: rec[20],
+			IndustryTop1: rec[20], TEUThousands: teu, CountryCode: cc,
 		}
 		seaports = append(seaports, sp)
 		ptr := &seaports[len(seaports)-1]
@@ -443,6 +464,27 @@ func loadSeaRoutes(path string) error {
 	return nil
 }
 
+func loadSeaDistancePorts(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	r := csv.NewReader(f)
+	r.Read()
+	seaDistancePorts = make(map[string]SeaDistancePort, 2000)
+	for {
+		rec, err := r.Read()
+		if err != nil {
+			break
+		}
+		lat, _ := strconv.ParseFloat(rec[1], 64)
+		lon, _ := strconv.ParseFloat(rec[2], 64)
+		seaDistancePorts[strings.ToUpper(rec[0])] = SeaDistancePort{lat, lon}
+	}
+	return nil
+}
+
 func loadShippingLanes(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -451,6 +493,236 @@ func loadShippingLanes(path string) error {
 	shippingLanesJSON = data
 	return nil
 }
+
+// ===================== MARNET SEA ROUTING GRAPH =====================
+
+// Node index type for the graph
+type nodeID int32
+
+// Graph edge with distance (nm) and intermediate coordinates for rendering
+type graphEdge struct {
+	to     nodeID
+	dist   float64
+	coords [][2]float64 // full polyline [lon,lat] pairs including endpoints
+}
+
+var (
+	marnetNodes [][2]float64  // [lon,lat] per node
+	marnetAdj   [][]graphEdge // adjacency list
+	marnetGrid  map[[2]int][]nodeID // spatial grid for nearest-node lookup (1-degree cells)
+	marnetJSON  []byte // raw GeoJSON for serving as lanes
+)
+
+// quantize coord to grid cell
+func gridKey(lon, lat float64) [2]int {
+	return [2]int{int(math.Floor(lon)), int(math.Floor(lat))}
+}
+
+func loadMarnet(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	marnetJSON = data
+	var gj struct {
+		Features []struct {
+			Geometry struct {
+				Coordinates [][]float64 `json:"coordinates"`
+			} `json:"geometry"`
+		} `json:"features"`
+	}
+	if err := json.Unmarshal(data, &gj); err != nil {
+		return err
+	}
+
+	// Build node index (deduplicate by rounded coords)
+	nodeMap := make(map[[2]int32]nodeID)
+	getNode := func(lon, lat float64) nodeID {
+		// Round to ~11m precision
+		key := [2]int32{int32(math.Round(lon * 1e4)), int32(math.Round(lat * 1e4))}
+		if id, ok := nodeMap[key]; ok {
+			return id
+		}
+		id := nodeID(len(marnetNodes))
+		nodeMap[key] = id
+		marnetNodes = append(marnetNodes, [2]float64{lon, lat})
+		marnetAdj = append(marnetAdj, nil)
+		return id
+	}
+
+	for _, feat := range gj.Features {
+		coords := feat.Geometry.Coordinates
+		if len(coords) < 2 {
+			continue
+		}
+		a := getNode(coords[0][0], coords[0][1])
+		b := getNode(coords[len(coords)-1][0], coords[len(coords)-1][1])
+		// Compute edge length in nm (sum of segments)
+		dist := 0.0
+		for i := 1; i < len(coords); i++ {
+			dist += haversineNM(coords[i-1][1], coords[i-1][0], coords[i][1], coords[i][0])
+		}
+		// Store polyline coords
+		poly := make([][2]float64, len(coords))
+		for i, c := range coords {
+			poly[i] = [2]float64{c[0], c[1]}
+		}
+		polyRev := make([][2]float64, len(coords))
+		for i, c := range poly {
+			polyRev[len(poly)-1-i] = c
+		}
+		marnetAdj[a] = append(marnetAdj[a], graphEdge{to: b, dist: dist, coords: poly})
+		marnetAdj[b] = append(marnetAdj[b], graphEdge{to: a, dist: dist, coords: polyRev})
+	}
+
+	// Build spatial grid
+	marnetGrid = make(map[[2]int][]nodeID, len(marnetNodes)/4)
+	for i, nd := range marnetNodes {
+		k := gridKey(nd[0], nd[1])
+		marnetGrid[k] = append(marnetGrid[k], nodeID(i))
+	}
+
+	fmt.Printf("  marnet: %d nodes, %d edges\n", len(marnetNodes), len(gj.Features))
+	return nil
+}
+
+func haversineNM(lat1, lon1, lat2, lon2 float64) float64 {
+	const deg2rad = math.Pi / 180
+	dLat := (lat2 - lat1) * deg2rad
+	dLon := (lon2 - lon1) * deg2rad
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
+		math.Cos(lat1*deg2rad)*math.Cos(lat2*deg2rad)*math.Sin(dLon/2)*math.Sin(dLon/2)
+	return 2 * 3440.065 * math.Asin(math.Sqrt(a)) // 3440.065 nm = earth radius in nm
+}
+
+// greatCircleArc returns a series of [lon,lat] points along the great circle between two points.
+// Uses SLERP (spherical linear interpolation). Number of segments scales with distance.
+func greatCircleArc(lat1, lon1, lat2, lon2 float64) [][]float64 {
+	const deg2rad = math.Pi / 180
+	const rad2deg = 180 / math.Pi
+	φ1, λ1 := lat1*deg2rad, lon1*deg2rad
+	φ2, λ2 := lat2*deg2rad, lon2*deg2rad
+
+	// Angular distance
+	d := math.Acos(math.Sin(φ1)*math.Sin(φ2) + math.Cos(φ1)*math.Cos(φ2)*math.Cos(λ2-λ1))
+	if d < 1e-10 {
+		return [][]float64{{lon1, lat1}, {lon2, lat2}}
+	}
+
+	// Segments: 1 per ~200nm, min 2 max 64
+	nm := d * 3440.065
+	n := int(nm/200) + 1
+	if n < 2 {
+		n = 2
+	}
+	if n > 64 {
+		n = 64
+	}
+
+	pts := make([][]float64, n+1)
+	for i := 0; i <= n; i++ {
+		f := float64(i) / float64(n)
+		a := math.Sin((1-f)*d) / math.Sin(d)
+		b := math.Sin(f*d) / math.Sin(d)
+		x := a*math.Cos(φ1)*math.Cos(λ1) + b*math.Cos(φ2)*math.Cos(λ2)
+		y := a*math.Cos(φ1)*math.Sin(λ1) + b*math.Cos(φ2)*math.Sin(λ2)
+		z := a*math.Sin(φ1) + b*math.Sin(φ2)
+		lat := math.Atan2(z, math.Sqrt(x*x+y*y)) * rad2deg
+		lon := math.Atan2(y, x) * rad2deg
+		pts[i] = []float64{lon, lat}
+	}
+	return pts
+}
+
+// Find nearest graph node to given lon,lat within search radius
+func nearestNode(lon, lat float64) (nodeID, float64) {
+	bestDist := math.MaxFloat64
+	bestNode := nodeID(-1)
+	cx, cy := int(math.Floor(lon)), int(math.Floor(lat))
+	for dx := -2; dx <= 2; dx++ {
+		for dy := -2; dy <= 2; dy++ {
+			for _, nid := range marnetGrid[[2]int{cx + dx, cy + dy}] {
+				d := haversineNM(lat, lon, marnetNodes[nid][1], marnetNodes[nid][0])
+				if d < bestDist {
+					bestDist = d
+					bestNode = nid
+				}
+			}
+		}
+	}
+	return bestNode, bestDist
+}
+
+// Priority queue for Dijkstra
+type pqItem struct {
+	node nodeID
+	dist float64
+	idx  int
+}
+type pq []*pqItem
+
+func (h pq) Len() int            { return len(h) }
+func (h pq) Less(i, j int) bool  { return h[i].dist < h[j].dist }
+func (h pq) Swap(i, j int)       { h[i], h[j] = h[j], h[i]; h[i].idx = i; h[j].idx = j }
+func (h *pq) Push(x any)         { it := x.(*pqItem); it.idx = len(*h); *h = append(*h, it) }
+func (h *pq) Pop() any           { old := *h; it := old[len(old)-1]; *h = old[:len(old)-1]; return it }
+
+// Dijkstra returns shortest path as polyline coords and total distance in nm
+func dijkstraRoute(from, to nodeID) ([][2]float64, float64) {
+	n := len(marnetNodes)
+	dist := make([]float64, n)
+	prev := make([]nodeID, n)
+	prevEdge := make([]int, n) // index into adj list for path reconstruction
+	for i := range dist {
+		dist[i] = math.MaxFloat64
+		prev[i] = -1
+	}
+	dist[from] = 0
+
+	h := &pq{{node: from, dist: 0}}
+	heap.Init(h)
+
+	for h.Len() > 0 {
+		cur := heap.Pop(h).(*pqItem)
+		if cur.node == to {
+			break
+		}
+		if cur.dist > dist[cur.node] {
+			continue
+		}
+		for ei, e := range marnetAdj[cur.node] {
+			nd := cur.dist + e.dist
+			if nd < dist[e.to] {
+				dist[e.to] = nd
+				prev[e.to] = cur.node
+				prevEdge[e.to] = ei
+				heap.Push(h, &pqItem{node: e.to, dist: nd})
+			}
+		}
+	}
+
+	if dist[to] == math.MaxFloat64 {
+		return nil, 0
+	}
+
+	// Reconstruct path
+	var path [][2]float64
+	for cur := to; cur != from; cur = prev[cur] {
+		edge := marnetAdj[prev[cur]][prevEdge[cur]]
+		// edge.coords goes from prev[cur] → cur, append in reverse order (skip last to avoid dup)
+		for i := len(edge.coords) - 1; i >= 1; i-- {
+			path = append(path, edge.coords[i])
+		}
+	}
+	// Add start node
+	path = append(path, marnetNodes[from])
+	// Reverse to get from→to order
+	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
+		path[i], path[j] = path[j], path[i]
+	}
+	return path, dist[to]
+}
+
 
 func loadShips(path string) error {
 	f, err := os.Open(path)
@@ -528,6 +800,172 @@ func paginate(rts []Route, limit, offset int) []Route {
 	return rts[offset:end]
 }
 
+// ===================== WEBSOCKET HELPERS =====================
+
+func computeAcceptKey(key string) string {
+	h := sha1.New()
+	h.Write([]byte(key + "258EAFA5-E914-47DA-95CA-5AB0A17FE6E5"))
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+}
+
+func writeWSFrame(conn net.Conn, payload []byte) {
+	// Binary frame, FIN=1, opcode=2
+	hdr := []byte{0x82}
+	n := len(payload)
+	if n < 126 {
+		hdr = append(hdr, byte(n))
+	} else if n < 65536 {
+		hdr = append(hdr, 126, byte(n>>8), byte(n))
+	} else {
+		hdr = append(hdr, 127, 0, 0, 0, 0, byte(n>>24), byte(n>>16), byte(n>>8), byte(n))
+	}
+	conn.Write(hdr)
+	conn.Write(payload)
+}
+
+func readWSFrame(conn net.Conn) ([]byte, error) {
+	hdr := make([]byte, 2)
+	if _, err := conn.Read(hdr); err != nil {
+		return nil, err
+	}
+	masked := hdr[1]&0x80 != 0
+	length := int(hdr[1] & 0x7F)
+	if length == 126 {
+		ext := make([]byte, 2)
+		conn.Read(ext)
+		length = int(ext[0])<<8 | int(ext[1])
+	} else if length == 127 {
+		ext := make([]byte, 8)
+		conn.Read(ext)
+		length = int(ext[4])<<24 | int(ext[5])<<16 | int(ext[6])<<8 | int(ext[7])
+	}
+	var mask [4]byte
+	if masked {
+		conn.Read(mask[:])
+	}
+	data := make([]byte, length)
+	if length > 0 {
+		total := 0
+		for total < length {
+			n, err := conn.Read(data[total:])
+			if err != nil {
+				return nil, err
+			}
+			total += n
+		}
+		if masked {
+			for i := range data {
+				data[i] ^= mask[i%4]
+			}
+		}
+	}
+	return data, nil
+}
+
+func buildPortsBinary() []byte {
+	strMap := make(map[string]uint16)
+	var strList []string
+	addStr := func(s string) uint16 {
+		if idx, ok := strMap[s]; ok {
+			return idx
+		}
+		idx := uint16(len(strList))
+		strMap[s] = idx
+		strList = append(strList, s)
+		return idx
+	}
+	sizeMap := map[string]uint8{"Major": 5, "Large": 4, "Medium": 3, "Small": 2, "Minor": 1, "Very Small": 0}
+	type bp struct{ lat, lon int32; size uint8; ni, ci uint16; flags uint8; teu uint16 }
+	pts := make([]bp, len(seaports))
+	for i := range seaports {
+		p := &seaports[i]
+		cs := p.Country
+		if p.CountryCode != "" {
+			cs = p.Country + "|" + p.CountryCode
+		}
+		pts[i] = bp{int32(p.Lat * 1e6), int32(p.Lon * 1e6), sizeMap[p.PortSize], addStr(p.Name), addStr(cs), 0, uint16(p.TEUThousands)}
+		if p.LOCODE != "" {
+			pts[i].flags |= 0x01
+		}
+	}
+	stSize := 2
+	for _, s := range strList {
+		stSize += 2 + len(s)
+	}
+	buf := make([]byte, 16+len(pts)*16+stSize)
+	copy(buf[0:4], "HPRA")
+	buf[4] = 1; buf[5] = 1
+	binary.LittleEndian.PutUint16(buf[6:8], uint16(len(pts)))
+	binary.LittleEndian.PutUint32(buf[8:12], uint32(16+len(pts)*16))
+	off := 16
+	for _, pt := range pts {
+		binary.LittleEndian.PutUint32(buf[off:], uint32(pt.lat))
+		binary.LittleEndian.PutUint32(buf[off+4:], uint32(pt.lon))
+		buf[off+8] = pt.size
+		binary.LittleEndian.PutUint16(buf[off+9:], pt.ni)
+		binary.LittleEndian.PutUint16(buf[off+11:], pt.ci)
+		buf[off+13] = pt.flags
+		binary.LittleEndian.PutUint16(buf[off+14:], pt.teu)
+		off += 16
+	}
+	binary.LittleEndian.PutUint16(buf[off:], uint16(len(strList)))
+	off += 2
+	for _, s := range strList {
+		binary.LittleEndian.PutUint16(buf[off:], uint16(len(s)))
+		off += 2
+		copy(buf[off:], s)
+		off += len(s)
+	}
+	return buf[:off]
+}
+
+func buildAirportsBinary() []byte {
+	strMap := make(map[string]uint16)
+	var strList []string
+	addStr := func(s string) uint16 {
+		if idx, ok := strMap[s]; ok {
+			return idx
+		}
+		idx := uint16(len(strList))
+		strMap[s] = idx
+		strList = append(strList, s)
+		return idx
+	}
+	type ba struct{ lat, lon int32; ni, ii, ai, rc uint16 }
+	pts := make([]ba, 0, len(airports))
+	for _, a := range airports {
+		pts = append(pts, ba{int32(a.Lat * 1e6), int32(a.Lon * 1e6), addStr(a.Name), addStr(a.ICAO), addStr(a.IATA), uint16(len(byAirport[a.ICAO]))})
+	}
+	stSize := 2
+	for _, s := range strList {
+		stSize += 2 + len(s)
+	}
+	buf := make([]byte, 16+len(pts)*16+stSize)
+	copy(buf[0:4], "HPRA")
+	buf[4] = 1; buf[5] = 2
+	binary.LittleEndian.PutUint16(buf[6:8], uint16(len(pts)))
+	binary.LittleEndian.PutUint32(buf[8:12], uint32(16+len(pts)*16))
+	off := 16
+	for _, pt := range pts {
+		binary.LittleEndian.PutUint32(buf[off:], uint32(pt.lat))
+		binary.LittleEndian.PutUint32(buf[off+4:], uint32(pt.lon))
+		binary.LittleEndian.PutUint16(buf[off+8:], pt.ni)
+		binary.LittleEndian.PutUint16(buf[off+10:], pt.ii)
+		binary.LittleEndian.PutUint16(buf[off+12:], pt.ai)
+		binary.LittleEndian.PutUint16(buf[off+14:], pt.rc)
+		off += 16
+	}
+	binary.LittleEndian.PutUint16(buf[off:], uint16(len(strList)))
+	off += 2
+	for _, s := range strList {
+		binary.LittleEndian.PutUint16(buf[off:], uint16(len(s)))
+		off += 2
+		copy(buf[off:], s)
+		off += len(s)
+	}
+	return buf[:off]
+}
+
 // ===================== MAIN =====================
 
 func main() {
@@ -542,7 +980,9 @@ func main() {
 		{"routes", loadRoutes, "routes.csv"},
 		{"seaports", loadSeaports, "seaports.csv"},
 		{"sea_routes", loadSeaRoutes, "sea_distances.csv"},
+		{"sea_distance_ports", loadSeaDistancePorts, "sea_distance_ports.csv"},
 		{"shipping_lanes", loadShippingLanes, "shipping_lanes.geojson"},
+		{"marnet", loadMarnet, "marnet.geojson"},
 		{"ships", loadShips, "ships.csv"},
 	} {
 		if err := l.fn(l.path); err != nil {
@@ -799,9 +1239,10 @@ func main() {
 		key := strings.ToUpper(origin)
 		rts := seaRoutesByOrigin[key]
 		if len(rts) == 0 {
-			// Try case-sensitive match
+			keyNoSpc := strings.ReplaceAll(key, " ", "")
 			for k, v := range seaRoutesByOrigin {
-				if strings.EqualFold(k, origin) || strings.Contains(strings.ToUpper(k), key) {
+				ku := strings.ToUpper(k)
+				if strings.Contains(ku, key) || strings.Contains(strings.ReplaceAll(ku, " ", ""), keyNoSpc) {
 					rts = v
 					break
 				}
@@ -847,9 +1288,138 @@ func main() {
 		writeJSON(w, map[string]any{"query": q, "count": len(matches), "ports": matches})
 	})
 
+	mux.HandleFunc("/v1/sea-routes/geojson", func(w http.ResponseWriter, r *http.Request) {
+		from := r.URL.Query().Get("from")
+		if from == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"from parameter required"}`))
+			return
+		}
+		key := strings.ToUpper(from)
+		origin, ok := seaDistancePorts[key]
+		if !ok {
+			// Fallback: partial match (also try without spaces)
+			keyNoSpc := strings.ReplaceAll(key, " ", "")
+			for k, v := range seaDistancePorts {
+				if strings.Contains(k, key) || strings.Contains(strings.ReplaceAll(k, " ", ""), keyNoSpc) {
+					origin = v
+					key = k
+					ok = true
+					break
+				}
+			}
+		}
+		if !ok {
+			notFound(w, "Origin port not found in distance ports")
+			return
+		}
+		rts := seaRoutesByOrigin[key]
+		if len(rts) == 0 {
+			keyNoSpc := strings.ReplaceAll(key, " ", "")
+			for k, v := range seaRoutesByOrigin {
+				ku := strings.ToUpper(k)
+				if strings.Contains(ku, key) || strings.Contains(strings.ReplaceAll(ku, " ", ""), keyNoSpc) {
+					rts = v
+					break
+				}
+			}
+		}
+		if len(rts) == 0 {
+			notFound(w, "No routes from this origin")
+			return
+		}
+		type feat struct {
+			Type string         `json:"type"`
+			Geom map[string]any `json:"geometry"`
+			Prop map[string]any `json:"properties"`
+		}
+		var features []feat
+		for _, rt := range rts {
+			dest, ok := seaDistancePorts[strings.ToUpper(rt.Destination)]
+			if !ok {
+				continue
+			}
+			features = append(features, feat{
+				Type: "Feature",
+				Geom: map[string]any{"type": "LineString", "coordinates": [][]float64{{origin.Lon, origin.Lat}, {dest.Lon, dest.Lat}}},
+				Prop: map[string]any{"origin": rt.Origin, "destination": rt.Destination, "distance_nm": rt.DistanceNM, "type": rt.Type},
+			})
+		}
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{"type": "FeatureCollection", "features": features})
+	})
+
 	mux.HandleFunc("/v1/shipping-lanes", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/geo+json")
 		w.Write(shippingLanesJSON)
+	})
+
+	// Marnet network as lanes visualization (alternative to CIA data)
+	mux.HandleFunc("/v1/shipping-lanes/marnet", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/geo+json")
+		w.Write(marnetJSON)
+	})
+
+	// Sea route (Dijkstra on marnet graph)
+	mux.HandleFunc("/v1/sea-routes/route", func(w http.ResponseWriter, r *http.Request) {
+		fromStr := r.URL.Query().Get("from")
+		toStr := r.URL.Query().Get("to")
+		if fromStr == "" || toStr == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"from and to parameters required (lat,lon)"}`))
+			return
+		}
+		parsePt := func(s string) (float64, float64, bool) {
+			parts := strings.SplitN(s, ",", 2)
+			if len(parts) != 2 {
+				return 0, 0, false
+			}
+			lat, e1 := strconv.ParseFloat(strings.TrimSpace(parts[0]), 64)
+			lon, e2 := strconv.ParseFloat(strings.TrimSpace(parts[1]), 64)
+			if e1 != nil || e2 != nil {
+				return 0, 0, false
+			}
+			return lat, lon, true
+		}
+		fromLat, fromLon, ok1 := parsePt(fromStr)
+		toLat, toLon, ok2 := parsePt(toStr)
+		if !ok1 || !ok2 {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"invalid coordinates, use lat,lon format"}`))
+			return
+		}
+		srcNode, srcDist := nearestNode(fromLon, fromLat)
+		dstNode, dstDist := nearestNode(toLon, toLat)
+		if srcNode < 0 || dstNode < 0 || srcDist > 200 || dstDist > 200 {
+			w.WriteHeader(404)
+			w.Write([]byte(`{"error":"no graph node within 200nm of given coordinates"}`))
+			return
+		}
+		path, dist := dijkstraRoute(srcNode, dstNode)
+		if path == nil {
+			w.WriteHeader(404)
+			w.Write([]byte(`{"error":"no route found between these points"}`))
+			return
+		}
+		// Build GeoJSON LineString
+		coords := make([][]float64, len(path))
+		for i, p := range path {
+			coords[i] = []float64{p[0], p[1]} // already [lon,lat]
+		}
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"type": "Feature",
+			"geometry": map[string]any{
+				"type":        "LineString",
+				"coordinates": coords,
+			},
+			"properties": map[string]any{
+				"distance_nm":   math.Round(dist*10) / 10,
+				"from_snap_nm":  math.Round(srcDist*10) / 10,
+				"to_snap_nm":    math.Round(dstDist*10) / 10,
+				"nodes_in_path": len(path),
+			},
+		})
 	})
 
 	// === Ships v1 ===
@@ -1108,6 +1678,138 @@ func main() {
 			})
 		}
 		writeJSON(w, map[string]any{"type": "FeatureCollection", "features": features})
+	})
+
+	// === HPR-Atlas Binary WebSocket (/ws) ===
+	// Streams binary frames: ports snapshot on connect, then on-demand queries
+	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		// Upgrade to WebSocket (stdlib, no deps)
+		if r.Header.Get("Upgrade") != "websocket" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"websocket upgrade required"}`))
+			return
+		}
+		w.Header().Set("Upgrade", "websocket")
+		w.Header().Set("Connection", "Upgrade")
+		w.Header().Set("Sec-WebSocket-Accept", computeAcceptKey(r.Header.Get("Sec-WebSocket-Key")))
+		w.Header().Set("Sec-WebSocket-Protocol", "hpra-v1")
+		w.WriteHeader(101)
+		hj, ok := w.(http.Hijacker)
+		if !ok {
+			return
+		}
+		conn, buf, err := hj.Hijack()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		buf.Flush()
+
+		// Send ports binary snapshot as first frame
+		portsBin := buildPortsBinary()
+		writeWSFrame(conn, portsBin)
+
+		// Read loop: client can request specific data
+		for {
+			msg, err := readWSFrame(conn)
+			if err != nil {
+				break
+			}
+			if len(msg) == 0 {
+				continue
+			}
+			switch msg[0] {
+			case 0x01: // request airports binary
+				writeWSFrame(conn, buildAirportsBinary())
+			case 0x02: // request lanes (raw geojson bytes)
+				writeWSFrame(conn, shippingLanesJSON)
+			case 0x09: // ping
+				writeWSFrame(conn, []byte{0x0A}) // pong
+			}
+		}
+	})
+
+	// === HPR-Atlas Binary Protocol (P6) ===
+	// Packs port/airport data into compact binary:
+	// Header: "HPRA" (4B) + version (1B) + type (1B) + count (2B) + string_table_offset (4B) + reserved (4B) = 16B
+	// Points: lat_i32 (4B) + lon_i32 (4B) + size_u8 (1B) + name_idx (2B) + country_idx (2B) + flags (1B) + teu_u16 (2B) = 16B each
+	// String table: count_u16 + [len_u16 + utf8 bytes]...
+
+	mux.HandleFunc("/v1/ports/bin", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("X-HPRA-Format", "ports-v1")
+		w.Write(buildPortsBinary())
+	})
+
+	mux.HandleFunc("/v1/airports/bin", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("X-HPRA-Format", "airports-v1")
+		w.Write(buildAirportsBinary())
+	})
+
+	// Air lanes: great-circle arcs for routes from/to an airport
+	mux.HandleFunc("/v1/air-lanes/geojson", func(w http.ResponseWriter, r *http.Request) {
+		icao := strings.ToUpper(r.URL.Query().Get("icao"))
+		if icao == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"icao parameter required"}`))
+			return
+		}
+		ap, ok := airports[icao]
+		if !ok {
+			notFound(w, "Airport not found")
+			return
+		}
+		rts := byAirport[icao]
+		limit := 200
+		if l := r.URL.Query().Get("limit"); l != "" {
+			if v, err := strconv.Atoi(l); err == nil && v > 0 && v < 1000 {
+				limit = v
+			}
+		}
+		type feat struct {
+			Type string         `json:"type"`
+			Geom map[string]any `json:"geometry"`
+			Prop map[string]any `json:"properties"`
+		}
+		var features []feat
+		count := 0
+		seen := make(map[string]bool)
+		for _, rt := range rts {
+			if count >= limit {
+				break
+			}
+			parts := strings.Split(rt.AirportCodes, "-")
+			// Find the other end
+			var destICAO string
+			for _, p := range parts {
+				if p != icao {
+					destICAO = p
+					break
+				}
+			}
+			if destICAO == "" || seen[destICAO] {
+				continue
+			}
+			seen[destICAO] = true
+			dest, ok := airports[destICAO]
+			if !ok {
+				continue
+			}
+			coords := greatCircleArc(ap.Lat, ap.Lon, dest.Lat, dest.Lon)
+			features = append(features, feat{
+				Type: "Feature",
+				Geom: map[string]any{"type": "LineString", "coordinates": coords},
+				Prop: map[string]any{
+					"from": icao, "to": destICAO,
+					"airline":     rt.AirlineCode,
+					"distance_nm": math.Round(haversineNM(ap.Lat, ap.Lon, dest.Lat, dest.Lon)*10) / 10,
+				},
+			})
+			count++
+		}
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{"type": "FeatureCollection", "features": features, "airport": ap.Name})
 	})
 
 	// === Static demo app ===

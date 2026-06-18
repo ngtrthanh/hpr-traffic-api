@@ -64,6 +64,9 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 .btn-icon svg{width:16px;height:16px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 
+/* ── View (below topbar) ── */
+#view-map{position:relative;flex:1}
+
 /* ── Left rail ── */
 #rail{position:absolute;left:var(--map-edge);top:var(--map-edge);z-index:22;pointer-events:auto;display:flex;flex-direction:column;gap:2px;padding:var(--s1);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(8px)}
 .rail-btn{display:flex;flex-direction:column;align-items:center;gap:2px;width:56px;padding:7px 2px;background:none;border:none;border-radius:var(--r);color:var(--text2);cursor:pointer;transition:all .12s}
@@ -146,6 +149,19 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 .endpoint-row .path{font-family:ui-monospace,monospace;font-size:var(--fs-xs);color:var(--text)}
 .tool-row{padding:3px 0;font-size:var(--fs-sm);color:var(--text2)}
 .tool-row b{color:var(--text);font-weight:600}
+
+/* ── Drag & Pin ── */
+.drag-handle{cursor:grab;display:flex;align-items:center;gap:4px;padding:2px 6px;border-radius:var(--r-sm);user-select:none;-webkit-user-select:none}
+.drag-handle:active{cursor:grabbing}
+.drag-handle svg{width:14px;height:14px;color:var(--text3)}
+.pin-btn{width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:var(--r-sm);color:var(--text3);cursor:pointer;flex-shrink:0;transition:color .15s}
+.pin-btn:hover{color:var(--text)}
+.pin-btn.pinned{color:var(--accent)}
+.pin-btn svg{width:14px;height:14px}
+.draggable.pinned{outline:1px dashed color-mix(in srgb,var(--accent) 40%,transparent)}
+.draggable.dragged{transform:none!important;transition:none!important}
+.panel-toolbar{display:flex;align-items:center;gap:2px;padding:2px 4px;border-bottom:1px solid var(--border);flex-shrink:0}
+.panel-toolbar .spacer{flex:1}
 
 /* ── MapLibre controls ── */
 .maplibregl-ctrl-top-right{top:calc(var(--topbar-h) + 10px)!important;right:10px!important;padding:0!important}

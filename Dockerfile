@@ -9,4 +9,5 @@ WORKDIR /app
 COPY --from=build /app .
 COPY *.csv .
 COPY shipping_lanes.geojson .
+COPY marnet.geojson .
 CMD ["./app"]
