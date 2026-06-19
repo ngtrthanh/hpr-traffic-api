@@ -1541,14 +1541,24 @@ func main() {
 	})
 
 	mux.HandleFunc("/v1/ports/", func(w http.ResponseWriter, r *http.Request) {
-		id := strings.ToUpper(r.URL.Path[len("/v1/ports/"):])
-		if p, ok := portByLOCODE[id]; ok {
+		id := r.URL.Path[len("/v1/ports/"):]
+		idU := strings.ToUpper(id)
+		if p, ok := portByLOCODE[idU]; ok {
 			writeJSON(w, p)
 			return
 		}
 		if p, ok := portByWPI[id]; ok {
 			writeJSON(w, p)
 			return
+		}
+		// Fallback: name match
+		idN := strings.ReplaceAll(strings.ReplaceAll(idU, " ", ""), "-", "")
+		for i := range seaports {
+			n := strings.ToUpper(seaports[i].Name)
+			if n == idU || strings.Contains(strings.ReplaceAll(strings.ReplaceAll(n, " ", ""), "-", ""), idN) {
+				writeJSON(w, &seaports[i])
+				return
+			}
 		}
 		notFound(w, "Port not found")
 	})
