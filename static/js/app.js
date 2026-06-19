@@ -302,10 +302,14 @@ function cardField(k, v) { return v ? `<div class="sf"><span class="k">${k}</spa
 function showPortCard(p) {
   document.getElementById('pcardIcon').textContent = '⚓';
   document.getElementById('pcardName').textContent = p.name;
-  document.getElementById('pcardType').textContent = p.port_size;
+  document.getElementById('pcardType').textContent = p.port_size || 'Seaport';
   document.getElementById('pcardMeta').innerHTML = [p.flag, p.country, p.locode, p.zone_code].filter(Boolean).join(' · ');
   const teuStr = p.teu_thousands ? `${p.teu_thousands.toLocaleString()}k TEU` : '';
+  const photoId = 'port-photo-' + Date.now();
   document.getElementById('pcardBody').innerHTML = `
+    <div class="sc-section" style="padding:0;overflow:hidden;border-radius:var(--r-lg) var(--r-lg) 0 0">
+      <div id="${photoId}" style="height:100px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--border) 100%);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:32px;position:relative;overflow:hidden">⚓</div>
+    </div>
     <div class="sc-section"><div class="st">Port Details</div>
       ${cardField('Country', (p.flag || '') + ' ' + (p.country || ''))}
       ${cardField('LOCODE', p.locode)}${cardField('Zone', p.zone_code)}
@@ -313,25 +317,47 @@ function showPortCard(p) {
       ${cardField('Channel Depth', p.channel_depth_m ? p.channel_depth_m + ' m' : '')}
       ${cardField('Cargo Depth', p.cargo_depth_m ? p.cargo_depth_m + ' m' : '')}
     </div><div class="sc-section" id="seaRoutesSection" style="display:none"><div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">Loading...</div></div>`;
-  const apiUrl = p.locode ? `/v1/ports/${p.locode}` : `/v1/ports/${p.wpi_id}`;
-  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="togglePortRoutes('${p.name}', this)">Show Routes</button><a class="act" href="${API}${apiUrl}" target="_blank">API</a><button class="act" onclick="toggleJson('${apiUrl}', this)">JSON</button>`;
+  const apiUrl = p.locode ? `/v1/ports/${p.locode}` : (p.wpi_id ? `/v1/ports/${p.wpi_id}` : `/v1/ports/${encodeURIComponent(p.name)}`);
+  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="togglePortRoutes('${p.name.replace(/'/g,"\\'")}', this)">Show Routes</button><a class="act" href="${API}${apiUrl}" target="_blank">API</a><button class="act" onclick="toggleJson('${apiUrl}', this)">JSON</button>`;
   openCard();
   // Fetch full port details to enrich card
   fetch(API + apiUrl).then(r => r.ok ? r.json() : null).then(full => {
     if (!full) return;
     const body = document.getElementById('pcardBody');
     if (!body) return;
-    const section = body.querySelector('.sc-section');
+    const section = body.querySelectorAll('.sc-section')[1];
     if (!section) return;
     let extra = '';
-    if (full.vessel_count_total) extra += cardField('Vessels (total)', full.vessel_count_total.toLocaleString());
-    if (full.vessel_count_container) extra += cardField('Container vessels', full.vessel_count_container.toLocaleString());
-    if (full.vessel_count_dry_bulk) extra += cardField('Bulk carriers', full.vessel_count_dry_bulk.toLocaleString());
-    if (full.vessel_count_tanker) extra += cardField('Tankers', full.vessel_count_tanker.toLocaleString());
-    if (full.industry_top1) extra += cardField('Main industry', full.industry_top1);
-    if (full.anchorage_depth_m) extra += cardField('Anchorage', full.anchorage_depth_m + ' m');
-    if (full.tidal_range_m) extra += cardField('Tidal range', full.tidal_range_m + ' m');
+    if (full.function) {
+      const fn = full.function;
+      const services = [];
+      if (fn[0]==='1') services.push('Seaport');
+      if (fn[1]==='2') services.push('Rail terminal');
+      if (fn[2]==='3') services.push('Road terminal');
+      if (fn[3]==='4') services.push('Airport');
+      if (fn[4]==='5') services.push('Postal');
+      if (fn[5]==='6') services.push('Multimodal');
+      if (fn[6]==='7') services.push('Fixed transport');
+      if (fn[7]==='B') services.push('Border crossing');
+      if (services.length) extra += cardField('Services', services.join(', '));
+    }
+    if (full.status) {
+      const statusMap = {AI:'Approved (international)',AA:'Approved (national)',AF:'Approved (foreign)',AS:'Approved (subdivision)',RL:'Recognized location',RQ:'Under review',QQ:'Not verified',AC:'Approved (customs)',NGA:'NGA source'};
+      extra += cardField('Status', statusMap[full.status] || full.status);
+    }
     if (extra) section.innerHTML += extra;
+    // Try to load Wikipedia image for major ports
+    if (p.teu_thousands > 500 || p.port_size === 'Major') {
+      const wikiName = (p.name.charAt(0) + p.name.slice(1).toLowerCase()).replace(/ /g, '_');
+      const photoEl = document.getElementById(photoId);
+      if (photoEl) {
+        const img = new Image();
+        img.style = 'width:100%;height:100%;object-fit:cover;opacity:0.8';
+        img.onerror = () => {};
+        img.src = `https://commons.wikimedia.org/wiki/Special:FilePath/Port_of_${wikiName}.jpg`;
+        img.onload = () => { photoEl.innerHTML = ''; photoEl.appendChild(img); };
+      }
+    }
   }).catch(() => {});
 }
 
@@ -879,17 +905,11 @@ function showIntroCard() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0">
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">🚢 Marine</div>
-          <div style="font-size:11px;color:var(--text2);line-height:1.8">
-            <div>747k vessels</div><div>17.7k seaports</div><div>29.5k sea lanes</div>
-            <div>98 operators</div><div>44 notable ships</div><div>Dijkstra routing</div>
-          </div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.8" id="intro-marine">Loading...</div>
         </div>
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">✈ Aviation</div>
-          <div style="font-size:11px;color:var(--text2);line-height:1.8">
-            <div>566k aircraft</div><div>9.2k airports</div><div>521k flight routes</div>
-            <div>2,111 airlines</div><div>Multi-hop graph</div><div>Great-circle arcs</div>
-          </div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.8" id="intro-air">Loading...</div>
         </div>
       </div>
     </div>
@@ -922,6 +942,14 @@ function showIntroCard() {
     </div>
     </div>
     <div class="sc-actions"><a class="act" href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank">⭐ GitHub</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a><a class="act" href="https://hpradar.com" target="_blank">HPRadar</a></div>`;
+  // Populate stats from API
+  fetch(API + '/v1/stats').then(r => r.json()).then(s => {
+    const fmt = n => n >= 1000000 ? (n/1000000).toFixed(0)+'M' : n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'')+'k' : n;
+    const m = document.getElementById('intro-marine');
+    const a = document.getElementById('intro-air');
+    if (m) m.innerHTML = `<div>${fmt(s.maritime?.ships||0)} vessels</div><div>${fmt(s.maritime?.seaports||0)} seaports</div><div>${fmt(s.maritime?.companies||0)} operators</div><div>Dijkstra routing</div><div>29.5k sea lanes</div>`;
+    if (a) a.innerHTML = `<div>${fmt(s.aviation?.aircraft||0)} aircraft</div><div>${fmt(s.aviation?.airports||0)} airports</div><div>${fmt(s.aviation?.routes||0)} flight routes</div><div>${fmt(s.aviation?.airlines||0)} airlines</div><div>Multi-hop graph</div>`;
+  }).catch(() => {});
 }
 
 // List stays closed until user opens it
