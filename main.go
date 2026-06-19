@@ -2186,6 +2186,185 @@ func main() {
 		}
 	})
 
+	// === Universal Search & Discovery ===
+
+	mux.HandleFunc("/v1/search", func(w http.ResponseWriter, r *http.Request) {
+		q := strings.TrimSpace(r.URL.Query().Get("q"))
+		if q == "" || len(q) < 2 {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"q parameter required (min 2 chars)"}`))
+			return
+		}
+		qu := strings.ToUpper(q)
+		qn := strings.ReplaceAll(qu, " ", "")
+		limit := 20
+		type result struct {
+			Type string `json:"type"`
+			Name string `json:"name"`
+			Code string `json:"code"`
+			CC   string `json:"country_code,omitempty"`
+			Lat  float64 `json:"lat,omitempty"`
+			Lon  float64 `json:"lon,omitempty"`
+		}
+		var results []result
+		// Ports
+		for i := range seaports {
+			if len(results) >= limit { break }
+			p := &seaports[i]
+			if !p.Active { continue }
+			if strings.Contains(strings.ToUpper(p.Name), qu) || strings.Contains(p.LOCODE, qu) {
+				results = append(results, result{"port", p.Name, p.LOCODE, p.CountryCode, p.Lat, p.Lon})
+			}
+		}
+		// Airports
+		for _, a := range airports {
+			if len(results) >= limit { break }
+			if strings.Contains(strings.ToUpper(a.Name), qu) || a.ICAO == qu || a.IATA == qu || strings.Contains(qn, strings.ReplaceAll(strings.ToUpper(a.Name), " ", "")) {
+				results = append(results, result{"airport", a.Name, a.ICAO, a.Country, a.Lat, a.Lon})
+			}
+		}
+		// Ships (by MMSI or name prefix)
+		if len(results) < limit {
+			if s, ok := ships[q]; ok {
+				results = append(results, result{"ship", s.Name, s.MMSI, s.CountryCode, 0, 0})
+			} else {
+				count := 0
+				for _, s := range ships {
+					if count >= 5 { break }
+					if strings.Contains(strings.ToUpper(s.Name), qu) {
+						results = append(results, result{"ship", s.Name, s.MMSI, s.CountryCode, 0, 0})
+						count++
+					}
+				}
+			}
+		}
+		writeJSON(w, map[string]any{"query": q, "results": results})
+	})
+
+	mux.HandleFunc("/v1/ports/top", func(w http.ResponseWriter, r *http.Request) {
+		limit := 50
+		if l := r.URL.Query().Get("limit"); l != "" {
+			if v, _ := strconv.Atoi(l); v > 0 && v <= 200 { limit = v }
+		}
+		type portItem struct {
+			LOCODE  string `json:"locode"`
+			Name    string `json:"name"`
+			CC      string `json:"country_code"`
+			TEU     int    `json:"teu_thousands"`
+			Size    string `json:"port_size"`
+		}
+		var items []portItem
+		for i := range seaports {
+			if seaports[i].TEUThousands > 0 {
+				p := &seaports[i]
+				items = append(items, portItem{p.LOCODE, p.Name, p.CountryCode, p.TEUThousands, p.PortSize})
+			}
+		}
+		sort.Slice(items, func(i, j int) bool { return items[i].TEU > items[j].TEU })
+		if len(items) > limit { items = items[:limit] }
+		writeJSON(w, items)
+	})
+
+	mux.HandleFunc("/v1/airports/top", func(w http.ResponseWriter, r *http.Request) {
+		limit := 50
+		if l := r.URL.Query().Get("limit"); l != "" {
+			if v, _ := strconv.Atoi(l); v > 0 && v <= 200 { limit = v }
+		}
+		type apItem struct {
+			ICAO   string `json:"icao"`
+			IATA   string `json:"iata"`
+			Name   string `json:"name"`
+			CC     string `json:"country_code"`
+			Routes int    `json:"routes"`
+		}
+		var items []apItem
+		for icao, rts := range byAirport {
+			if ap, ok := airports[icao]; ok {
+				items = append(items, apItem{icao, ap.IATA, ap.Name, ap.Country, len(rts)})
+			}
+		}
+		sort.Slice(items, func(i, j int) bool { return items[i].Routes > items[j].Routes })
+		if len(items) > limit { items = items[:limit] }
+		writeJSON(w, items)
+	})
+
+	mux.HandleFunc("/v1/ports/search", func(w http.ResponseWriter, r *http.Request) {
+		q := strings.TrimSpace(r.URL.Query().Get("q"))
+		if q == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"q parameter required"}`))
+			return
+		}
+		qu := strings.ToUpper(q)
+		qn := strings.ReplaceAll(strings.ReplaceAll(qu, " ", ""), "-", "")
+		var results []map[string]any
+		for i := range seaports {
+			if len(results) >= 20 { break }
+			p := &seaports[i]
+			if !p.Active { continue }
+			n := strings.ToUpper(p.Name)
+			if strings.Contains(n, qu) || strings.Contains(p.LOCODE, qu) || strings.Contains(strings.ReplaceAll(n, " ", ""), qn) {
+				results = append(results, map[string]any{"locode": p.LOCODE, "name": p.Name, "country_code": p.CountryCode, "lat": p.Lat, "lon": p.Lon, "port_size": p.PortSize, "teu_thousands": p.TEUThousands})
+			}
+		}
+		writeJSON(w, results)
+	})
+
+	mux.HandleFunc("/v1/airports/search", func(w http.ResponseWriter, r *http.Request) {
+		q := strings.TrimSpace(r.URL.Query().Get("q"))
+		if q == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"q parameter required"}`))
+			return
+		}
+		qu := strings.ToUpper(q)
+		var results []map[string]any
+		for _, a := range airports {
+			if len(results) >= 20 { break }
+			if a.ICAO == qu || a.IATA == qu || strings.Contains(strings.ToUpper(a.Name), qu) || strings.Contains(strings.ToUpper(a.City), qu) {
+				results = append(results, map[string]any{"icao": a.ICAO, "iata": a.IATA, "name": a.Name, "city": a.City, "country_code": a.Country, "lat": a.Lat, "lon": a.Lon, "type": a.Type, "routes": len(byAirport[a.ICAO])})
+			}
+		}
+		writeJSON(w, results)
+	})
+
+	mux.HandleFunc("/v1/airports/nearby", func(w http.ResponseWriter, r *http.Request) {
+		latS := r.URL.Query().Get("lat")
+		lonS := r.URL.Query().Get("lon")
+		if latS == "" || lonS == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"lat and lon required"}`))
+			return
+		}
+		lat, _ := strconv.ParseFloat(latS, 64)
+		lon, _ := strconv.ParseFloat(lonS, 64)
+		radius := 100.0
+		if rs := r.URL.Query().Get("radius_km"); rs != "" {
+			if v, _ := strconv.ParseFloat(rs, 64); v > 0 { radius = v }
+		}
+		radiusNM := radius / 1.852
+		limit := 20
+		type nearby struct {
+			ICAO string  `json:"icao"`
+			IATA string  `json:"iata"`
+			Name string  `json:"name"`
+			CC   string  `json:"country_code"`
+			Lat  float64 `json:"lat"`
+			Lon  float64 `json:"lon"`
+			Dist float64 `json:"distance_km"`
+		}
+		var results []nearby
+		for _, a := range airports {
+			d := haversineNM(lat, lon, a.Lat, a.Lon)
+			if d <= radiusNM {
+				results = append(results, nearby{a.ICAO, a.IATA, a.Name, a.Country, a.Lat, a.Lon, math.Round(d*1.852*10) / 10})
+			}
+		}
+		sort.Slice(results, func(i, j int) bool { return results[i].Dist < results[j].Dist })
+		if len(results) > limit { results = results[:limit] }
+		writeJSON(w, results)
+	})
+
 	// === MCP v1 ===
 
 	mcpManifest, _ := json.Marshal(map[string]any{
