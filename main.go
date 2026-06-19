@@ -2652,6 +2652,8 @@ func main() {
 		}
 	})
 
+	mux.HandleFunc("/ws/hub", handleWSHub)
+
 	// === HPR-Atlas Binary Protocol (P6) ===
 	// Packs port/airport data into compact binary:
 	// Header: "HPRA" (4B) + version (1B) + type (1B) + count (2B) + string_table_offset (4B) + reserved (4B) = 16B
