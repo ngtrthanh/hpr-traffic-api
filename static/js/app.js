@@ -244,12 +244,6 @@ function setupPortInteractions() {
     const p = e.features[0].properties;
     showPortCard(p);
     map.flyTo({ center: e.lngLat, zoom: Math.max(map.getZoom(), 6), duration: 800 });
-    // Fetch sea routes
-    try {
-      const sr = await fetch(API + '/v1/sea-routes/from/' + encodeURIComponent(p.name)).then(r => r.json());
-      if (sr && sr.destinations) drawArcs(e.features[0].geometry.coordinates, sr.destinations, p.name);
-      renderSeaRoutesInCard(sr);
-    } catch (e) {}
   });
   map.on('mouseenter', 'ports', (e) => {
     map.getCanvas().style.cursor = 'pointer';
@@ -279,29 +273,14 @@ function setupAirportInteractions() {
   map.on('mouseleave', 'airports', () => { map.getCanvas().style.cursor = ''; if (popup) { popup.remove(); popup = null; } });
 }
 
-async function drawArcs(origin, destinations, portName) {
-  // Use Dijkstra sea router for real curved paths
+function drawArcs(origin, destinations, portName) {
   const features = [];
-  const dests = (destinations || []).slice(0, 20);
-  const promises = dests.map(async d => {
-    if (!portsData) return null;
+  for (const d of (destinations || []).slice(0, 40)) {
+    if (!portsData) break;
     const dp = portsData.features.find(f => f.properties.name === d.destination);
-    if (!dp) return null;
-    const [dLon, dLat] = dp.geometry.coordinates;
-    try {
-      const resp = await fetch(`${API}/v1/sea-routes/route?from=${origin[1]},${origin[0]}&to=${dLat},${dLon}`);
-      if (resp.ok) {
-        const gj = await resp.json();
-        gj.properties.dest = d.destination;
-        gj.properties.distance = d.distance_nm;
-        return gj;
-      }
-    } catch(e) {}
-    // Fallback: straight line
-    return { type: 'Feature', geometry: { type: 'LineString', coordinates: [origin, dp.geometry.coordinates] }, properties: { distance: d.distance_nm, dest: d.destination } };
-  });
-  const results = await Promise.all(promises);
-  for (const f of results) if (f) features.push(f);
+    if (!dp) continue;
+    features.push({ type: 'Feature', geometry: { type: 'LineString', coordinates: [origin, dp.geometry.coordinates] }, properties: { distance: d.distance_nm, dest: d.destination } });
+  }
   const src = map.getSource('arcs');
   if (src) src.setData({ type: 'FeatureCollection', features });
 }
@@ -324,15 +303,35 @@ function showPortCard(p) {
   document.getElementById('pcardName').textContent = p.name;
   document.getElementById('pcardType').textContent = p.port_size;
   document.getElementById('pcardMeta').innerHTML = [p.flag, p.country, p.locode, p.zone_code].filter(Boolean).join(' · ');
+  const teuStr = p.teu_thousands ? `${p.teu_thousands.toLocaleString()}k TEU` : '';
   document.getElementById('pcardBody').innerHTML = `
     <div class="sc-section"><div class="st">Port Details</div>
-      ${cardField('Max Vessel', p.max_vessel_size)}${cardField('Channel Depth', p.channel_depth_m ? p.channel_depth_m + ' m' : '')}
-      ${cardField('Cargo Depth', p.cargo_depth_m ? p.cargo_depth_m + ' m' : '')}${cardField('WPI ID', p.wpi_id)}
+      ${cardField('Country', (p.flag || '') + ' ' + (p.country || ''))}
       ${cardField('LOCODE', p.locode)}${cardField('Zone', p.zone_code)}
-    </div><div class="sc-section" id="seaRoutesSection"><div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">Loading...</div></div>`;
+      ${cardField('TEU Throughput', teuStr)}${cardField('Max Vessel', p.max_vessel_size)}
+      ${cardField('Channel Depth', p.channel_depth_m ? p.channel_depth_m + ' m' : '')}
+      ${cardField('Cargo Depth', p.cargo_depth_m ? p.cargo_depth_m + ' m' : '')}
+    </div><div class="sc-section" id="seaRoutesSection" style="display:none"><div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">Loading...</div></div>`;
   const apiUrl = p.locode ? `/v1/ports/${p.locode}` : `/v1/ports/${p.wpi_id}`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="${API}${apiUrl}" target="_blank">Try API</a><button class="act" onclick="viewJson('${apiUrl}')">View JSON</button>`;
+  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="togglePortRoutes('${p.name}', this)">Show Routes</button><a class="act" href="${API}${apiUrl}" target="_blank">API</a><button class="act" onclick="toggleJson('${apiUrl}', this)">JSON</button>`;
   openCard();
+  // Fetch full port details to enrich card
+  fetch(API + apiUrl).then(r => r.ok ? r.json() : null).then(full => {
+    if (!full) return;
+    const body = document.getElementById('pcardBody');
+    if (!body) return;
+    const section = body.querySelector('.sc-section');
+    if (!section) return;
+    let extra = '';
+    if (full.vessel_count_total) extra += cardField('Vessels (total)', full.vessel_count_total.toLocaleString());
+    if (full.vessel_count_container) extra += cardField('Container vessels', full.vessel_count_container.toLocaleString());
+    if (full.vessel_count_dry_bulk) extra += cardField('Bulk carriers', full.vessel_count_dry_bulk.toLocaleString());
+    if (full.vessel_count_tanker) extra += cardField('Tankers', full.vessel_count_tanker.toLocaleString());
+    if (full.industry_top1) extra += cardField('Main industry', full.industry_top1);
+    if (full.anchorage_depth_m) extra += cardField('Anchorage', full.anchorage_depth_m + ' m');
+    if (full.tidal_range_m) extra += cardField('Tidal range', full.tidal_range_m + ' m');
+    if (extra) section.innerHTML += extra;
+  }).catch(() => {});
 }
 
 function renderSeaRoutesInCard(sr) {
@@ -350,10 +349,12 @@ function showAirportCard(p) {
   document.getElementById('pcardMeta').innerHTML = [p.flag, p.name, p.city].filter(Boolean).join(' · ');
   document.getElementById('pcardBody').innerHTML = `
     <div class="sc-section"><div class="st">Airport Details</div>
-      ${cardField('ICAO', p.icao)}${cardField('IATA', p.iata)}${cardField('Name', p.name)}
-      ${cardField('City', p.city)}${cardField('Country', (p.flag || '') + ' ' + (p.country_code || ''))}${cardField('Routes', p.route_count)}
+      ${cardField('Country', (p.flag || '') + ' ' + (p.country_code || ''))}
+      ${cardField('ICAO', p.icao)}${cardField('IATA', p.iata)}
+      ${cardField('Name', p.name)}${cardField('City', p.city)}
+      ${cardField('Routes', p.route_count)}
     </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="${API}/v1/airports/${p.icao}" target="_blank">Try API</a><button class="act" onclick="drawAirLanes('${p.icao}')">Show Routes</button><button class="act" onclick="viewJson('/v1/airports/${p.icao}')">View JSON</button>`;
+  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="toggleAirRoutes('${p.icao}', this)">Show Routes</button><a class="act" href="${API}/v1/airports/${p.icao}" target="_blank">API</a><button class="act" onclick="toggleJson('/v1/airports/${p.icao}', this)">JSON</button>`;
   openCard();
 }
 
@@ -803,6 +804,53 @@ async function drawAirLanes(icao) {
     map.addLayer({ id: 'air-lanes-layer', type: 'line', source: 'air-lanes-src',
       paint: { 'line-color': '#a78bfa', 'line-width': 1.5, 'line-opacity': 0.6 } });
   }
+}
+
+function toggleAirRoutes(icao, btn) {
+  const src = map.getSource('air-lanes-src');
+  if (src && btn.dataset.active) {
+    src.setData({ type: 'FeatureCollection', features: [] });
+    btn.textContent = 'Show Routes';
+    delete btn.dataset.active;
+  } else {
+    drawAirLanes(icao);
+    btn.textContent = 'Hide Routes';
+    btn.dataset.active = '1';
+  }
+}
+
+async function togglePortRoutes(name, btn) {
+  const section = document.getElementById('seaRoutesSection');
+  if (btn.dataset.active) {
+    if (section) section.style.display = 'none';
+    clearArcs();
+    btn.textContent = 'Show Routes';
+    delete btn.dataset.active;
+  } else {
+    btn.textContent = 'Hide Routes';
+    btn.dataset.active = '1';
+    if (section) section.style.display = '';
+    try {
+      const sr = await fetch(API + '/v1/sea-routes/from/' + encodeURIComponent(name)).then(r => r.json());
+      if (sr && sr.destinations) {
+        const port = portsData.features.find(f => f.properties.name === name);
+        if (port) drawArcs(port.geometry.coordinates, sr.destinations, name);
+      }
+      renderSeaRoutesInCard(sr);
+    } catch(e) {}
+  }
+}
+
+async function toggleJson(url, btn) {
+  const existing = document.getElementById('jsonPreview');
+  if (existing) { existing.remove(); btn.textContent = 'JSON'; return; }
+  btn.textContent = 'Close JSON';
+  const data = await fetch(API + url).then(r => r.json());
+  const pre = document.createElement('div');
+  pre.id = 'jsonPreview';
+  pre.className = 'sc-section';
+  pre.innerHTML = `<pre style="font-size:10px;overflow:auto;max-height:200px;background:var(--surface-2);padding:8px;border-radius:4px;margin:0">${JSON.stringify(data, null, 2)}</pre>`;
+  document.getElementById('pcardBody').appendChild(pre);
 }
 
 // ═══════════════════════════════════════════════════════════════

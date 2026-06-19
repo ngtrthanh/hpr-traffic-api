@@ -1748,7 +1748,12 @@ func main() {
 	resolvePort := func(q string) *Seaport {
 		q = strings.TrimSpace(q)
 		qu := strings.ToUpper(q)
-		// Try LOCODE exact
+		qn := strings.ReplaceAll(strings.ReplaceAll(qu, " ", ""), "-", "")
+		// Try LOCODE via index
+		if p, ok := portByLOCODE[qu]; ok {
+			return p
+		}
+		// Try LOCODE in records
 		for i := range seaports {
 			if strings.ToUpper(seaports[i].LOCODE) == qu {
 				return &seaports[i]
@@ -1764,9 +1769,14 @@ func main() {
 				return &seaports[i]
 			}
 		}
-		// Fuzzy name match
+		// Fuzzy: contains or space-stripped match
 		for i := range seaports {
-			if strings.Contains(strings.ToUpper(seaports[i].Name), qu) {
+			name := strings.ToUpper(seaports[i].Name)
+			if strings.Contains(name, qu) {
+				return &seaports[i]
+			}
+			nn := strings.ReplaceAll(strings.ReplaceAll(name, " ", ""), "-", "")
+			if strings.Contains(nn, qn) || strings.Contains(qn, nn) {
 				return &seaports[i]
 			}
 		}

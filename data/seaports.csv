@@ -1400,7 +1400,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 61590,HIBI KO,Japan,Okayama,34.45,133.93,Very Small,large vessels,31.1,,42.1,,2.0,,JPTAM,AS-JAP,,,,,,,JP
 62118,HIBIKINADA,Japan,Fukuoka,33.93,130.83,Very Small,medium vessels,38.4,42.1,5.5,,1.0,other,,,6205,3,1313,970,Mineral Products,,JP
 61385,KAWASAKI KO,Japan,Kanagawa,35.5,139.77,Major,large vessels,34.7,9.1,20.1,12.8,4.0,other,,,7836,391,721,4440,Mineral Products,,JP
-57580,THANH HO CHI MINH,Vietnam,Vietnam,10.7395,106.76,Major,large vessels,38.4,27.4,16.5,27.4,4.0,tide|other,VNVIC,AS-SIN,9332,5205,805,1492,Mineral Products,9158,VN
+57580,THANH PHO HO CHI MINH,Vietnam,Vietnam,10.7395,106.76,Major,large vessels,38.4,27.4,16.5,27.4,4.0,tide|other,VNVIC,AS-SIN,9332,5205,805,1492,Mineral Products,9158,VN
 48165,AL AHMADI,Yemen,Al Hudaydah,14.83,42.97,Small,medium vessels,38.4,49.4,42.1,49.4,1.0,other,,,283,47,103,61,Mineral Products,,YE
 32470,ST MARGARETS HOPE,United Kingdom,Scotland,58.83,-2.95,Very Small,,56.7,56.7,49.4,,7.0,tide|swell|other,GBSGP,EU-NEU,,,,,,,GB
 57700,HON GAI,Vietnam,Quang Ninh,20.95,107.07,Very Small,medium vessels,42.1,34.7,23.8,38.4,2.0,tide|other,VNHLG,AS-SIN,668,15,260,239,Mineral Products,,VN

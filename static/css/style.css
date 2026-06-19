@@ -116,8 +116,8 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 .vrow .vmeta{font-size:var(--fs-xs);color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vlist-empty{padding:var(--s5);text-align:center;color:var(--text3);font-size:var(--fs-sm)}
 
-/* ── Detail card (left, beside rail) ── */
-#pcard{position:absolute;top:var(--map-edge);left:var(--vlist-left);width:var(--shipcard-w);max-height:var(--panel-h);pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:var(--fs-sm);transform:translateX(calc(-100% - 90px));transition:transform .22s ease;overflow:hidden;z-index:20}
+/* ── Detail card (right side, no overlap) ── */
+#pcard{position:absolute;top:var(--map-edge);right:var(--map-edge);width:var(--shipcard-w);max-height:var(--panel-h);pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:var(--fs-sm);transform:translateX(calc(100% + 20px));transition:transform .22s ease;overflow:hidden;z-index:20}
 #pcard.open{transform:translateX(0)}
 .sc-head{padding:var(--s3) var(--s4);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1);position:relative}
 .sc-title{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
