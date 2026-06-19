@@ -8,12 +8,12 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 15640,ACAJUTLA,El Salvador,Sonsonate,13.58,-89.83,Medium,large vessels,,34.7,12.8,31.1,2.0,,SVAQJ,NAE-CEN,661,178,186,223,Vegetable Products,,SV
 48190,ADEN,Yemen,Aden Governorate,12.78,44.95,Minor,medium vessels,27.4,23.8,16.5,23.8,1.0,tide|other,YEADE,,420,145,116,67,Vegetable Products,,YE
 45802,AGADIR,Morocco,Souss-Massa,30.43,-9.63,Major,medium vessels,42.1,27.4,,,3.0,,MAANZ,AF-NAF,640,227,94,191,Mineral Products,,MA
-11090,AGUADILLA,Puerto Rico,Puerto Rico,18.43,-67.15,Very Small,large vessels,12.8,34.7,23.8,42.1,1.0,swell|other,PRBQN,,,,,,,,
+11090,AGUADILLA,Puerto Rico,Puerto Rico,18.43,-67.15,Very Small,large vessels,12.8,34.7,23.8,42.1,1.0,swell|other,PRBQN,,,,,,,,PR
 24300,AHUS,Sweden,Skåne County,55.93,14.32,Small,medium vessels,42.1,42.1,49.4,42.1,,ice|other,SEAHU,EU-SCA,210,70,0,0,Mineral Products,,SE
 48270,AJMAN,United Arab Emirates,Ajman,25.42,55.43,Very Small,medium vessels,45.7,49.4,38.4,,2.0,,AEAJM,,363,259,0,28,Prepared Foodstuffs & Beverages,,AE
 27410,KEMI,Finland,Lapland,65.73,24.57,Small,medium vessels,38.4,45.7,23.8,38.4,1.0,ice|other,FIKEM,EU-SCA,337,51,0,51,Mineral Products,,FI
 61560,KOBE,Japan,Hyogo,34.65,135.18,Large,large vessels,27.4,27.4,23.8,27.4,2.0,other,JPUKB,AS-JAP,10594,4121,789,2490,Mineral Products,3500,JP
-48298,AL SHAHEEN TERMINAL,Qatar,Qatar,26.58,52.0,Very Small,medium vessels,,,5.5,5.5,,other,,,,,,,,,QA
+48298,AL SHAHEEN TERMINAL,Qatar,Qatar,26.58,52.0,Very Small,medium vessels,,,5.5,5.5,,other,XZSHA,,,,,,,,QA
 7720,ALBANY,United States,NY,42.65,-73.75,Minor,large vessels,38.4,42.1,34.7,42.1,5.0,tide|other,USALB,NAE-USA,55,5,18,12,,,US
 54470,ALBANY,Australia,Western Australia,-35.03,117.88,Small,medium vessels,34.7,34.7,38.4,38.4,1.0,tide|other,AUALH,OC-OCE,130,0,122,2,Vegetable Products,,AU
 31660,KINGSTON UPON HULL,United Kingdom,East Riding of Yorkshire,53.75,-0.28,Minor,large vessels,49.4,38.4,49.4,38.4,6.0,tide|other,GBHUL,EU-NEU,1886,626,53,448,Mineral Products,,GB
@@ -43,7 +43,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 10230,ANTILLA,Cuba,Holguín,20.83,-75.73,Major,large vessels,31.1,45.7,49.4,49.4,1.0,other,,,,,,,,,CU
 14660,ANTOFAGASTA,Chile,Antofagasta,-23.65,-70.42,Medium,large vessels,38.4,34.7,16.5,20.1,3.0,swell|other,CLANF,SA-WSA,322,81,188,12,Vegetable Products,,CL
 47630,ANTSIRANANA,Madagascar,Diana,-12.27,49.28,Small,large vessels,27.4,42.1,42.1,42.1,2.0,tide|other,MGDIE,,58,13,5,25,Mineral Products,,MG
-55670,APIA,Samoa,Tuamasaga,-13.82,-171.77,Very Small,large vessels,34.7,42.1,5.5,34.7,1.0,tide|swell,WSAPW,OC-OCE,191,93,0,23,Mineral Products,,
+55670,APIA,Samoa,Tuamasaga,-13.82,-171.77,Very Small,large vessels,34.7,42.1,5.5,34.7,1.0,tide|swell,WSAPW,OC-OCE,191,93,0,23,Mineral Products,,WS
 12772,ARATU,Brazil,Bahia,-12.78,-38.5,Small,large vessels,20.1,34.7,,34.7,3.0,other,BRARB,SA-ESA,752,1,233,480,Mineral Products,,BR
 62800,ARKHANGELS'K,Russia,Arkhangelsk Oblast,64.53,40.53,Minor,large vessels,42.1,42.1,38.4,42.1,1.0,tide|ice|other,,,564,17,30,160,Mineral Products,,RU
 54236,ARDROSSAN,Australia,South Australia,-34.43,137.92,Very Small,medium vessels,42.1,42.1,31.1,,3.0,tide|other,AUARD,OC-OCE,,,,,,,AU
@@ -59,7 +59,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 55060,AUCKLAND,New Zealand,Auckland,-36.845,174.775,Major,large vessels,38.4,38.4,34.7,38.4,2.0,,NZDEV,OC-OCE,914,533,122,23,Mineral Products,,NZ
 40250,AUGUSTA,Italy,Sicily,37.22,15.23,Medium,medium vessels,5.5,,9.1,23.8,,other,ITAUG,EU-SEU,1398,37,71,1164,Mineral Products,,IT
 32830,AULTBEA,United Kingdom,Scotland,57.83,-5.58,Very Small,,38.4,53.0,31.1,,11.0,tide|other,GBAUL,EU-NEU,,,,,,,GB
-55740,AVATIU,Cook Islands,Rarotonga,-21.2,-159.78,Very Small,medium vessels,49.4,49.4,5.5,49.4,1.0,swell|other,CKRAR,OC-OCE,34,5,0,11,,,
+55740,AVATIU,Cook Islands,Rarotonga,-21.2,-159.78,Very Small,medium vessels,49.4,49.4,5.5,49.4,1.0,swell|other,CKRAR,OC-OCE,34,5,0,11,,,CK
 37970,AVEIRO,Portugal,Aveiro,40.65,-8.65,Minor,medium vessels,45.7,38.4,34.7,,3.0,tide|other,PTAVE,EU-SEU,961,64,93,240,Mineral Products,,PT
 37600,AVILES,Spain,Asturias,43.6,-5.93,Small,medium vessels,38.4,34.7,31.1,,3.0,tide|swell|other,ESAVS,EU-SEU,586,30,67,71,Mineral Products,,ES
 16480,MARTINEZ,United States,California,38.03,-122.13,Very Small,large vessels,38.4,,,38.4,4.0,,USBNC,NAW-USA,280,0,9,102,Mineral Products,,US
@@ -83,14 +83,14 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 50925,BANTEN,Indonesia,Banten,-6.02,105.97,Very Small,medium vessels,27.4,27.4,12.8,20.1,,other,IDCIW,AS-SIN,1482,4,502,734,Mineral Products,,ID
 34260,BANTRY,Ireland,County Cork,51.68,-9.45,Very Small,large vessels,38.4,38.4,9.1,9.1,4.0,,IEBTH,EU-NEU,0,0,0,0,,,IE
 41640,BAR,Montenegro,Montenegro,42.08,19.08,Medium,large vessels,20.1,38.4,5.5,31.1,1.0,other,MEBAR,EU-BLA,254,74,32,24,Mineral Products,,ME
-11690,BRIDGETOWN,Barbados,Saint Michael,13.1,-59.63,Medium,large vessels,31.1,34.7,42.1,31.1,1.0,swell,BBBGI,NAE-CAR,638,229,36,137,Mineral Products,,
+11690,BRIDGETOWN,Barbados,Saint Michael,13.1,-59.63,Medium,large vessels,31.1,34.7,42.1,31.1,1.0,swell,BBBGI,NAE-CAR,638,229,36,137,Mineral Products,,BB
 38550,BARCELONA,Spain,Catalonia,41.355,2.155,Large,large vessels,38.4,23.8,5.5,,1.0,swell|other,ESBCN,EU-SEU,4557,2189,127,1054,Mineral Products,2900,ES
 40530,BARI,Italy,Apulia,41.13,16.87,Medium,medium vessels,34.7,34.7,38.4,31.1,,tide|swell|other,ITBRI,EU-SEU,564,84,57,1,Mineral Products,,IT
 57570,VUNG TAU,Vietnam,Ba Ria-Vung Tau,10.35,107.07,Small,large vessels,42.1,42.1,31.1,27.4,1.0,,VNVUT,AS-SIN,365,10,25,183,Mineral Products,,VN
 53450,GLADSTONE,Australia,Queensland,-23.85,151.25,Small,medium vessels,42.1,38.4,27.4,34.7,3.0,other,AUGLT,OC-OCE,1817,17,1217,523,Mineral Products,,AU
 11930,BARRANQUILLA,Colombia,Atlántico,10.97,-74.77,Minor,large vessels,42.1,38.4,34.7,,2.0,swell|other,COBAQ,,1064,309,359,202,Mineral Products,,CO
 34990,BARRY,United Kingdom,Wales,51.4,-3.27,Minor,medium vessels,56.7,42.1,38.4,42.1,10.0,other,GBBAD,EU-NEU,39,0,0,33,Mineral Products,,GB
-11400,BASSETERRE,Saint Kitts and Nevis,St. Kitts,17.3,-62.72,Medium,large vessels,9.1,42.1,9.1,49.4,,tide|swell,KNBAS,NAE-CAR,267,65,0,85,Mineral Products,,
+11400,BASSETERRE,Saint Kitts and Nevis,St. Kitts,17.3,-62.72,Medium,large vessels,9.1,42.1,9.1,49.4,,tide|swell,KNBAS,NAE-CAR,267,65,0,85,Mineral Products,,KN
 39060,BASTIA,France,Corsica,42.7,9.45,Very Small,medium vessels,20.1,42.1,5.5,38.4,1.0,other,FRBIA,EU-SEU,,,,,,,FR
 57768,BASUO,China,Hainan,19.1,108.62,Small,medium vessels,42.1,42.1,34.7,42.1,2.0,tide|swell|other,,,549,0,95,445,Mineral Products,,CN
 46305,BATA,Equatorial Guinea,Litoral,1.87,9.77,Medium,large vessels,34.7,27.4,34.7,34.7,2.0,swell|other,GQBSG,AF-WAF,184,72,19,37,Mineral Products,,GN
@@ -112,7 +112,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 50730,BELAWAN,Indonesia,North Sumatra,3.78,98.68,Medium,large vessels,42.1,38.4,42.1,49.4,2.0,other,IDBLW,AS-SIN,1330,478,235,336,Mineral Products,,ID
 12490,BELEM,Brazil,Pará,-1.45,-48.5,Minor,large vessels,53.0,45.7,34.7,38.4,3.0,other,BRBEL,NAE-CEN,,,,,,,BR
 33770,BELFAST,United Kingdom,Northern Ireland,54.62,-5.9,Major,large vessels,42.1,38.4,38.4,34.7,2.0,other,IENAY,EU-NEU,1691,360,121,311,Prepared Foodstuffs & Beverages,,GB
-9590,BELIZE CITY,Belize,Belize,17.5,-88.18,Small,large vessels,20.1,38.4,42.1,49.4,1.0,,BZBZE,NAE-CEN,185,122,0,26,Mineral Products,,
+9590,BELIZE CITY,Belize,Belize,17.5,-88.18,Small,large vessels,20.1,38.4,42.1,49.4,1.0,,BZBZE,NAE-CEN,185,122,0,26,Mineral Products,,BZ
 57436,BENCHAMAS TERMINAL,Thailand,Bangkok,10.52,101.25,Very Small,large vessels,,,5.5,5.5,1.0,other,,,7,0,0,7,,,TH
 16470,BENICIA,United States,California,38.05,-122.15,Very Small,,38.4,38.4,,,4.0,other,USBNC,NAW-USA,280,0,9,102,Mineral Products,,US
 51260,BENOA,Indonesia,Bali,-8.75,115.22,Very Small,medium vessels,42.1,42.1,9.1,49.4,2.0,swell|other,IDBOA,AS-SIN,,,,,,,ID
@@ -128,7 +128,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 22290,BODO,Norway,Nordland,67.28,14.38,Very Small,large vessels,12.8,53.0,5.5,45.7,2.0,,NOBOO,EU-SCA,,,,,,,NO
 9240,HOUSTON,United States,Texas,29.735,-95.01,Major,large vessels,27.4,42.1,38.4,34.7,,other,USJCX,NAE-GUS,,,,,,4140,US
 46520,BOMA,Democratic Republic of the Congo,Kongo Central,-5.85,13.05,Small,medium vessels,42.1,38.4,42.1,,2.0,other,CDBOA,AF-WAF,,,,,,,CG
-11780,KRALENDIJK,"Bonaire, Sint Eustatius and Saba",Bonaire,12.15,-68.28,Very Small,large vessels,31.1,38.4,,,1.0,other,BQKRA,NAE-CAR,125,32,9,5,,,
+11780,KRALENDIJK,"Bonaire, Sint Eustatius and Saba",Bonaire,12.15,-68.28,Very Small,large vessels,31.1,38.4,,,1.0,other,BQKRA,NAE-CAR,125,32,9,5,,,BQ
 39080,BONIFACIO,France,Corsica,41.38,9.17,Very Small,,34.7,42.1,34.7,,,,FRBON,EU-SEU,,,,,,,FR
 46205,BONNY,Nigeria,Rivers,4.45,7.17,Minor,large vessels,27.4,,16.5,31.1,3.0,tide|swell|other,NGBON,,333,0,0,329,Mineral Products,,NG
 9985,FREEPORT,Bahamas,Bahamas,26.52,-78.78,Small,large vessels,27.4,34.7,5.5,5.5,1.0,other,USXAS,,1139,742,76,176,Mineral Products,,BS
@@ -162,7 +162,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 13760,BUENOS AIRES,Argentina,Buenos Aires,-34.615,-58.345,Large,large vessels,45.7,42.1,45.7,38.4,1.0,tide|other,ARBUE,,1376,521,52,659,Mineral Products,1850,AR
 3430,BUFFALO,United States,New York,42.88,-78.88,Major,large vessels,42.1,45.7,42.1,,,ice|other,USBUF,,,,,,,,US
 52680,BULA,Indonesia,Maluku,-3.1,130.5,Very Small,medium vessels,34.7,38.4,9.1,,1.0,other,IDBUA,,40,0,0,40,,,ID
-11810,WILLEMSTAD,Curaçao,Curaçao,12.12,-68.93,Minor,large vessels,27.4,27.4,34.7,31.1,1.0,other,CWWIL,NAE-CAR,446,210,7,123,Mineral Products,,
+11810,WILLEMSTAD,Curaçao,Curaçao,12.12,-68.93,Minor,large vessels,27.4,27.4,34.7,31.1,1.0,other,CWWIL,NAE-CAR,446,210,7,123,Mineral Products,,CW
 54500,BUNBURY,Australia,Western Australia,-33.32,115.63,Small,medium vessels,31.1,34.7,27.4,,1.0,other,AUBUY,,436,0,395,14,Mineral Products,,AU
 53460,BUNDABERG,Australia,Queensland,-24.87,152.35,Very Small,medium vessels,42.1,38.4,42.1,42.1,2.0,tide|other,AUBDB,,,,,,,,AU
 54880,BURNIE,Australia,Tasmania,-41.05,145.95,Small,medium vessels,38.4,34.7,5.5,34.7,2.0,swell,AUBWT,OC-OCE,165,0,65,18,Mineral Products,,AU
@@ -191,7 +191,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 11910,CARTAGENA,Colombia,Bolívar,10.395,-75.52,Large,large vessels,34.7,31.1,34.7,34.7,,other,COSPC,NAE-CEN,,,,,,,CO
 7910,CARTERET,United States,New Jersey,40.58,-74.22,Small,large vessels,38.4,38.4,38.4,42.1,5.0,other,USCSF,,3883,2190,205,1099,Mineral Products,,US
 45793,CASABLANCA,Morocco,Casablanca-Settat,33.595,-7.62,Major,large vessels,31.1,34.7,5.5,,4.0,swell|other,MACAS,AF-NAF,2427,1142,459,73,Mineral Products,,MA
-11630,CASTRIES,Saint Lucia,Castries.,14.02,-61.0,Medium,large vessels,34.7,38.4,9.1,34.7,1.0,other,LCCAS,NAE-CAR,540,148,7,252,Mineral Products,,
+11630,CASTRIES,Saint Lucia,Castries.,14.02,-61.0,Medium,large vessels,34.7,38.4,9.1,34.7,1.0,other,LCCAS,NAE-CAR,540,148,7,252,Mineral Products,,LC
 40270,CATANIA,Italy,Sicily,37.5,15.1,Small,medium vessels,34.7,38.4,5.5,42.1,,swell|other,ITCTA,EU-SEU,550,63,7,20,Wood & Wood Products,,IT
 35370,PLYMOUTH,United Kingdom,England,50.37,-4.15,Minor,medium vessels,38.4,42.1,42.1,42.1,5.0,tide|other,GBDVP,EU-NEU,393,10,33,152,Mineral Products,,GB
 45730,CEUTA,Spain,Ceuta,35.9,-5.32,Minor,medium vessels,,34.7,5.5,42.1,1.0,swell|other,ESCEU,EU-SEU,1271,67,24,555,Mineral Products,,ES
@@ -199,8 +199,8 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 59974,CHANGSHU,China,Jiangsu,31.77,120.95,Small,medium vessels,45.7,45.7,31.1,42.1,3.0,,CNCGU,AS-NCN,701,52,303,4,Mineral Products,,CN
 15427,CHARCO AZUL,Panama,Panama Province,8.22,-82.87,Very Small,large vessels,,,5.5,5.5,2.0,other,PACHA,,101,0,0,101,Mineral Products,,PA
 8500,CHARLESTON,United States,South Carolina,32.785,-79.945,Large,large vessels,31.1,34.7,31.1,31.1,5.0,other,USCHS,NAE-USA,,,,,,2650,US
-11410,CHARLESTOWN,Saint Kitts and Nevis,Nevis,17.13,-62.63,Very Small,,31.1,42.1,42.1,53.0,1.0,swell|other,KNCHA,NAE-CAR,109,6,0,0,Mineral Products,,
-11310,CHARLOTTE AMALIE,U.S. Virgin Islands,Virgin Islands,18.35,-64.93,Small,large vessels,38.4,42.1,49.4,53.0,,,VISTT,NAE-CAR,613,269,10,61,Mineral Products,,
+11410,CHARLESTOWN,Saint Kitts and Nevis,Nevis,17.13,-62.63,Very Small,,31.1,42.1,42.1,53.0,1.0,swell|other,KNCHA,NAE-CAR,109,6,0,0,Mineral Products,,KN
+11310,CHARLOTTE AMALIE,U.S. Virgin Islands,Virgin Islands,18.35,-64.93,Small,large vessels,38.4,42.1,49.4,53.0,,,VISTT,NAE-CAR,613,269,10,61,Mineral Products,,VI
 5750,CHARLOTTETOWN,Canada,Prince Edward Island,46.23,-63.13,Small,large vessels,38.4,42.1,38.4,42.1,3.0,ice|other,CACHA,NAE-CAN,33,0,16,16,,,CA
 4510,CHEBOYGAN,United States,Michigan,45.65,-84.47,Small,medium vessels,45.7,45.7,49.4,45.7,,ice|other,,,,,,,,,US
 60160,YANTAI,China,Shandong,37.555,121.4,Major,medium vessels,27.4,27.4,23.8,,2.0,tide|ice|other,CNYTG,AS-NCN,1925,686,486,33,Mineral Products,5090,CN
@@ -266,7 +266,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 13580,DIAMANTE,Argentina,Entre Ríos,-32.07,-60.65,Very Small,large vessels,45.7,45.7,,,,,ARDME,SA-ESA,,,,,,,AR
 47800,DIEGO GARCIA,British Indian Ocean Territory,British Indian Ocean Territory,-7.35,72.47,Very Small,,31.1,,23.8,31.1,2.0,other,,,,,,,,,IN
 57680,HAI PHONG,Vietnam,Hai Phong,20.8106,106.7535,Major,medium vessels,45.7,38.4,34.7,53.0,4.0,tide|swell|other,VNHPH,,,,,,,,VN
-51440,DILI,Timor-Leste,Dili,-8.53,125.58,Small,medium vessels,5.5,45.7,5.5,,5.0,,TLDIL,AS-SIN,92,19,1,11,Mineral Products,,
+51440,DILI,Timor-Leste,Dili,-8.53,125.58,Small,medium vessels,5.5,45.7,5.5,,5.0,,TLDIL,AS-SIN,92,19,1,11,Mineral Products,,TL
 20300,DILLINGHAM,United States,Alaska,59.03,-158.48,Very Small,,,,,,15.0,tide|other,,,,,,,,,US
 50970,JAKARTA,Indonesia,Jakarta,-6.105,106.885,Major,medium vessels,34.7,34.7,,9.1,,tide|swell|other,IDTPP,AS-SIN,9315,4257,590,1361,Mineral Products,7827,ID
 47850,DJIBOUTI,Djibouti,Djibouti,11.6,43.13,Small,medium vessels,20.1,34.7,12.8,34.7,2.0,tide|other,DJPOD,AF-EAF,1296,532,223,269,Vegetable Products,,DJ
@@ -328,7 +328,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 39820,FIUMICINO,Italy,Lazio,41.77,12.23,Very Small,medium vessels,53.0,53.0,5.5,56.7,,swell|other,ITFCO,EU-SEU,,,,,,,IT
 29005,FLENSBURG,Germany,Schleswig-Holstein,54.8,9.43,Small,medium vessels,49.4,49.4,34.7,49.4,2.0,other,DEFLF,EU-SCA,,,,,,,DE
 31210,VLISSINGEN,Netherlands,Zeeland,51.45,3.6,Minor,medium vessels,31.1,42.1,38.4,38.4,4.0,other,NLVLI,,4257,329,177,2395,Mineral Products,,NL
-50910,FLYING FISH COVE,Christmas Island,Christmas Island,-10.42,105.7,Minor,medium vessels,5.5,49.4,,,3.0,tide|swell|other,CXFFC,AS-SIN,,,,,,,
+50910,FLYING FISH COVE,Christmas Island,Christmas Island,-10.42,105.7,Minor,medium vessels,5.5,49.4,,,3.0,tide|swell|other,CXFFC,AS-SIN,,,,,,,CX
 59860,FUZHOU,China,Fujian,25.985,119.455,Large,medium vessels,34.7,34.7,34.7,34.7,3.0,other,CNFZH,AS-SCN,,,,,,3900,CN
 46160,FORCADOS,Nigeria,Delta State,5.37,5.43,Very Small,large vessels,53.0,49.4,42.1,,3.0,swell|other,NGFOR,,,,,,,,NG
 33200,FORT WILLIAM,United Kingdom,Scotland,56.82,-5.12,Very Small,medium vessels,34.7,34.7,27.4,,4.0,tide|swell,GBFWM,EU-NEU,,,,,,,GB
@@ -339,7 +339,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 30170,FREDERICIA,Denmark,South Denmark,55.57,9.77,Medium,medium vessels,27.4,49.4,27.4,45.7,1.0,swell|other,DKFRC,EU-SCA,899,241,36,315,Mineral Products,,DK
 30430,FREDERIKSHAVN,Denmark,North Jutland,57.43,10.55,Small,medium vessels,42.1,45.7,34.7,42.1,1.0,other,DKFDH,EU-SCA,206,13,3,62,Mineral Products,,DK
 9250,FREEPORT,United States,Texas,28.95,-95.33,Very Small,large vessels,34.7,42.1,42.1,34.7,,other,USFPO,NAE-GUS,1075,133,21,789,Mineral Products,,US
-45862,FREETOWN,Sierra Leone,Sierra Leone,8.5,-13.23,Medium,medium vessels,42.1,38.4,27.4,34.7,3.0,tide|swell|other,SLFNA,AF-WAF,611,172,127,84,Mineral Products,,
+45862,FREETOWN,Sierra Leone,Sierra Leone,8.5,-13.23,Medium,medium vessels,42.1,38.4,27.4,34.7,3.0,tide|swell|other,SLFNA,AF-WAF,611,172,127,84,Mineral Products,,SL
 54520,FREMANTLE,Australia,Western Australia,-32.055,115.74,Major,medium vessels,31.1,31.1,27.4,38.4,1.0,other,AUFRE,OC-OCE,,,,,,,AU
 38810,MARSEILLE,France,Provence-Alpes-Côte d'Azur,43.32,5.37,Medium,large vessels,31.1,23.8,34.7,34.7,,,FRMRS,EU-SEU,711,236,27,110,Mineral Products,,FR
 25380,STOCKHOLM,Sweden,Stockholm County,59.33,18.05,Major,medium vessels,38.4,45.7,23.8,49.4,,ice|other,SESTO,EU-SCA,350,43,21,146,Wood & Wood Products,,SE
@@ -358,7 +358,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 54050,GEELONG,Australia,Victoria,-38.15,144.37,Minor,large vessels,34.7,34.7,31.1,34.7,1.0,tide|other,AUGEX,OC-OCE,516,0,223,254,Mineral Products,,AU
 40220,GELA,Italy,Sicily,37.07,14.25,Very Small,medium vessels,31.1,38.4,38.4,27.4,,other,ITGEA,EU-SEU,116,0,0,116,Mineral Products,,IT
 43340,GEMLIK,Turkey,Bursa,40.42,29.12,Medium,medium vessels,,45.7,5.5,23.8,,other,TRGEM,EU-BLA,1305,822,29,37,Mineral Products,,TR
-12370,GEORGETOWN,Guyana,Demerara-Mahaica,6.83,-58.17,Medium,large vessels,45.7,45.7,49.4,45.7,2.0,tide|other,GYGEO,NAE-CEN,1236,218,121,310,Mineral Products,,
+12370,GEORGETOWN,Guyana,Demerara-Mahaica,6.83,-58.17,Medium,large vessels,45.7,45.7,49.4,45.7,2.0,tide|other,GYGEO,NAE-CEN,1236,218,121,310,Mineral Products,,GY
 54540,GERALDTON,Australia,Western Australia,-28.78,114.6,Very Small,medium vessels,27.4,31.1,34.7,38.4,1.0,tide|swell|other,AUWTN,OC-OCE,410,0,363,18,Vegetable Products,,AU
 45670,GHAZAOUET,Algeria,Tlemcen,35.1,-1.87,Very Small,large vessels,34.7,38.4,16.5,,,swell,DZGHZ,AF-NAF,118,48,38,9,Vegetable Products,,DZ
 31270,GHENT,Belgium,East Flanders,51.07,3.73,Minor,large vessels,34.7,34.7,27.4,49.4,,other,BEWDG,EU-NEU,5598,252,543,2738,Mineral Products,,BE
@@ -369,7 +369,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 33210,GLENSANDA,United Kingdom,Scotland,56.57,-5.53,Very Small,large vessels,12.8,34.7,5.5,,4.0,other,GBGSA,,,,,,,,GB
 22540,GLOMFJORD,Norway,Nordland,66.82,13.98,Very Small,medium vessels,5.5,45.7,,,3.0,,NOGLO,EU-SCA,158,15,4,1,Prepared Foodstuffs & Beverages,,NO
 9060,SABINE PASS,United States,Texas,29.73,-93.9,Very Small,,34.7,34.7,34.7,42.1,1.0,other,,,605,0,18,569,,,US
-10020,GRAND TURK,Turks and Caicos Islands,Turks and Caicos Islands,21.43,-71.15,Very Small,medium vessels,31.1,49.4,31.1,,1.0,other,TCGDT,NAE-CAR,55,0,0,18,Mineral Products,,
+10020,GRAND TURK,Turks and Caicos Islands,Turks and Caicos Islands,21.43,-71.15,Very Small,medium vessels,31.1,49.4,31.1,,1.0,other,TCGDT,NAE-CAR,55,0,0,18,Mineral Products,,TC
 32010,GRANGEMOUTH,United Kingdom,Falkirk,56.02,-3.72,Medium,medium vessels,45.7,42.1,49.4,49.4,3.0,tide|other,GBGRG,EU-NEU,800,266,0,471,Mineral Products,,GB
 35740,GRAVELINES,France,Hauts-de-France,51.0,2.12,Very Small,medium vessels,,,38.4,,6.0,tide|other,FRGPO,EU-NEU,,,,,,,FR
 31420,GRAVESEND,United Kingdom,Kent,51.45,0.37,Small,medium vessels,42.1,45.7,23.8,,,tide|other,GBGVS,EU-NEU,1189,159,59,211,Mineral Products,,GB
@@ -426,12 +426,12 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 7770,HOBOKEN,United States,New Jersey,40.75,-74.02,Minor,large vessels,31.1,38.4,31.1,,4.0,,USV7X,NAE-USA,,,,,,,US
 31080,HOEK VAN HOLLAND,Netherlands,South Holland,51.95,4.13,Very Small,,20.1,45.7,27.4,,1.0,tide|swell|other,NLEUR,EU-NEU,32584,7045,1052,16990,Mineral Products,,NL
 23760,HOLMESTRAND,Norway,Vestfold og Telemark,59.48,10.3,Very Small,medium vessels,12.8,53.0,12.8,,,other,NOHOL,EU-SCA,,,,,,,NO
-690,SISIMIUT,Greenland,Greenland,66.92,-53.7,Small,medium vessels,5.5,34.7,5.5,,4.0,ice|other,GLJHS,NAE-GRL,,,,,,,
+690,SISIMIUT,Greenland,Greenland,66.92,-53.7,Small,medium vessels,5.5,34.7,5.5,,4.0,ice|other,GLJHS,NAE-GRL,,,,,,,GL
 28930,KIEL,Germany,Schleswig-Holstein,54.32,10.13,Major,medium vessels,34.7,49.4,45.7,49.4,,other,DEKEL,EU-NEU,421,55,32,165,Mineral Products,,DE
 34770,HOLYHEAD,United Kingdom,Wales,53.32,-4.63,Small,medium vessels,53.0,31.1,34.7,,5.0,other,GBHLY,EU-NEU,75,0,0,72,,,GB
 35860,HONFLEUR,France,Normandy,49.42,0.22,Very Small,medium vessels,53.0,42.1,31.1,38.4,7.0,tide|other,FRHON,EU-NEU,3720,1751,17,1426,Mineral Products,,FR
 57840,HONG KONG,Hong Kong,Hong Kong SAR,22.27,114.2,Major,medium vessels,27.4,27.4,16.5,20.1,1.0,tide|other,HKCWB,AS-SCN,,,,,,13668,HK
-57120,HONIARA,Solomon Islands,Guadalcanal Province,-9.42,159.95,Very Small,large vessels,42.1,42.1,20.1,34.7,1.0,tide|swell|other,SBHIR,OC-OCE,207,84,36,50,Mineral Products,,
+57120,HONIARA,Solomon Islands,Guadalcanal Province,-9.42,159.95,Very Small,large vessels,42.1,42.1,20.1,34.7,1.0,tide|swell|other,SBHIR,OC-OCE,207,84,36,50,Mineral Products,,SB
 56280,HONOLULU,United States,Hawaii,21.3,-157.87,Medium,medium vessels,34.7,45.7,5.5,45.7,2.0,other,USHNL,NAW-USA,465,292,2,62,Mineral Products,,US
 44370,HOPA,Turkey,Artvin,41.42,41.4,Very Small,medium vessels,5.5,42.1,5.5,,1.0,other,TRHOP,EU-BLA,86,0,1,1,Mineral Products,,TR
 30230,HORSENS,Denmark,Denmark,55.87,9.85,Very Small,medium vessels,45.7,49.4,38.4,45.7,1.0,other,DKHOR,,,,,,,,DK
@@ -463,7 +463,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 27570,JAKOBSTAD,Finland,Ostrobothnia,63.68,22.67,Minor,medium vessels,42.1,49.4,23.8,49.4,,ice|other,FIAHL,EU-SCA,259,39,23,13,Wood & Wood Products,,FI
 51690,KOTA KINABALU,Malaysia,Sabah,5.98,116.07,Medium,large vessels,42.1,38.4,23.8,45.7,1.0,swell|ice|other,MYBKI,AS-SIN,163,2,39,1,Mineral Products,,MY
 59985,JIANGYIN,China,Jiangsu,31.92,120.23,Small,medium vessels,45.7,42.1,49.4,49.4,2.0,tide,CNCHX,AS-NCN,4978,250,2575,1743,Mineral Products,,CN
-56325,JOHNSTON ATOLL,Johnston Atoll,Hawaii,16.75,-169.52,Very Small,large vessels,42.1,53.0,38.4,,2.0,other,,,,,,,,,
+56325,JOHNSTON ATOLL,Johnston Atoll,Hawaii,16.75,-169.52,Very Small,large vessels,42.1,53.0,38.4,,2.0,other,UMJON,,,,,,,,UM
 59180,JORDAN,Philippines,Guimaras,10.67,122.58,Very Small,medium vessels,5.5,38.4,5.5,34.7,4.0,,,,426,56,78,116,,,PH
 13115,JOSE IGNACIO,Uruguay,Maldonado,-34.95,-54.7,Very Small,,23.8,,42.1,20.1,1.0,,,,,,,,,,UY
 56180,KAHULUI,United States,Hawaii,20.9,-156.47,Very Small,medium vessels,34.7,38.4,23.8,49.4,1.0,,USOGG,NAW-USA,,,,,,,US
@@ -503,7 +503,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 10770,KINGSTON,Jamaica,Jamaica,17.97,-76.78,Large,large vessels,20.1,27.4,34.7,34.7,,tide|other,JMKIN,,2418,1562,88,320,Mineral Products,2500,JM
 7680,KINGSTON,United States,NY,41.93,-73.97,Small,medium vessels,53.0,49.4,34.7,,4.0,other,USPE2,NAE-USA,,,,,,,US
 2740,KINGSTON,Canada,Ontario,44.23,-76.5,Very Small,medium vessels,45.7,49.4,45.7,,,ice,JMKIN,,,,,,,,CA
-11640,KINGSTOWN,Saint Vincent and the Grenadines,Saint Vincent,13.15,-61.23,Small,large vessels,,34.7,5.5,42.1,1.0,swell|other,VCCRP,NAE-CAR,439,97,4,118,Vegetable Products,,
+11640,KINGSTOWN,Saint Vincent and the Grenadines,Saint Vincent,13.15,-61.23,Small,large vessels,,34.7,5.5,42.1,1.0,swell|other,VCCRP,NAE-CAR,439,97,4,118,Vegetable Products,,VC
 47100,MOMBASA,Kenya,Mombasa County,-4.065,39.66,Large,medium vessels,27.4,38.4,45.7,49.4,3.0,swell|other,KEMBA,AF-EAF,1444,565,285,290,Mineral Products,1500,KE
 20650,KIRKENES,Norway,Finnmark,69.73,30.05,Small,medium vessels,5.5,49.4,5.5,38.4,3.0,other,NOKKN,EU-RUS,21,0,0,12,,,NO
 32440,KIRKWALL,United Kingdom,Scotland,58.98,-2.97,Very Small,medium vessels,49.4,49.4,31.1,,2.0,tide|other,GBSCF,EU-NEU,122,0,0,0,,,GB
@@ -553,7 +553,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 44960,LARNACA,Cyprus,Larnaca District,34.92,33.65,Small,medium vessels,31.1,34.7,16.5,31.1,1.0,tide|swell|other,CYLAR,ME-MID,364,20,42,62,Mineral Products,,CY
 33790,LARNE,United Kingdom,Northern Ireland,54.85,-5.8,Small,large vessels,42.1,45.7,34.7,38.4,2.0,other,GBBLR,EU-NEU,66,0,0,53,,,GB
 23700,LARVIK,Norway,Vestfold og Telemark,59.05,10.03,Medium,medium vessels,5.5,49.4,38.4,38.4,1.0,other,NOLAR,EU-SCA,332,181,0,18,Wood & Wood Products,,NO
-11250,LAS MAREAS,Puerto Rico,Puerto Rico,17.95,-66.17,Very Small,large vessels,38.4,,34.7,34.7,1.0,,PRPJO,NAE-CAR,,,,,,,
+11250,LAS MAREAS,Puerto Rico,Puerto Rico,17.95,-66.17,Very Small,large vessels,38.4,,34.7,34.7,1.0,,PRPJO,NAE-CAR,,,,,,,PR
 38170,LAS PALMAS,Spain,Canary Islands,28.15,-15.42,Major,large vessels,34.7,9.1,5.5,,2.0,swell,ESLPX,AF-NAF,4905,1333,1518,1136,Mineral Products,,ES
 42120,LAVRIO,Greece,Attica,37.7,24.07,Very Small,medium vessels,49.4,49.4,31.1,49.4,,,GRLAV,EU-BLA,139,4,0,13,,,GR
 15765,LAZARO CARDENAS,Mexico,Michoacán,17.93,-102.17,Medium,large vessels,38.4,31.1,5.5,27.4,,swell,MXLZC,NAW-MEX,1620,824,244,241,Mineral Products,,MX
@@ -567,9 +567,9 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 28640,LIEPAJA,Latvia,Liepāja Municipality,56.52,21.02,Minor,medium vessels,34.7,42.1,20.1,53.0,,other,LVLPX,EU-RUS,1119,138,113,117,Mineral Products,,LV
 44950,LIMASSOL,Cyprus,Limassol District,34.67,33.05,Small,medium vessels,27.4,27.4,5.5,20.1,1.0,tide|other,CYLOP,ME-MID,1094,649,12,115,Mineral Products,,CY
 34110,LIMERICK,Ireland,Ireland,52.63,-8.62,Small,medium vessels,56.7,49.4,34.7,49.4,5.0,tide|other,IELMK,EU-NEU,109,7,0,0,Mineral Products,,IE
-11335,LIMETREE BAY,U.S. Virgin Islands,U.S. Virgin Islands,17.7,-64.75,Very Small,large vessels,31.1,49.4,,38.4,1.0,other,VILIB,NAE-CAR,822,223,0,465,Chemical & Allied Industries,,
+11335,LIMETREE BAY,U.S. Virgin Islands,U.S. Virgin Islands,17.7,-64.75,Very Small,large vessels,31.1,49.4,,38.4,1.0,other,VILIB,NAE-CAR,822,223,0,465,Chemical & Allied Industries,,VI
 24220,LIMHAMN,Sweden,Skåne County,55.58,12.93,Very Small,large vessels,45.7,45.7,42.1,,3.0,other,SELIM,EU-SCA,,,,,,,SE
-12380,LINDEN,Guyana,Upper Demerara-Berbice,6.0,-58.3,Very Small,medium vessels,45.7,45.7,,53.0,1.0,tide|other,GYLDN,NAE-CEN,116,2,40,9,Mineral Products,,
+12380,LINDEN,Guyana,Upper Demerara-Berbice,6.0,-58.3,Very Small,medium vessels,45.7,45.7,,53.0,1.0,tide|other,GYLDN,NAE-CEN,116,2,40,9,Mineral Products,,GY
 14425,LIRQUEN,Chile,Biobío,-36.72,-72.98,Very Small,medium vessels,,31.1,27.4,,1.0,other,CLPEO,SA-WSA,246,124,65,10,Vegetable Products,,CL
 59960,ZHOUSHAN,China,Zhejiang,30.0,122.1,Small,large vessels,9.1,5.5,9.1,53.0,1.0,tide|other,CNMAJ,AS-NCN,6370,450,1732,3487,Mineral Products,,CN
 34690,LIVERPOOL,United Kingdom,England,53.445,-3.015,Major,large vessels,45.7,31.1,45.7,31.1,6.0,tide|other,GBLIV,EU-NEU,2257,726,210,659,Wood & Wood Products,,GB
@@ -602,7 +602,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 38690,MAHON,Spain,Balearic Islands,39.88,4.27,Very Small,medium vessels,27.4,34.7,5.5,,,other,ESMAH,EU-SEU,25,0,4,17,,,ES
 57953,MAILIAO,Taiwan,Yunlin,23.78,120.17,Very Small,,9.1,27.4,9.1,16.5,5.0,other,TWMLI,,1194,0,130,1009,Mineral Products,,TW
 38370,MALAGA,Spain,Andalusia,36.72,-4.42,Medium,large vessels,31.1,20.1,5.5,,1.0,other,ESAGP,EU-SEU,459,199,42,34,Mineral Products,,ES
-49200,MALE,Maldives,Maldives,4.17,73.5,Very Small,medium vessels,5.5,38.4,5.5,5.5,1.0,other,MVMLE,ME-IPB,610,56,84,211,Mineral Products,,
+49200,MALE,Maldives,Maldives,4.17,73.5,Very Small,medium vessels,5.5,38.4,5.5,5.5,1.0,other,MVMLE,ME-IPB,610,56,84,211,Mineral Products,,MV
 24210,MALMO,Sweden,Skåne,55.62,13.0,Major,medium vessels,42.1,49.4,38.4,34.7,,other,SEMMA,EU-SCA,786,16,70,361,Mineral Products,,SE
 11905,MAMONAL,Colombia,Bolívar,10.32,-75.52,Small,medium vessels,38.4,45.7,34.7,45.7,,,COMAM,NAE-CEN,3462,2105,229,611,Mineral Products,,CO
 12560,MANAUS,Brazil,Amazonas,-3.13,-60.02,Medium,large vessels,45.7,5.5,12.8,42.1,11.0,tide|other,BRMAO,SA-ESA,488,223,38,221,Mineral Products,,BR
@@ -686,10 +686,10 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 22030,NARVIK,Norway,Nordland,68.43,17.42,Very Small,large vessels,5.5,53.0,20.1,45.7,2.0,tide|swell|other,NONVK,EU-SCA,246,4,195,1,Mineral Products,,NO
 9990,NASSAU,Bahamas,Bahamas,25.08,-77.35,Medium,large vessels,34.7,34.7,27.4,34.7,1.0,,BSNAS,NAE-GUS,634,264,25,6,Mineral Products,,BS
 12690,NATAL,Brazil,Rio Grande do Norte,-5.78,-35.2,Small,large vessels,42.1,42.1,38.4,45.7,2.0,tide|other,BRNAT,,46,23,20,0,Vegetable Products,,BR
-56500,NAURU,Nauru,Nauru,-0.53,166.92,Very Small,medium vessels,5.5,5.5,,5.5,1.0,swell|other,NRINU,OC-OCE,26,0,9,5,Mineral Products,,
+56500,NAURU,Nauru,Nauru,-0.53,166.92,Very Small,medium vessels,5.5,5.5,,5.5,1.0,swell|other,NRINU,OC-OCE,26,0,9,5,Mineral Products,,NR
 48635,NAVLAKHI,India,Gujarat,22.95,70.45,Very Small,large vessels,34.7,,34.7,,6.0,tide|other,INNAV,,64,4,1,0,Mineral Products,,IN
 55290,NELSON,New Zealand,Nelson,-41.27,173.27,Small,large vessels,45.7,42.1,34.7,42.1,2.0,tide|other,NZPON,OC-OCE,324,136,89,38,Wood & Wood Products,,NZ
-12390,NEW AMSTERDAM,Guyana,East Berbice-Corentyne,6.25,-57.52,Very Small,,,49.4,53.0,49.4,3.0,tide|swell|other,GYNAM,,90,0,7,32,Mineral Products,,
+12390,NEW AMSTERDAM,Guyana,East Berbice-Corentyne,6.25,-57.52,Very Small,,,49.4,53.0,49.4,3.0,tide|swell|other,GYNAM,,90,0,7,32,Mineral Products,,GY
 7370,NEW BEDFORD,United States,Massachusetts,41.63,-70.92,Small,medium vessels,42.1,42.1,42.1,42.1,4.0,,USNBD,NAE-CAN,10,0,0,0,Mineral Products,,US
 7550,NEW HAVEN,United States,Connecticut,41.23,-72.92,Small,large vessels,38.4,38.4,56.7,34.7,6.0,tide|other,USNH2,,169,1,55,104,Mineral Products,,US
 31668,NEW HOLLAND,United Kingdom,England,53.7,-0.37,Very Small,medium vessels,,,49.4,,5.0,other,GBNHO,EU-NEU,330,37,1,4,Vegetable Products,,GB
@@ -707,9 +707,9 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 25190,NORRKOPING,Sweden,Östergötland,58.58,16.2,Medium,medium vessels,42.1,49.4,16.5,49.4,,other,SENRK,EU-SCA,881,239,16,225,Mineral Products,,SE
 45812,NOUADHIBOU,Mauritania,Dakhlet Nouadhibou,20.92,-17.05,Minor,medium vessels,42.1,20.1,38.4,34.7,2.0,swell|other,MRNDB,AF-WAF,387,85,106,147,Mineral Products,,MR
 45814,NOUAKCHOTT,Mauritania,Nouakchott,18.03,-16.03,Small,medium vessels,34.7,42.1,38.4,38.4,1.0,swell|other,MRNKC,,451,197,102,91,Mineral Products,,MR
-57320,NOUMEA,New Caledonia,South Province,-22.28,166.43,Medium,medium vessels,42.1,38.4,42.1,38.4,1.0,other,NCNOU,OC-OCE,535,230,123,44,Mineral Products,,
+57320,NOUMEA,New Caledonia,South Province,-22.28,166.43,Medium,medium vessels,42.1,38.4,42.1,38.4,1.0,other,NCNOU,OC-OCE,535,230,123,44,Mineral Products,,NC
 13150,NUEVA PALMIRA,Uruguay,Colonia,-33.88,-58.42,Very Small,,38.4,42.1,53.0,,,,UYNVP,,346,19,270,14,,,UY
-640,NUUK,Greenland,Nuuk,64.18,-51.75,Small,medium vessels,16.5,38.4,20.1,,10.0,tide|ice|other,GLGOH,NAE-GRL,,,,,,,
+640,NUUK,Greenland,Nuuk,64.18,-51.75,Small,medium vessels,16.5,38.4,20.1,,10.0,tide|ice|other,GLGOH,NAE-GRL,,,,,,,GL
 29860,NYBORG,Denmark,Region of Southern Denmark,55.32,10.8,Small,medium vessels,45.7,49.4,38.4,49.4,1.0,ice|other,DKNBG,EU-SCA,245,14,4,131,Mineral Products,,DK
 25330,NYNASHAMN,Sweden,Stockholm,58.9,17.97,Small,medium vessels,27.4,,42.1,34.7,,other,SENYN,EU-SCA,207,1,0,200,Mineral Products,,SE
 16340,OAKLAND,United States,California,37.82,-122.33,Large,large vessels,42.1,42.1,,42.1,5.0,other,USOAK,NAW-USA,1060,1018,24,4,Mineral Products,3050,US
@@ -743,13 +743,13 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 8610,PALM BEACH,United States,Florida,26.77,-80.05,Very Small,large vessels,38.4,38.4,5.5,38.4,3.0,tide,,,619,218,14,6,Mineral Products,,US
 8750,PANAMA CITY,United States,Florida,30.13,-85.65,Small,medium vessels,38.4,38.4,38.4,42.1,1.0,,USPFN,NAE-USA,219,59,38,1,Mineral Products,,US
 50380,PANJANG,Indonesia,Lampung,-5.47,105.32,Medium,medium vessels,31.1,31.1,31.1,34.7,3.0,tide|other,IDPNJ,AS-SIN,1986,156,607,765,Mineral Products,,ID
-55840,PAPEETE,French Polynesia,French Polynesia,-17.53,-149.58,Medium,medium vessels,38.4,38.4,20.1,49.4,,tide|swell|other,PFPPT,OC-OCE,428,111,5,24,Prepared Foodstuffs & Beverages,,
+55840,PAPEETE,French Polynesia,French Polynesia,-17.53,-149.58,Medium,medium vessels,38.4,38.4,20.1,49.4,,tide|swell|other,PFPPT,OC-OCE,428,111,5,24,Prepared Foodstuffs & Beverages,,PF
 35330,PAR,United Kingdom,Cornwall,50.35,-4.7,Very Small,medium vessels,,49.4,38.4,,4.0,tide|other,GBPAR,EU-NEU,,,,,,,GB
 49535,PARADIP,India,Odisha,20.27,86.68,Small,medium vessels,31.1,34.7,38.4,27.4,2.0,tide|other,,,1267,13,1044,161,Mineral Products,,IN
-12410,PARAMARIBO,Suriname,Paramaribo,5.83,-55.17,Medium,large vessels,53.0,49.4,49.4,49.4,2.0,tide|other,SRPBM,NAE-CEN,657,155,41,170,Mineral Products,,
+12410,PARAMARIBO,Suriname,Paramaribo,5.83,-55.17,Medium,large vessels,53.0,49.4,49.4,49.4,2.0,tide|other,SRPBM,NAE-CEN,657,155,41,170,Mineral Products,,SR
 13570,PARANA,Argentina,Entre Ríos,-31.72,-60.53,Very Small,,53.0,53.0,,,,other,ARPRA,SA-ESA,,,,,,,AR
 12980,PARANAGUA,Brazil,Paraná,-25.5,-48.52,Medium,large vessels,34.7,34.7,23.8,34.7,2.0,other,BRPNG,SA-ESA,2079,534,914,478,Vegetable Products,,BR
-12415,PARANAM,Suriname,Para,5.62,-55.1,Very Small,large vessels,53.0,42.1,38.4,,2.0,tide,SRPRM,,,,,,,,
+12415,PARANAM,Suriname,Para,5.62,-55.1,Very Small,large vessels,53.0,42.1,38.4,,2.0,tide,SRPRM,,,,,,,,SR
 28550,PARNU,Estonia,Pärnu maakond,58.38,24.5,Small,medium vessels,49.4,49.4,49.4,,2.0,ice|other,EEPRN,EU-SCA,270,46,0,0,Wood & Wood Products,,EE
 9220,PASADENA,United States,California,29.72,-95.22,Very Small,large vessels,34.7,42.1,42.1,34.7,1.0,other,USPAS,NAE-GUS,7358,984,735,5014,Mineral Products,,US
 57435,PATTANI,Thailand,Songkhla,6.95,101.3,Small,,56.7,49.4,38.4,,,,THPTN,,,,,,,,TH
@@ -759,7 +759,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 14440,PENCO,Chile,Biobío,-36.72,-73.0,Very Small,large vessels,,38.4,34.7,,4.0,other,CLPEO,SA-WSA,246,124,65,10,Vegetable Products,,CL
 60165,PENGLAI,China,Shandong,37.82,120.83,Very Small,medium vessels,53.0,42.1,49.4,,2.0,,,,,,,,,,CN
 8760,PENSACOLA,United States,Florida,30.4,-87.22,Small,large vessels,34.7,38.4,53.0,38.4,1.0,other,USPNS,NAE-USA,26,0,13,0,,,US
-45865,PEPEL,Sierra Leone,Northern Province,8.58,-13.05,Very Small,medium vessels,38.4,34.7,38.4,38.4,3.0,tide|other,SLPEP,,,,,,,,
+45865,PEPEL,Sierra Leone,Northern Province,8.58,-13.05,Very Small,medium vessels,38.4,34.7,38.4,38.4,3.0,tide|other,SLPEP,,,,,,,,SL
 42210,PERAMA,Greece,Attica,37.97,23.57,Small,large vessels,34.7,34.7,42.1,42.1,,other,GRPER,EU-BLA,5354,2845,166,1248,Mineral Products,,GR
 7960,PERTH AMBOY,United States,New Jersey,40.5,-74.27,Small,large vessels,34.7,42.1,42.1,34.7,5.0,other,USPAY,NAE-USA,,,,,,,US
 32230,PETERHEAD,United Kingdom,Scotland,57.5,-1.78,Minor,large vessels,38.4,38.4,31.1,38.4,3.0,tide|swell|other,GBPHD,EU-NEU,136,4,3,91,Mineral Products,,GB
@@ -777,7 +777,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 48680,PORBANDAR,India,Gujarat,21.63,69.6,Very Small,large vessels,31.1,38.4,20.1,,2.0,,INPBD,,,,,,,,IN
 27740,PORI,Finland,Satakunta,61.48,21.8,Major,medium vessels,45.7,42.1,12.8,38.4,,ice|other,FIPOR,EU-SCA,,,,,,,FI
 53440,PORT ALMA,Australia,Queensland,-23.58,150.85,Very Small,large vessels,45.7,38.4,34.7,38.4,2.0,other,AUPTL,,64,1,9,11,Mineral Products,,AU
-11336,PORT ALUCROIX,U.S. Virgin Islands,Virgin Islands,17.7,-64.77,Very Small,large vessels,38.4,,38.4,,,other,VILIB,NAE-CAR,822,223,0,465,Chemical & Allied Industries,,
+11336,PORT ALUCROIX,U.S. Virgin Islands,Virgin Islands,17.7,-64.77,Very Small,large vessels,38.4,,38.4,,,other,VILIB,NAE-CAR,822,223,0,465,Chemical & Allied Industries,,VI
 17120,PORT ANGELES,United States,Washington,48.12,-123.43,Small,,16.5,27.4,31.1,,4.0,,USCLM,,223,9,44,151,Mineral Products,,US
 10710,PORT ANTONIO,Jamaica,Portland,18.18,-76.45,Small,large vessels,42.1,42.1,5.5,,1.0,other,JMPOT,,,,,,,,JM
 9310,PORT ARANSAS,United States,Texas,27.83,-97.05,Very Small,,56.7,53.0,56.7,,1.0,other,USHJS,NAE-GUS,404,1,30,345,Chemical & Allied Industries,,US
@@ -788,7 +788,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 38780,PORT-DE-BOUC,France,Provence-Alpes-Côte d'Azur,43.4,4.98,Small,large vessels,34.7,42.1,34.7,,,other,FRPDB,EU-SEU,1047,3,5,1028,Mineral Products,,FR
 49960,PORT DICKSON,Malaysia,Negeri Sembilan,2.53,101.78,Minor,large vessels,34.7,42.1,5.5,27.4,2.0,tide|swell|other,MYPDI,AS-SIN,472,0,99,373,Mineral Products,,MY
 10772,PORT ESQUIVEL,Jamaica,Jamaica,17.88,-77.13,Very Small,large vessels,34.7,34.7,34.7,31.1,,other,JMPEV,,116,0,14,80,Mineral Products,,JM
-46440,PORT GENTIL,Gabon,Ogooué-Maritime,-0.7,8.8,Minor,large vessels,27.4,38.4,31.1,31.1,2.0,other,,,224,16,5,121,Mineral Products,,GA
+46440,PORT GENTIL,Gabon,Ogooué-Maritime,-0.7,8.8,Minor,large vessels,27.4,38.4,31.1,31.1,2.0,other,GAPOG,,224,16,5,121,Mineral Products,,GA
 54255,PORT GILES,Australia,South Australia,-35.03,137.77,Very Small,medium vessels,31.1,34.7,23.8,,1.0,other,AUPGI,,19,0,19,0,Vegetable Products,,AU
 46210,PORT HARCOURT,Nigeria,Rivers State,4.77,7.0,Very Small,large vessels,42.1,42.1,23.8,42.1,2.0,tide|other,NGPHC,,258,10,107,103,Mineral Products,,NG
 1810,STEPHENVILLE,Canada,Newfoundland and Labrador,48.53,-58.53,Very Small,large vessels,38.4,42.1,,42.1,,other,CASTV,NAE-CAN,,,,,,,CA
@@ -807,7 +807,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 7930,PORT READING,United States,New Jersey,40.57,-74.23,Small,medium vessels,38.4,38.4,38.4,34.7,5.0,other,,,,,,,,,US
 8830,PORT SULPHUR,United States,Louisiana,29.48,-89.68,Very Small,large vessels,34.7,27.4,34.7,38.4,,other,USSUL,NAE-USA,,,,,,,US
 34980,PORT TALBOT,United Kingdom,Wales,51.58,-3.82,Small,medium vessels,34.7,27.4,9.1,,6.0,tide|swell|other,GBPTB,EU-NEU,106,10,0,1,,,GB
-57230,PORT VILA,Vanuatu,Shefa,-17.73,168.32,Very Small,medium vessels,34.7,38.4,5.5,56.7,1.0,other,VUVLI,OC-OCE,122,61,0,22,Animal & Animal Products,,
+57230,PORT VILA,Vanuatu,Shefa,-17.73,168.32,Very Small,medium vessels,34.7,38.4,5.5,56.7,1.0,other,VUVLI,OC-OCE,122,61,0,22,Animal & Animal Products,,VU
 54600,PORT WALCOTT,Australia,Western Australia,-20.65,117.18,Very Small,medium vessels,31.1,16.5,34.7,38.4,6.0,other,AUPWL,,1031,0,1028,1,Mineral Products,,AU
 4870,PORT WASHINGTON,United States,New York,43.38,-87.87,Small,medium vessels,45.7,45.7,45.7,,,ice|other,USPOW,,,,,,,,US
 7150,PORTLAND,United States,Maine,43.67,-70.25,Minor,large vessels,38.4,34.7,27.4,27.4,9.0,tide,USPWM,NAE-CAN,170,50,17,100,Chemical & Allied Industries,,US
@@ -815,7 +815,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 54140,PORTLAND,Australia,Victoria,-38.33,141.6,Small,medium vessels,31.1,34.7,23.8,38.4,1.0,tide|swell|other,USPDX,,246,1,184,7,Mineral Products,,AU
 13080,PORTO ALEGRE,Brazil,Rio Grande do Sul,-30.03,-51.23,Minor,large vessels,49.4,49.4,45.7,49.4,1.0,other,BRPOA,SA-ESA,152,0,54,93,Mineral Products,,BR
 40200,PORTO EMPEDOCLE,Italy,Sicily,37.28,13.53,Very Small,large vessels,34.7,49.4,38.4,,,,ITPEM,,,,,,,,IT
-45880,PORTO GRANDE,Cabo Verde,Cape Verde,16.88,-25.0,Very Small,medium vessels,,34.7,9.1,34.7,1.0,swell|other,CVMIN,AF-WAF,595,95,119,213,Mineral Products,,
+45880,PORTO GRANDE,Cabo Verde,Cape Verde,16.88,-25.0,Very Small,medium vessels,,34.7,9.1,34.7,1.0,swell|other,CVMIN,AF-WAF,595,95,119,213,Mineral Products,,CV
 39790,PORTO SANTO STEFANO,Italy,Tuscany,42.43,11.12,Very Small,medium vessels,34.7,45.7,5.5,,1.0,,ITPSS,,,,,,,,IT
 39310,PORTO TORRES,Italy,Sardinia,40.83,8.4,Small,medium vessels,34.7,31.1,12.8,27.4,,swell|ice|other,ITPTO,,173,39,22,47,Mineral Products,,IT
 11530,PORTSMOUTH,Dominica,Saint John,15.57,-61.47,Very Small,large vessels,,27.4,38.4,,2.0,other,DMPOR,NAE-CAR,,,,,,,DO
@@ -842,7 +842,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 12090,PUERTO CUMAREBO,Venezuela,Falcón,11.48,-69.35,Very Small,medium vessels,,38.4,34.7,45.7,1.0,,VECMR,NAE-CEN,0,0,0,0,,,VE
 38180,PUERTO DEL ROSARIO,Spain,Fuerteventura,28.5,-13.85,Very Small,medium vessels,31.1,34.7,20.1,,3.0,other,ESFUE,AF-NAF,330,156,5,82,Prepared Foodstuffs & Beverages,,ES
 12185,PUERTO LA CRUZ,Venezuela,Anzoátegui,10.25,-64.63,Major,large vessels,42.1,45.7,5.5,23.8,,other,VEELC,NAE-CEN,127,2,20,105,Mineral Products,,VE
-9810,PUERTO LIMON,Costa Rica,Limón,9.98,-83.02,Medium,large vessels,27.4,34.7,31.1,,1.0,swell|other,CRLIO,NAE-CEN,46,9,6,0,,,
+9810,PUERTO LIMON,Costa Rica,Limón,9.98,-83.02,Medium,large vessels,27.4,34.7,31.1,,1.0,swell|other,CRLIO,NAE-CEN,46,9,6,0,,,CR
 12035,PUERTO MIRANDA,Venezuela,Falcón,10.77,-71.57,Small,large vessels,34.7,,38.4,34.7,5.0,tide|other,,,27,1,0,26,Mineral Products,,VE
 14270,PUERTO MONTT,Chile,Los Lagos,-41.48,-72.97,Small,large vessels,5.5,45.7,5.5,34.7,6.0,tide|other,CLPMC,SA-WSA,893,12,61,25,Mineral Products,,CL
 12335,PUERTO ORDAZ,Venezuela,Bolívar,8.35,-62.72,Small,large vessels,38.4,38.4,,34.7,4.0,other,VEPZO,,91,0,79,1,Mineral Products,,VE
@@ -858,10 +858,10 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 12050,PUNTA CARDON,Venezuela,Falcón,11.63,-70.23,Small,large vessels,,42.1,20.1,9.1,,,VEPRC,NAE-CEN,209,1,25,155,Mineral Products,,VE
 12032,PUNTA DE PALMAS,Venezuela,Zulia,10.78,-71.58,Very Small,large vessels,31.1,,,31.1,1.0,other,VEPLV,,27,1,0,26,Mineral Products,,VE
 14080,PUNTA DELGADA,Chile,Magallanes y la Antártica Chilena,-52.47,-69.55,Very Small,,,,49.4,,,,,,,,,,,,CL
-15510,PUNTARENAS,Costa Rica,Puntarenas,9.98,-84.83,Very Small,large vessels,38.4,42.1,42.1,45.7,3.0,swell|other,CRPAS,NAE-CEN,,,,,,,
+15510,PUNTARENAS,Costa Rica,Puntarenas,9.98,-84.83,Very Small,large vessels,38.4,42.1,42.1,45.7,3.0,swell|other,CRPAS,NAE-CEN,,,,,,,CR
 57820,QINZHOU,China,Guangxi,21.73,108.58,Very Small,large vessels,31.1,38.4,34.7,45.7,5.0,,CNQZH,,,,,,,,CN
 57874,QUANZHOU,China,Fujian,24.88,118.6,Small,,49.4,49.4,34.7,23.8,5.0,swell|other,CNQZL,,,,,,,,CN
-11670,ST GEORGE'S,Grenada,St. George,12.05,-61.75,Small,large vessels,31.1,16.5,31.1,38.4,1.0,other,GDSTG,NAE-CAR,364,116,16,114,Vegetable Products,,
+11670,ST GEORGE'S,Grenada,St. George,12.05,-61.75,Small,large vessels,31.1,16.5,31.1,38.4,1.0,other,GDSTG,NAE-CAR,364,116,16,114,Vegetable Products,,GD
 57640,QUI NHON,Vietnam,Bình Định,13.77,109.23,Very Small,medium vessels,34.7,45.7,34.7,42.1,2.0,tide|swell|other,VNTMT,AS-SIN,707,210,148,60,Mineral Products,,VN
 27530,RAAHE,Finland,Oulu,64.68,24.42,Small,medium vessels,42.1,42.1,27.4,42.1,,ice|other,FILLO,EU-SCA,339,21,31,9,Mineral Products,,FI
 56810,RABAUL,Papua New Guinea,East New Britain,-4.2,152.18,Small,medium vessels,5.5,5.5,27.4,42.1,,tide|swell|other,PGRAB,OC-OCE,220,98,15,42,Mineral Products,,PG
@@ -892,7 +892,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 16590,SACRAMENTO,United States,California,38.58,-121.5,Small,large vessels,42.1,42.1,,,2.0,other,USSAC,NAW-USA,,,,,,,US
 45797,SAFI,Morocco,Marrakesh-Safi,32.3,-9.25,Small,medium vessels,42.1,34.7,5.5,,3.0,tide|swell|other,MASFI,,430,22,142,145,Vegetable Products,,MA
 38490,SAGUNTO,Spain,Valencia,39.65,-0.22,Very Small,large vessels,42.1,27.4,12.8,,,swell|other,ESPDS,EU-SEU,1059,218,82,89,Mineral Products,,ES
-56520,SAIPAN,Northern Mariana Islands,Northern Mariana Islands,15.2,145.68,Small,medium vessels,38.4,49.4,49.4,49.4,1.0,other,,,163,75,6,25,Prepared Foodstuffs & Beverages,,
+56520,SAIPAN,Northern Mariana Islands,Northern Mariana Islands,15.2,145.68,Small,medium vessels,38.4,49.4,49.4,49.4,1.0,other,MPSPN,,163,75,6,25,Prepared Foodstuffs & Beverages,,MP
 61760,SAKAIMINATO,Japan,Tottori,35.53,133.23,Very Small,,42.1,49.4,,45.7,1.0,other,JPSMN,AS-JAP,884,163,160,320,Wood & Wood Products,,JP
 15050,SALAVERRY,Peru,La Libertad,-8.23,-78.98,Very Small,large vessels,42.1,42.1,38.4,42.1,3.0,swell|other,PESVY,,201,9,157,5,Mineral Products,,PE
 52695,SALAWATI,Indonesia,West Papua,-1.35,130.98,Small,medium vessels,23.8,,5.5,31.1,2.0,tide|swell|other,IDSWT,AS-SIN,56,0,0,47,Metals,,ID
@@ -905,7 +905,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 37690,SAN CIPRIAN,Spain,Galicia,43.7,-7.43,Very Small,medium vessels,20.1,31.1,31.1,,4.0,other,ESSCI,EU-SEU,161,18,48,9,,,ES
 16010,SAN DIEGO,United States,California,32.72,-117.18,Minor,large vessels,34.7,38.4,34.7,38.4,4.0,other,USSAN,NAW-USA,289,58,12,4,Mineral Products,,US
 16300,SAN FRANCISCO,United States,California,37.82,-122.42,Major,large vessels,38.4,34.7,42.1,34.7,4.0,other,USSFO,NAW-USA,50,2,9,9,Mineral Products,,US
-11110,SAN JUAN,Puerto Rico,Puerto Rico,18.47,-66.12,Small,large vessels,38.4,42.1,34.7,49.4,,tide|other,PRSIG,NAE-CAR,1241,572,52,227,Mineral Products,,
+11110,SAN JUAN,Puerto Rico,Puerto Rico,18.47,-66.12,Small,large vessels,38.4,42.1,34.7,49.4,,tide|other,PRSIG,NAE-CAR,1241,572,52,227,Mineral Products,,PR
 13610,SAN LORENZO,Argentina,Santa Fe,-32.75,-60.73,Very Small,large vessels,42.1,34.7,,45.7,,other,ARSMA,SA-ESA,,,,,,,AR
 11980,SAN LORENZO,Venezuela,Aragua,9.78,-71.07,Very Small,large vessels,34.7,,38.4,38.4,1.0,other,MXSLO,,,,,,,,VE
 13650,SAN NICOLAS,Argentina,Buenos Aires,-33.33,-60.23,Very Small,large vessels,38.4,38.4,38.4,38.4,,,ARSNS,SA-ESA,,,,,,,AR
@@ -918,7 +918,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 37470,SANTANDER,Spain,Cantabria,43.47,-3.78,Minor,large vessels,34.7,31.1,9.1,31.1,3.0,tide|other,ESSDR,EU-SEU,1190,109,99,67,Mineral Products,,ES
 12510,SANTAREM,Brazil,Pará,-2.42,-54.72,Very Small,large vessels,38.4,38.4,27.4,,2.0,other,,,226,1,211,3,,,BR
 10370,SANTIAGO DE CUBA,Cuba,Santiago de Cuba,20.02,-75.83,Minor,large vessels,42.1,42.1,42.1,34.7,1.0,tide|swell|other,CUSCU,NAE-CAR,200,41,42,63,Vegetable Products,,CU
-57200,LUGANVILLE,Vanuatu,Sanma,-15.52,167.17,Small,large vessels,31.1,38.4,5.5,42.1,1.0,other,VULUG,OC-OCE,65,28,0,5,Animal & Animal Products,,
+57200,LUGANVILLE,Vanuatu,Sanma,-15.52,167.17,Small,large vessels,31.1,38.4,5.5,42.1,1.0,other,VULUG,OC-OCE,65,28,0,5,Animal & Animal Products,,VU
 12960,SAO SEBASTIAO,Brazil,São Paulo,-23.8,-45.4,Small,large vessels,38.4,42.1,12.8,16.5,1.0,other,BRSSO,SA-ESA,672,3,40,604,Mineral Products,,BR
 46150,SAPELE,Nigeria,Delta,5.9,5.68,Very Small,large vessels,49.4,38.4,45.7,,1.0,other,NGSPL,,127,0,8,119,Mineral Products,,NG
 3700,SARNIA,Canada,Ontario,42.98,-82.42,Small,large vessels,49.4,45.7,42.1,45.7,,ice,USPHN,NAE-CAN,561,3,372,176,Mineral Products,,CA
@@ -960,10 +960,10 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 9940,ST GEORGE'S,Bermuda,Bermuda,32.38,-64.68,Small,large vessels,42.1,42.1,38.4,38.4,2.0,other,BMSGE,NAE-CAN,,,,,,,BM
 8893,ST. JAMES,United States,Louisiana,29.98,-90.93,Small,medium vessels,,,,34.7,,other,,,,,,,,,US
 1670,ST JOHN'S,Canada,Newfoundland and Labrador,47.57,-52.7,Small,large vessels,34.7,20.1,27.4,23.8,1.0,ice|other,CASJF,NAE-CAN,190,93,4,38,Mineral Products,,CA
-11430,ST JOHNS,Antigua and Barbuda,Saint John,17.12,-61.85,Minor,large vessels,38.4,27.4,23.8,31.1,,swell|other,AGSJO,NAE-CAR,437,56,0,169,Mineral Products,,
+11430,ST JOHNS,Antigua and Barbuda,Saint John,17.12,-61.85,Minor,large vessels,38.4,27.4,23.8,31.1,,swell|other,AGSJO,NAE-CAR,437,56,0,169,Mineral Products,,AG
 36130,SAINT-MALO,France,Brittany,48.65,-2.02,Small,medium vessels,53.0,42.1,9.1,42.1,13.0,ice|other,FRSML,EU-NEU,223,11,0,31,Mineral Products,,FR
 20360,ST MICHAEL,United States,Minnesota,63.48,-162.03,Very Small,,,,49.4,,4.0,other,,,,,,,,,US
-11390,ORANJESTAD,"Bonaire, Sint Eustatius and Saba",Caribbean Netherlands,17.48,-62.98,Small,large vessels,42.1,53.0,20.1,16.5,1.0,swell|other,BQEUX,NAE-CAR,378,0,0,343,Mineral Products,,
+11390,ORANJESTAD,"Bonaire, Sint Eustatius and Saba",Caribbean Netherlands,17.48,-62.98,Small,large vessels,42.1,53.0,20.1,16.5,1.0,swell|other,BQEUX,NAE-CAR,378,0,0,343,Mineral Products,,BQ
 23480,STAVANGER,Norway,Rogaland,58.97,5.75,Minor,large vessels,5.5,42.1,5.5,38.4,1.0,tide,NOSVG,EU-SCA,1154,116,29,220,Mineral Products,,NO
 24000,STENUNGSUND,Sweden,Västra Götaland,58.07,11.83,Very Small,medium vessels,31.1,,42.1,42.1,,other,SESTE,,361,0,0,361,Mineral Products,,SE
 28823,SZCZECIN,Poland,West Pomeranian Voivodeship,53.42,14.55,Minor,medium vessels,42.1,56.7,45.7,49.4,,other,PLSZZ,EU-EEU,2066,350,127,333,Mineral Products,,PL
@@ -1008,7 +1008,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 9160,TEXAS CITY,United States,Texas,29.38,-94.92,Small,large vessels,34.7,34.7,42.1,38.4,,other,USTXT,,724,0,30,693,Mineral Products,,US
 42530,THESSALONIKI,Greece,Central Macedonia,40.63,22.93,Medium,large vessels,,34.7,12.8,20.1,1.0,other,GRSKG,EU-BLA,1705,496,235,424,Mineral Products,,GR
 54410,THEVENARD,Australia,South Australia,-32.17,133.65,Small,medium vessels,42.1,38.4,45.7,,1.0,other,AUTHE,,89,0,78,0,Vegetable Products,,AU
-32690,TORSHAVN,Faroe Islands,Faroe Islands,62.0,-6.75,Very Small,large vessels,45.7,45.7,23.8,42.1,1.0,other,FOTOR,EU-NEU,,,,,,,
+32690,TORSHAVN,Faroe Islands,Faroe Islands,62.0,-6.75,Very Small,large vessels,45.7,45.7,23.8,42.1,1.0,other,FOTOR,EU-NEU,,,,,,,FO
 53300,THURSDAY ISLAND,Australia,Queensland,-10.58,142.22,Small,medium vessels,49.4,53.0,42.1,53.0,1.0,other,AUTIS,OC-OCE,,,,,,,AU
 30460,THYBORON,Denmark,Central Jutland,56.7,8.22,Very Small,medium vessels,49.4,49.4,49.4,,1.0,other,,,275,11,4,45,Mineral Products,,DK
 62670,TIKSI,Russia,Sakha Republic,71.63,128.87,Small,,45.7,45.7,45.7,56.7,1.0,ice,RUIKS,,,,,,,,RU
@@ -1070,7 +1070,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 42470,VOLOS,Greece,Thessaly,39.37,22.95,Minor,medium vessels,38.4,34.7,9.1,,1.0,other,GRVOL,EU-BLA,505,27,158,16,Mineral Products,,GR
 60725,VOSTOCHNYY,Russia,Khabarovsk Krai,42.75,133.08,Very Small,medium vessels,9.1,23.8,9.1,34.7,,ice,RUVYP,AS-RUE,1365,350,605,190,Mineral Products,,RU
 28300,VYBORG,Russia,Leningrad Oblast,60.72,28.75,Minor,medium vessels,45.7,45.7,34.7,,2.0,other,RUVYG,,207,36,0,6,Mineral Products,,RU
-56330,WAKE ISLAND,Wake Island,Hawaii,19.28,166.62,Very Small,large vessels,5.5,,,31.1,1.0,tide|swell|other,,,,,,,,,
+56330,WAKE ISLAND,Wake Island,Hawaii,19.28,166.62,Very Small,large vessels,5.5,,,31.1,1.0,tide|swell|other,UMAWK,,,,,,,,UM
 54280,WALLAROO,Australia,South Australia,-33.93,137.62,Very Small,medium vessels,42.1,38.4,42.1,,1.0,other,AUWAL,,27,0,17,0,Vegetable Products,,AU
 46640,WALVIS BAY,Namibia,Erongo,-22.95,14.5,Small,large vessels,31.1,31.1,42.1,38.4,2.0,swell|other,NAWVB,,536,174,86,132,Mineral Products,,NA
 46170,WARRI,Nigeria,Delta State,5.52,5.73,Very Small,large vessels,45.7,34.7,45.7,45.7,1.0,other,NGWAR,,249,1,25,206,Mineral Products,,NG
@@ -1158,7 +1158,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 50340,ARDJUNA OIL FIELD,Indonesia,East Java,-5.88,107.72,Very Small,medium vessels,9.1,,38.4,9.1,,other,,,,,,,,,ID
 14800,RADA DE ARICA,Chile,Arica y Parinacota,-18.47,-70.33,Medium,large vessels,23.8,34.7,16.5,31.1,1.0,swell|other,CLARI,SA-WSA,295,176,52,22,Vegetable Products,,CL
 7890,PORT SOCONY,United States,New York,40.55,-74.25,Small,large vessels,38.4,42.1,38.4,38.4,5.0,other,USTTV,NAE-USA,,,,,,,US
-11840,PAARDEN BAAI - (ORANJESTAD),Aruba,Aruba,12.52,-70.03,Very Small,large vessels,34.7,38.4,5.5,,,other,AWORJ,NAE-CAR,296,164,21,21,Mineral Products,,
+11840,PAARDEN BAAI - (ORANJESTAD),Aruba,Aruba,12.52,-70.03,Very Small,large vessels,34.7,38.4,5.5,,,other,AWORJ,NAE-CAR,296,164,21,21,Mineral Products,,AW
 46691,NORTH POINT,Saint Helena,Ascension,-7.88,-14.37,Small,medium vessels,,,53.0,34.7,,other,,,,,,,,,
 48202,ASH SHIHR OIL TERMINAL,Yemen,Hadhramaut,14.73,49.5,Very Small,,,5.5,,5.5,2.0,other,,,2,0,0,2,,,YE
 45110,ASHQELON,Israel,South District,31.67,34.5,Very Small,large vessels,,,20.1,5.5,,other,,,50,0,24,26,Vegetable Products,,IL
@@ -1209,7 +1209,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 50922,MERAK MAS TERMINAL,Indonesia,Banten,-5.92,105.98,Minor,medium vessels,34.7,34.7,5.5,34.7,,,IDMRK,AS-SIN,1461,5,387,966,Mineral Products,,ID
 26280,ULVVIK,Sweden,Västernorrland,62.67,17.87,Very Small,large vessels,34.7,45.7,27.4,,,other,,,,,,,,,SE
 48840,MUMBAI (BOMBAY),India,Maharashtra,18.97,72.87,Major,large vessels,34.7,38.4,38.4,27.4,4.0,tide|swell|other,,,,,,,,,IN
-11782,SALINA,"Bonaire, Sint Eustatius and Saba",Bonaire,12.08,-68.28,Very Small,large vessels,5.5,27.4,,,,other,BQBON,NAE-CAR,125,32,9,5,,,
+11782,SALINA,"Bonaire, Sint Eustatius and Saba",Bonaire,12.08,-68.28,Very Small,large vessels,5.5,27.4,,,,other,BQBON,NAE-CAR,125,32,9,5,,,BQ
 44870,BOTAS,Turkey,Adana,36.88,35.93,Very Small,large vessels,,5.5,,5.5,,other,TRBOT,,528,12,70,359,Mineral Products,,TR
 44542,BOTAS NATURAL GAS TERMINAL,Turkey,Adana,41.0,27.98,Very Small,medium vessels,,,,34.7,,other,,,826,7,58,536,Mineral Products,,TR
 31120,VLAARDINGEN,Netherlands,South Holland,51.9,4.35,Very Small,medium vessels,34.7,34.7,34.7,34.7,2.0,other,NLVLA,EU-NEU,,,,,,,NL
@@ -1224,7 +1224,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 30710,BRUNSBUTTEL ELBAHAFEN,Germany,Schleswig-Holstein,53.88,9.17,Very Small,large vessels,31.1,31.1,34.7,27.4,5.0,,DEOSR,EU-NEU,2629,420,188,987,Mineral Products,,DE
 60431,TONGHAE,South Korea,Gyeonggi-do,37.53,129.15,Very Small,medium vessels,31.1,31.1,12.8,,,swell|other,KRBUK,AS-NCN,933,1,342,118,Mineral Products,,KR
 60430,MUKHO,South Korea,Gangwon-do,37.57,129.12,Very Small,medium vessels,42.1,42.1,5.5,,1.0,tide|other,KRMUK,AS-NCN,190,1,50,7,,,KR
-11820,BULLEN BAAI,Curaçao,Curaçao,12.18,-69.03,Minor,large vessels,9.1,,,5.5,1.0,swell|other,CWBUB,NAE-CAR,6,0,0,6,Mineral Products,,
+11820,BULLEN BAAI,Curaçao,Curaçao,12.18,-69.03,Minor,large vessels,9.1,,,5.5,1.0,swell|other,CWBUB,NAE-CAR,6,0,0,6,Mineral Products,,CW
 32500,SCAPA BAY,United Kingdom,Scotland,58.95,-2.98,Small,large vessels,27.4,56.7,27.4,27.4,3.0,tide|swell|other,GBSCF,EU-NEU,122,0,0,0,,,GB
 60390,PUSAN,South Korea,South Gyeongsang,35.075,129.065,Major,large vessels,31.1,23.8,31.1,45.7,1.0,other,KRPNC,AS-NCN,,,,,,24402,KR
 12900,DTSE / GEGUA OIL TERMINAL,Brazil,Brazil,-22.82,-43.15,Minor,large vessels,34.7,,27.4,42.1,1.0,other,,,,,,,,,BR
@@ -1235,7 +1235,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 35880,PORT DE CAEN,France,Normandy,49.18,-0.35,Small,medium vessels,45.7,42.1,34.7,42.1,7.0,tide|other,FRCFR,EU-NEU,94,3,8,0,Mineral Products,,FR
 49560,CALCUTTA,India,West Bengal,22.545,88.32,Major,medium vessels,42.1,42.1,38.4,42.1,2.0,tide|other,INCCU,ME-IPB,642,434,9,11,Mineral Products,,IN
 14630,PUERTO CALDERA,Chile,Atacama,-27.05,-70.83,Very Small,large vessels,27.4,31.1,12.8,38.4,1.0,other,CLCLD,SA-WSA,181,1,98,80,Vegetable Products,,CL
-15500,PUERTO CALDERA,Costa Rica,Puntarenas,9.92,-84.72,Medium,large vessels,34.7,42.1,31.1,38.4,3.0,,CRCAL,NAE-CEN,530,280,169,9,Mineral Products,,
+15500,PUERTO CALDERA,Costa Rica,Puntarenas,9.92,-84.72,Medium,large vessels,34.7,42.1,31.1,38.4,3.0,,CRCAL,NAE-CEN,530,280,169,9,Mineral Products,,CR
 14950,PUERTO DEL CALLAO,Peru,Callao,-12.05,-77.145,Large,large vessels,38.4,38.4,5.5,38.4,1.0,other,PECLL,SA-WSA,2157,1177,449,273,Mineral Products,2750,PE
 11772,GALEOTA POINT TERMINAL,Trinidad and Tobago,Trinidad and Tobago,10.13,-60.98,Small,large vessels,5.5,,,5.5,1.0,other,,,0,0,0,0,Mineral Products,,TT
 39420,RADA DI VADO,Italy,Italy.,44.27,8.43,Minor,medium vessels,38.4,27.4,23.8,5.5,,tide|other,ITVDL,EU-SEU,429,225,0,182,Mineral Products,,IT
@@ -1249,7 +1249,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 9395,CAYO ARCAS TERMINAL,Mexico,Campeche,20.17,-91.98,Very Small,large vessels,,,5.5,12.8,,other,MXCAT,,,,,,,,MX
 58960,CEBU,Philippines,Cebu,10.31,123.915,Major,medium vessels,38.4,38.4,27.4,45.7,2.0,other,PHLGU,AS-SIN,2061,635,74,322,Mineral Products,,PH
 46335,CEIBA TERMINAL,Equatorial Guinea,Litoral,1.42,9.23,Very Small,medium vessels,,,5.5,5.5,1.0,swell|other,,,0,0,0,0,,,GN
-38330,EUROPA POINT,Gibraltar,Andalusia,36.13,-5.35,Minor,large vessels,31.1,42.1,16.5,38.4,1.0,swell|other,GIGIB,EU-SEU,838,31,5,684,Mineral Products,,
+38330,EUROPA POINT,Gibraltar,Andalusia,36.13,-5.35,Minor,large vessels,31.1,42.1,16.5,38.4,1.0,swell|other,GIGIB,EU-SEU,838,31,5,684,Mineral Products,,GI
 46286,MOUDI MARINE TERMINAL,Cameroon,Extreme-North,4.12,8.48,Very Small,medium vessels,,,5.5,5.5,3.0,other,,,,,,,,,CM
 60330,KUNSAN,South Korea,Jeollabuk-do,35.98,126.62,Small,large vessels,38.4,34.7,38.4,53.0,6.0,other,,,748,44,227,106,Mineral Products,,KR
 59990,ZHANGJIANGANG,China,Jiangsu,31.97,120.4,Small,medium vessels,38.4,38.4,42.1,45.7,3.0,other,,,2849,345,1008,1175,Vegetable Products,,CN
@@ -1268,7 +1268,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 55320,PORT LYTTELTON,New Zealand,Canterbury,-43.6,172.72,Medium,medium vessels,34.7,38.4,27.4,31.1,2.0,,NZLYT,OC-OCE,668,348,129,111,Mineral Products,,NZ
 11934,PUERTO PRODECO,Colombia,Magdalena,11.15,-74.22,Small,large vessels,,,12.8,20.1,,other,,,,,,,,,CO
 50350,CINTA OIL TERMINAL,Indonesia,East Kalimantan,-5.5,106.23,Very Small,medium vessels,5.5,,5.5,5.5,,other,,,1,0,0,1,,,ID
-46670,GEORGETOWN,Saint Helena,Ascension Island,-7.93,-14.42,Minor,large vessels,5.5,56.7,12.8,34.7,1.0,other,VCGRG,,,,,,,,
+46670,GEORGETOWN,Saint Helena,Ascension Island,-7.93,-14.42,Minor,large vessels,5.5,56.7,12.8,34.7,1.0,other,VCGRG,,,,,,,,VC
 33780,KILROOT,United Kingdom,Northern Ireland,54.73,-5.72,Small,medium vessels,,38.4,38.4,45.7,,tide|swell|other,GBWHE,EU-NEU,,,,,,,GB
 49130,KOCHI (COCHIN),India,Kerala,9.97,76.23,Medium,large vessels,27.4,31.1,31.1,9.1,1.0,swell|other,INCOK,ME-IPB,1037,487,82,366,Mineral Products,,IN
 9865,PUERTO COLON,Panama,Colón,9.37,-79.88,Minor,medium vessels,31.1,31.1,,,,other,PAMIT,NAE-CEN,2312,1806,17,172,Mineral Products,,PA
@@ -1319,7 +1319,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 30720,BRUNSBUTTEL CANAL TERMINALS,Germany,Hamburg,53.9,9.15,Small,medium vessels,34.7,34.7,34.7,38.4,5.0,tide|ice|other,DEOSR,EU-NEU,2629,420,188,987,Mineral Products,,DE
 42200,ELEVSIS,Greece,Attica,38.03,23.55,Small,large vessels,,34.7,34.7,27.4,,other,GRIXE,EU-BLA,1793,14,66,1146,Mineral Products,,GR
 7640,NEW YORK CITY,United States,New Jersey,40.7,-74.02,Major,large vessels,31.1,31.1,31.1,27.4,5.0,tide,USNYC,NAE-USA,,,,,,,US
-11821,SINT MICHELSBAAI,Curaçao,Curaçao,12.13,-69.02,Very Small,large vessels,,5.5,5.5,,,,CWSMB,NAE-CAR,6,0,0,6,Mineral Products,,
+11821,SINT MICHELSBAAI,Curaçao,Curaçao,12.13,-69.02,Very Small,large vessels,,5.5,5.5,,,,CWSMB,NAE-CAR,6,0,0,6,Mineral Products,,CW
 49454,KAMARAJAR PORT,India,Tamil Nadu,13.27,80.32,Medium,medium vessels,23.8,31.1,23.8,27.4,1.0,tide|swell,INENR,ME-IPB,798,134,330,226,Mineral Products,,IN
 30105,ENSTED,Denmark,Region of Southern Denmark,55.02,9.43,Very Small,medium vessels,31.1,23.8,5.5,27.4,,other,DKENS,EU-SCA,359,31,53,81,Mineral Products,,DK
 57440,ERAWAN TERMINAL,Thailand,Loei,9.1,101.35,Very Small,large vessels,5.5,,5.5,5.5,,other,,,,,,,,,TH
@@ -1340,7 +1340,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 23130,FLORO,Norway,Vestland,61.6,5.03,Very Small,,,45.7,,38.4,2.0,other,NOFLR,EU-SCA,1004,81,64,176,Mineral Products,,NO
 32460,SOUTH NESS,United Kingdom,Scotland,58.8,-3.2,Very Small,,53.0,53.0,45.7,,7.0,other,GBLHO,EU-NEU,22,0,0,22,,,GB
 42180,AYIOS NIKOLAOS,Greece,Greece,37.98,23.53,Very Small,,38.4,42.1,31.1,,,other,GRPAO,EU-BLA,1793,14,66,1146,Mineral Products,,GR
-11550,FORT DE FRANCE,Martinique,Martinique,14.6,-61.07,Minor,large vessels,38.4,31.1,38.4,27.4,1.0,other,MQQPC,NAE-CAR,584,169,15,193,Mineral Products,,
+11550,FORT DE FRANCE,Martinique,Martinique,14.6,-61.07,Minor,large vessels,38.4,31.1,38.4,27.4,1.0,other,MQQPC,NAE-CAR,584,169,15,193,Mineral Products,,MQ
 8630,PORT EVERGLADES,United States,Florida,26.1,-80.12,Minor,large vessels,31.1,,5.5,34.7,3.0,tide|other,USPEF,NAE-GUS,2316,1471,67,379,Mineral Products,,US
 12650,PORTO DE MUCURIPE,Brazil,Ceará,-3.72,-38.48,Small,large vessels,38.4,38.4,45.7,38.4,2.0,tide,,,440,71,80,268,Mineral Products,,BR
 38770,PORT SAINT LOUIS DU RHONE,France,Provence-Alpes-Côte d'Azur,43.38,4.82,Small,large vessels,45.7,20.1,45.7,9.1,,other,FRPSL,EU-SEU,1216,688,10,268,Mineral Products,,FR
@@ -1352,15 +1352,15 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 62430,HAKATA,Japan,Fukuoka,33.6,130.4,Medium,large vessels,27.4,27.4,31.1,49.4,2.0,tide|other,JPHKT,AS-JAP,5762,1792,241,1460,Mineral Products,,JP
 61855,SHIMMINATO,Japan,Toyama,36.77,137.12,Very Small,,31.1,45.7,31.1,,,,JPTOS,AS-JAP,1234,231,137,324,Mineral Products,,JP
 61372,KISARAZU KO,Japan,Chiba,35.37,139.88,Very Small,large vessels,16.5,16.5,27.4,,2.0,other,,,3179,0,708,307,Mineral Products,,JP
-11370,PHILLIPSBURG,Sint Maarten,Anguilla,18.02,-63.05,Medium,medium vessels,9.1,38.4,42.1,,1.0,other,SXPHI,NAE-CAR,692,298,28,3,Mineral Products,,
+11370,PHILLIPSBURG,Sint Maarten,Anguilla,18.02,-63.05,Medium,medium vessels,9.1,38.4,42.1,,1.0,other,SXPHI,NAE-CAR,692,298,28,3,Mineral Products,,SX
 49250,GALLE HARBOR,Sri Lanka,Southern Province,6.02,80.22,Small,medium vessels,38.4,42.1,5.5,,1.0,swell|other,LKGAL,ME-IPB,41,0,0,7,,,LK
 61475,GAMAGORI KO,Japan,Aichi,34.82,137.22,Small,large vessels,38.4,38.4,34.7,49.4,2.0,other,,,,,,,,,JP
 46453,GAMBA OIL TERMINAL,Gabon,Ogooué-Maritime,-2.83,10.0,Very Small,large vessels,5.5,,5.5,9.1,2.0,tide|swell|other,,,24,0,0,23,,,GA
 49480,VISHAKHAPATNAM,India,Andhra Pradesh,17.68,83.3,Minor,medium vessels,20.1,38.4,53.0,38.4,1.0,tide|swell|other,INVTZ,ME-IPB,1850,231,1166,342,Mineral Products,,IN
-57810,MACAU,Macau,Gansu,22.18,113.57,Minor,medium vessels,53.0,53.0,53.0,53.0,2.0,other,MOMFM,AS-SCN,314,66,29,157,Prepared Foodstuffs & Beverages,,
+57810,MACAU,Macau,Gansu,22.18,113.57,Minor,medium vessels,53.0,53.0,53.0,53.0,2.0,other,MOMFM,AS-SCN,314,66,29,157,Prepared Foodstuffs & Beverages,,MO
 38398,PUERTO DE GARRUCHA,Spain,Almería,37.18,-1.82,Very Small,medium vessels,,42.1,5.5,,,,ESMOJ,EU-SEU,274,20,155,0,Vegetable Products,,ES
 39470,GENOVA,Italy,Liguria,44.41,8.91,Large,medium vessels,23.8,27.4,42.1,5.5,1.0,other,ITGOA,EU-SEU,3399,1640,52,629,Mineral Products,,IT
-10580,GEORGETOWN,Cayman Islands,Cayman Islands,19.3,-81.38,Very Small,large vessels,,45.7,27.4,27.4,,tide|swell|other,KYGEC,NAE-GUS,253,140,9,0,Mineral Products,,
+10580,GEORGETOWN,Cayman Islands,Cayman Islands,19.3,-81.38,Very Small,large vessels,,45.7,27.4,27.4,,tide|swell|other,KYGEC,NAE-GUS,253,140,9,0,Mineral Products,,KY
 45753,TANGIER-MEDITERRANEAN,Morocco,Gibraltar,35.9,-5.52,Major,,,20.1,,,,,,,4177,3015,24,672,Mineral Products,,MA
 46549,GIRASSOL TERMINAL,Angola,Luanda,-7.65,11.68,Very Small,large vessels,,,,5.5,2.0,swell|other,AOGIR,AF-SAF,,,,,,,AO
 23530,MANDAL,Norway,Agder,58.02,7.47,Very Small,medium vessels,34.7,49.4,5.5,31.1,1.0,other,NOMAN,EU-SCA,,,,,,,NO
@@ -1377,7 +1377,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 12661,GUAMARE OIL TERMINAL,Brazil,Rio Grande do Norte,-4.87,-36.28,Very Small,large vessels,23.8,,20.1,38.4,,other,,,,,,,,,BR
 10320,PUERTO GUANTANAMO,Cuba,Guantanamo,19.98,-75.13,Major,large vessels,31.1,49.4,38.4,,,other,,,,,,,,,CU
 14560,BAHIA HERRADURA GUAYACAN,Chile,Coquimbo,-29.97,-71.37,Very Small,large vessels,23.8,38.4,31.1,23.8,2.0,other,CLGYC,SA-WSA,78,0,20,58,,,CL
-11240,BAHIA DE JOBOS,Puerto Rico,Puerto Rico,17.95,-66.18,Very Small,large vessels,53.0,42.1,49.4,,1.0,other,PRPJO,NAE-CAR,,,,,,,
+11240,BAHIA DE JOBOS,Puerto Rico,Puerto Rico,17.95,-66.18,Very Small,large vessels,53.0,42.1,49.4,,1.0,other,PRPJO,NAE-CAR,,,,,,,PR
 11270,PLAYA DE GUAYANILLA,Puerto Rico,Puerto Rico,18.02,-66.77,Minor,large vessels,38.4,,34.7,34.7,1.0,other,,,124,0,0,107,Mineral Products,,
 29545,STIGSNAESVAERKET,Denmark,Zealand,55.2,11.25,Very Small,medium vessels,23.8,45.7,12.8,23.8,,other,DKSIT,EU-SCA,203,11,12,114,,,DK
 62495,KIN WAN,Japan,Okinawa,26.42,127.9,Very Small,large vessels,5.5,23.8,5.5,5.5,2.0,swell|other,JPCHW,AS-SCN,227,1,103,96,,,JP
@@ -1514,14 +1514,14 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 52320,UJUNG PANDANG,Indonesia,South Sulawesi,-5.13,119.4,Minor,medium vessels,38.4,38.4,9.1,42.1,2.0,tide|swell|other,IDMAK,AS-SIN,2101,833,84,607,Mineral Products,,ID
 12750,PORTO DE MACEIO,Brazil,Alagoas,-9.67,-35.73,Small,large vessels,42.1,38.4,27.4,38.4,3.0,swell|other,BRMCZ,SA-ESA,224,0,84,131,Chemical & Allied Industries,,BR
 57822,HUANGPU,China,Guangdong,23.08,113.42,Small,medium vessels,38.4,42.1,38.4,,2.0,tide|swell|other,CNWUC,AS-SCN,,,,,,,CN
-47220,VICTORIA,Seychelles,Seychelles,-4.62,55.45,Medium,medium vessels,56.7,38.4,27.4,45.7,2.0,swell|other,SCPOV,AF-ISL,164,111,6,28,Mineral Products,,
+47220,VICTORIA,Seychelles,Seychelles,-4.62,55.45,Medium,medium vessels,56.7,38.4,27.4,45.7,2.0,swell|other,SCPOV,AF-ISL,164,111,6,28,Mineral Products,,SC
 61800,MAIZURU KO,Japan,Kyoto,35.52,135.33,Small,large vessels,38.4,34.7,16.5,,,other,,,555,91,158,84,Vegetable Products,,JP
-56400,MAJURO ATOLL,Marshall Islands,Marshall Islands,7.08,171.38,Very Small,,27.4,23.8,5.5,34.7,2.0,other,MHMAJ,OC-OCE,99,57,2,18,Mineral Products,,
+56400,MAJURO ATOLL,Marshall Islands,Marshall Islands,7.08,171.38,Very Small,,27.4,23.8,5.5,34.7,2.0,other,MHMAJ,OC-OCE,99,57,2,18,Mineral Products,,MH
 49970,MELAKA,Malaysia,Melaka,2.2,102.25,Small,medium vessels,,53.0,49.4,42.1,1.0,tide|other,MYMKZ,AS-SIN,,,,,,,MY
 52235,MANGKASA OIL TERMINAL,Indonesia,South Sulawesi,-2.73,121.07,Small,large vessels,38.4,,12.8,38.4,2.0,,,,,,,,,,ID
 49875,MALONG MARINE TERMINAL,Malaysia,Sarawak,4.63,104.82,Very Small,large vessels,5.5,,5.5,5.5,3.0,other,,,,,,,,,MY
 40330,VALLETTA HARBORS,Malta,Malta,35.9,14.52,Minor,medium vessels,23.8,31.1,5.5,,1.0,other,MTMSX,EU-SEU,1278,124,56,538,Mineral Products,,MT
-47340,DZAOUDZI,Comoros,Mayotte,-12.78,45.25,Very Small,medium vessels,49.4,34.7,38.4,34.7,4.0,other,YTMAM,AF-ISL,,,,,,,
+47340,DZAOUDZI,Comoros,Mayotte,-12.78,45.25,Very Small,medium vessels,49.4,34.7,38.4,34.7,4.0,other,YTMAM,AF-ISL,,,,,,,YT
 7780,JERSEY CITY,United States,New York,40.72,-74.03,Minor,large vessels,31.1,38.4,31.1,38.4,4.0,other,USV7X,NAE-USA,,,,,,,US
 45220,MERSA TOBRUQ,Libya,Butnan,32.08,23.98,Small,medium vessels,20.1,42.1,5.5,,1.0,swell|other,LYTOB,AF-MED,114,4,19,48,Mineral Products,,LY
 45295,AL BURAYQAH,Libya,Al Wahat District,30.42,19.6,Small,medium vessels,,34.7,5.5,5.5,1.0,other,LYLMQ,AF-MED,67,3,5,23,Mineral Products,,LY
@@ -1548,7 +1548,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 10280,CAYO MOA GRANDE,Cuba,Holguín,20.67,-74.9,Small,large vessels,34.7,34.7,27.4,,1.0,other,,,88,5,5,44,Vegetable Products,,CU
 48175,AL MUKHA,Yemen,Taiz,13.32,43.25,Minor,medium vessels,42.1,42.1,42.1,42.1,1.0,other,,,0,0,0,0,,,YE
 47160,MUQDISHO,Somalia,Banaadir,2.02,45.35,Major,large vessels,34.7,38.4,31.1,34.7,3.0,swell|other,SOMGQ,AF-EAF,220,109,22,32,Vegetable Products,,SO
-9805,PUERTO MOIN,Costa Rica,Limón,10.0,-83.08,Very Small,large vessels,34.7,34.7,5.5,31.1,1.0,swell|other,CRMOB,NAE-CEN,1242,982,43,142,Vegetable Products,,
+9805,PUERTO MOIN,Costa Rica,Limón,10.0,-83.08,Very Small,large vessels,34.7,34.7,5.5,31.1,1.0,swell|other,CRMOB,NAE-CEN,1242,982,43,142,Vegetable Products,,CR
 22760,MO INLET,Norway,Nordland,66.32,14.13,Small,large vessels,5.5,45.7,5.5,,2.0,other,NOMQN,EU-SCA,670,95,51,3,Mineral Products,,NO
 62065,MUTUREZIMA KO,Japan,Fukuoka,33.97,130.87,Small,large vessels,23.8,,5.5,20.1,7.0,other,,,219,1,0,218,,,JP
 34200,KILRUSH,Ireland,County Clare,52.63,-9.5,Very Small,medium vessels,49.4,49.4,42.1,,5.0,other,IEKLR,,,,,,,,IE
@@ -1579,11 +1579,11 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 61870,NIIGATA KO,Japan,Niigata,37.92,139.05,Minor,large vessels,38.4,27.4,5.5,27.4,,other,JPKIJ,AS-JAP,,,,,,,JP
 43670,MYKOLAYIV,Ukraine,Mykolaiv Oblast,46.95,31.98,Small,large vessels,38.4,45.7,45.7,,,ice|other,UANLV,EU-BLA,366,5,163,71,Mineral Products,,UA
 46473,N'KOSSA TERMINAL,Republic of the Congo,Kouilou,-5.27,11.57,Very Small,,5.5,,5.5,5.5,,other,CGNKO,,9,0,0,9,,,CG
-56975,PORT NORO,Solomon Islands,Western Province,-8.22,157.18,Small,large vessels,5.5,42.1,5.5,,,other,SBNOR,OC-OCE,155,17,104,10,Wood & Wood Products,,
+56975,PORT NORO,Solomon Islands,Western Province,-8.22,157.18,Small,large vessels,5.5,42.1,5.5,,,other,SBNOR,OC-OCE,155,17,104,10,Wood & Wood Products,,SB
 51855,NORTH PULAU LAUT COAL TERMINAL,Indonesia,South Kalimantan,-3.2,116.28,Very Small,medium vessels,31.1,20.1,20.1,,2.0,other,IDNPL,AS-SIN,457,6,81,353,Mineral Products,,ID
 61277,NOSHIRO KO,Japan,Akita,40.22,140.0,Very Small,,38.4,45.7,,45.7,,,,,184,0,111,0,Mineral Products,,JP
 10150,NUEVITAS BAY,Cuba,Camagüey,21.55,-77.27,Major,large vessels,38.4,49.4,38.4,38.4,1.0,tide|other,CUNVT,NAE-GUS,77,0,8,56,Vegetable Products,,CU
-55590,NUKU ALOFA,Tonga,Tongatapu,-21.13,-175.2,Very Small,medium vessels,34.7,27.4,5.5,,1.0,tide|swell,TOTBU,OC-OCE,198,66,0,44,Mineral Products,,
+55590,NUKU ALOFA,Tonga,Tongatapu,-21.13,-175.2,Very Small,medium vessels,34.7,27.4,5.5,,1.0,tide|swell,TOTBU,OC-OCE,198,66,0,44,Mineral Products,,TO
 23108,HAROYSUND,Norway,Møre og Romsdal,62.9,6.97,Small,,,45.7,42.1,38.4,,ice|other,NOHRS,EU-SCA,358,3,87,133,Mineral Products,,NO
 29630,NYKOBING (FALSTER),Denmark,Zealand,54.77,11.87,Small,medium vessels,53.0,49.4,42.1,,1.0,tide|other,DKNYF,EU-SCA,,,,,,,DK
 43650,ODESA,Ukraine,Odesa Oblast,46.48,30.73,Major,medium vessels,42.1,42.1,38.4,49.4,1.0,ice|other,UAODS,EU-BLA,692,178,240,56,Mineral Products,,UA
@@ -1605,7 +1605,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 46435,PORT OWENDO,Gabon,Estuaire,0.28,9.5,Small,large vessels,34.7,34.7,38.4,,2.0,other,,,480,132,112,147,Mineral Products,,GA
 61515,OWASE KO,Japan,Mie,34.07,136.22,Very Small,large vessels,12.8,49.4,5.5,20.1,1.0,other,,,51,0,6,5,,,JP
 50450,TELUK BAYUR,Indonesia,West Sumatra,-1.0,100.37,Very Small,large vessels,42.1,31.1,42.1,45.7,1.0,other,IDTBR,AS-SIN,1138,138,223,505,Mineral Products,,ID
-55680,PAGO PAGO HARBOR,American Samoa,American Samoa,-14.28,-170.67,Small,medium vessels,5.5,23.8,34.7,34.7,3.0,swell,ASPPG,OC-OCE,139,81,0,24,Mineral Products,,
+55680,PAGO PAGO HARBOR,American Samoa,American Samoa,-14.28,-170.67,Small,medium vessels,5.5,23.8,34.7,34.7,3.0,swell,ASPPG,OC-OCE,139,81,0,24,Mineral Products,,AS
 9410,NANCHITAL,Mexico,Veracruz,18.07,-94.42,Very Small,large vessels,38.4,42.1,5.5,42.1,2.0,other,MXNAN,,1148,48,98,951,Mineral Products,,MX
 46547,PALANCA TERMINAL,Angola,Luanda,-6.95,12.4,Small,large vessels,,,5.5,5.5,2.0,swell|other,AOPAT,,,,,,,,AO
 11048,PUNTA NIZAO OIL TERMINAL,Dominican Republic,San Cristóbal,18.2,-70.2,Small,large vessels,,,31.1,31.1,1.0,,,,,,,,,,DO
@@ -1615,7 +1615,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 41850,PATRAI,Greece,Achaea,38.25,21.73,Small,large vessels,45.7,34.7,5.5,,2.0,other,GRGPA,EU-BLA,473,2,4,108,Mineral Products,,GR
 46200,PENNINGTON OIL TERMINAL,Nigeria,Bayelsa,4.25,5.62,Major,large vessels,,,5.5,5.5,1.0,swell|other,,,,,,,,,NG
 35850,PORT OF ROUEN,France,Normandy,49.45,1.07,Major,medium vessels,38.4,34.7,31.1,34.7,3.0,tide|other,FRURO,EU-NEU,1401,57,265,343,Mineral Products,,FR
-11372,COLES BAY OIL TERMINAL,Sint Maarten,Sint Maarten,18.02,-63.08,Medium,,,,34.7,38.4,1.0,other,SXPHI,NAE-CAR,88,0,0,88,Mineral Products,,
+11372,COLES BAY OIL TERMINAL,Sint Maarten,Sint Maarten,18.02,-63.08,Medium,,,,34.7,38.4,1.0,other,SXPHI,NAE-CAR,88,0,0,88,Mineral Products,,SX
 39740,PORTOVECCHIO DI PIOMBINO,Italy,Tuscany,42.93,10.55,Very Small,medium vessels,34.7,34.7,45.7,,1.0,swell|other,,,246,12,23,59,Metals,,IT
 48730,PIPAVAV BANDAR,India,Gujarat,20.92,71.52,Small,large vessels,27.4,27.4,42.1,31.1,3.0,tide|other,INPPV,ME-IPB,875,222,242,81,Vegetable Products,,IN
 44803,YAKACIK,Turkey,Şanlıurfa,36.72,36.18,Very Small,medium vessels,20.1,49.4,16.5,27.4,,other,TRIDM,EU-BLA,2707,285,929,26,Mineral Products,,TR
@@ -1625,7 +1625,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 1957,POINTE NOIRE,Canada,Quebec,50.17,-66.48,Small,large vessels,5.5,27.4,34.7,,6.0,ice|other,CAPNO,NAE-CAN,395,0,295,50,Chemical & Allied Industries,,CA
 11730,POINTE A PIERRE,Trinidad and Tobago,Trinidad and Tobago,10.32,-61.47,Small,large vessels,31.1,45.7,31.1,27.4,1.0,swell|other,TTCLA,NAE-CAR,573,0,14,482,Mineral Products,,TT
 11725,POINT LISAS PORT,Trinidad and Tobago,Trinidad and Tobago,10.38,-61.48,Small,large vessels,31.1,34.7,49.4,34.7,1.0,,TTPTS,NAE-CAR,1209,317,91,495,Chemical & Allied Industries,,TT
-11450,POINTE A PITRE,Guadeloupe,Guadeloupe,16.23,-61.53,Minor,large vessels,34.7,34.7,34.7,42.1,1.0,other,FRPPN,AF-NAF,687,183,18,178,Mineral Products,,
+11450,POINTE A PITRE,Guadeloupe,Guadeloupe,16.23,-61.53,Minor,large vessels,34.7,34.7,34.7,42.1,1.0,other,FRPPN,AF-NAF,687,183,18,178,Mineral Products,,FR
 11260,PLAYA DE PONCE,Puerto Rico,Puerto Rico,17.98,-66.62,Minor,,38.4,42.1,42.1,,,swell|other,,,23,0,10,8,,,
 39215,SARROCH OIL TERMINAL,Italy,Sicily,39.08,9.03,Minor,large vessels,9.1,,34.7,9.1,,other,ITPFX,EU-SEU,649,0,0,649,Mineral Products,,IT
 35480,POOLE HARBOUR,United Kingdom,Dorset,50.68,-1.95,Small,medium vessels,49.4,45.7,34.7,49.4,2.0,tide|other,GBPOO,EU-NEU,299,8,0,50,Mineral Products,,GB
@@ -1634,14 +1634,14 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 1958,PORT CARTIER,Canada,Quebec,50.03,-66.78,Very Small,large vessels,23.8,27.4,12.8,,,other,CAPCA,,438,0,397,26,Mineral Products,,CA
 46820,PORT ELIZABETH,South Africa,Eastern Cape,-33.97,25.62,Medium,medium vessels,34.7,49.4,31.1,38.4,2.0,other,ZAPLZ,AF-SAF,1260,184,629,291,Mineral Products,,ZA
 7820,ELIZABETHPORT,United States,New Jersey,40.65,-74.18,Small,large vessels,34.7,38.4,34.7,42.1,5.0,other,USH4H,NAE-USA,3883,2190,205,1099,Mineral Products,,US
-47690,PORT EST,Réunion,Réunion,-20.93,55.32,Small,large vessels,31.1,34.7,5.5,31.1,1.0,swell|other,REPOS,AF-ISL,474,275,45,52,Mineral Products,,
+47690,PORT EST,Réunion,Réunion,-20.93,55.32,Small,large vessels,31.1,34.7,5.5,31.1,1.0,swell|other,REPOS,AF-ISL,474,275,45,52,Mineral Products,,RE
 48040,AS SUWAYS,Egypt,Egypt,29.97,32.55,Major,medium vessels,16.5,49.4,45.7,42.1,2.0,swell|other,EGSUZ,ME-MID,194,2,4,94,Mineral Products,,EG
 8667,PORT MANATEE,United States,Florida,27.63,-82.57,Small,,34.7,,,,,,USPME,NAE-GUS,311,130,84,49,Mineral Products,,US
 45515,PORT METHANIER,Algeria,Oran,36.88,6.95,Small,medium vessels,20.1,38.4,20.1,27.4,,swell|other,DZSKI,AF-MED,596,115,64,290,Mineral Products,,DZ
 48605,MUHAMAMAD BIN QASIM,Pakistan,Sindh,24.77,67.35,Small,medium vessels,34.7,34.7,34.7,34.7,3.0,tide|swell|other,PKBQM,ME-IPB,990,393,317,250,Mineral Products,,PK
 28715,PORT POLNOCHNY,Poland,Pomeranian Voivodeship,54.4,18.72,Minor,medium vessels,20.1,27.4,23.8,38.4,,ice|other,PLNOW,EU-SCA,3059,799,271,822,Mineral Products,,PL
 48257,PORT OF SOHAR,Oman,Al Batinah North.,24.52,56.63,Small,,23.8,23.8,5.5,23.8,3.0,other,,,1967,505,544,624,Mineral Products,,OM
-14000,STANLEY,Falkland Islands,Falkland Islands,-51.7,-57.83,Minor,medium vessels,42.1,45.7,49.4,53.0,2.0,other,AUSTA,,,,,,,,
+14000,STANLEY,Falkland Islands,Falkland Islands,-51.7,-57.83,Minor,medium vessels,42.1,45.7,49.4,53.0,2.0,other,AUSTA,,,,,,,,AU
 10880,PORT AU PRINCE,Haiti,Ouest,18.55,-72.35,Minor,large vessels,31.1,38.4,27.4,38.4,1.0,other,HTPAP,,,,,,,,HT
 35450,PORTLAND HARBOUR,United Kingdom,England,50.58,-2.43,Minor,large vessels,34.7,31.1,12.8,34.7,2.0,tide|swell|other,GBCSW,EU-NEU,253,5,12,174,Mineral Products,,GB
 39260,PORTO VESME,Italy,Sardinia,39.2,8.4,Very Small,large vessels,27.4,34.7,27.4,,,other,,,,,,,,,IT
@@ -1668,10 +1668,10 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 48340,RAS  TANNURAH,Saudi Arabia,Eastern Province,26.63,50.17,Minor,large vessels,23.8,27.4,5.5,5.5,2.0,other,SARTA,ME-MID,672,0,0,672,Mineral Products,,SA
 40720,PORTO DI CORSINI,Italy,Emilia-Romagna,44.5,12.28,Minor,medium vessels,49.4,38.4,49.4,12.8,2.0,tide|swell|other,,,2275,419,507,589,Mineral Products,,IT
 57443,RAYONG TPI TERMINAL,Thailand,Rayong,12.63,101.3,Very Small,medium vessels,16.5,27.4,49.4,49.4,,,THMAT,AS-SIN,1553,1,14,1511,Mineral Products,,TH
-47695,PORT OUEST,Réunion,Reunion,-20.93,55.28,Medium,large vessels,38.4,42.1,5.5,,1.0,swell|other,RELPT,AF-ISL,474,275,45,52,Mineral Products,,
+47695,PORT OUEST,Réunion,Reunion,-20.93,55.28,Medium,large vessels,38.4,42.1,5.5,,1.0,swell|other,RELPT,AF-ISL,474,275,45,52,Mineral Products,,RE
 16370,POINT RICHMOND,United States,California,37.92,-122.37,Small,large vessels,38.4,38.4,,27.4,4.0,other,,,548,0,83,450,Mineral Products,,US
 11045,PUERTO DE HAINA,Dominican Republic,San Cristóbal,18.42,-70.02,Small,large vessels,38.4,38.4,31.1,34.7,,swell|other,DOBQL,NAE-CAR,1322,638,160,193,Mineral Products,,DO
-11350,ROAD HARBOR,British Virgin Islands,Tortola,18.42,-64.62,Minor,large vessels,45.7,38.4,9.1,42.1,1.0,swell|other,VGRAD,NAE-CAR,261,31,0,33,Mineral Products,,
+11350,ROAD HARBOR,British Virgin Islands,Tortola,18.42,-64.62,Minor,large vessels,45.7,38.4,9.1,42.1,1.0,swell|other,VGRAD,NAE-CAR,261,31,0,33,Mineral Products,,VG
 29710,RODBY HAVN,Denmark,Region Zealand,54.65,11.35,Very Small,medium vessels,49.4,53.0,38.4,53.0,2.0,other,DKROD,EU-SCA,,,,,,,DK
 16410,MARE ISLAND,United States,California,38.1,-122.27,Small,,42.1,42.1,42.1,,4.0,other,,,125,0,2,111,,,US
 29110,RONNE,Denmark,Capital Region,55.1,14.7,Small,large vessels,42.1,53.0,12.8,45.7,,ice|other,,,180,9,4,22,,,DK
@@ -1699,7 +1699,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 9625,SANTO THOMAS DE CASTILLA,Guatemala,Izabal,15.7,-88.62,Medium,large vessels,38.4,42.1,53.0,42.1,1.0,other,GTSTC,NAE-CEN,1391,1057,79,179,Vegetable Products,,GT
 13000,SAO FRANCISCO,Brazil,Santa Catarina,-26.25,-48.63,Small,large vessels,34.7,38.4,42.1,,2.0,,BRSFS,SA-ESA,404,4,331,6,Vegetable Products,,BR
 47946,SAWAKIN HARBOR,Sudan,Red Sea State,19.13,37.35,Small,,,34.7,,,,,,,283,4,5,10,Mineral Products,,SD
-11800,CARACASBAAI,Curaçao,Curaçao,12.07,-68.87,Small,large vessels,27.4,31.1,,31.1,1.0,other,CWCRB,NAE-CAR,2,0,0,1,Vegetable Products,,
+11800,CARACASBAAI,Curaçao,Curaçao,12.07,-68.87,Small,large vessels,27.4,31.1,,31.1,1.0,other,CWCRB,NAE-CAR,2,0,0,1,Vegetable Products,,CW
 32780,SCRABSTER HARBOR,United Kingdom,Scotland,58.62,-3.55,Small,large vessels,5.5,42.1,12.8,53.0,4.0,tide|swell|other,GBSCR,EU-NEU,72,25,0,25,,,GB
 61350,SENDAI-SHIOGAMA,Japan,Miyagi,38.32,141.03,Small,large vessels,45.7,42.1,34.7,20.1,1.0,swell|other,JPSGM,AS-JAP,4010,555,313,1570,Mineral Products,,JP
 1955,SEPT ILES,Canada,Quebec,50.2,-66.38,Minor,large vessels,34.7,20.1,34.7,34.7,10.0,ice|other,CASEI,NAE-CAN,395,0,295,50,Chemical & Allied Industries,,CA
@@ -1723,9 +1723,9 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 53020,TG. SORONG,Indonesia,West Papua,-0.88,131.23,Small,medium vessels,16.5,34.7,5.5,38.4,1.0,tide,IDSOQ,AS-SIN,254,85,0,157,Mineral Products,,ID
 48468,SIRUS OIL TERMINAL,Iran,Khuzestan,29.02,49.48,Small,large vessels,5.5,,5.5,5.5,2.0,swell,IRCYT,ME-MID,,,,,,,IR
 43100,SOUDHA,Greece,Crete,35.48,24.18,Minor,large vessels,27.4,45.7,5.5,,,other,,,,,,,,,GR
-36040,SAINT HELIER HARBOUR,Jersey,Jersey,49.18,-2.12,Small,medium vessels,56.7,49.4,16.5,49.4,12.0,tide|other,JESTH,EU-NEU,,,,,,,
+36040,SAINT HELIER HARBOUR,Jersey,Jersey,49.18,-2.12,Small,medium vessels,56.7,49.4,16.5,49.4,12.0,tide|other,JESTH,EU-NEU,,,,,,,JE
 11360,BAIE DU MARIGOT,France,Anguilla,18.07,-63.08,Very Small,medium vessels,45.7,49.4,45.7,,2.0,other,MFGES,NAE-CAR,175,21,0,52,Mineral Products,,FR
-36000,SAINT PETER PORT,Guernsey,Guernsey,49.45,-2.53,Small,medium vessels,53.0,42.1,38.4,,8.0,tide|other,GGSPT,EU-NEU,,,,,,,
+36000,SAINT PETER PORT,Guernsey,Guernsey,49.45,-2.53,Small,medium vessels,53.0,42.1,38.4,,8.0,tide|other,GGSPT,EU-NEU,,,,,,,GG
 28370,SANKT-PETERBURG,Russia,Russia,59.93,30.3,Major,medium vessels,53.0,45.7,12.8,49.4,1.0,other,,,,,,,,,RU
 29546,GULFHAVEN,Denmark,Zealand,55.2,11.27,Very Small,medium vessels,49.4,,12.8,45.7,1.0,other,DKSIT,EU-SCA,203,11,12,114,,,DK
 26880,OBBOLA,Sweden,Stockholm County,63.7,20.33,Very Small,medium vessels,38.4,45.7,38.4,34.7,,ice|other,SEOBB,,284,33,10,47,Wood & Wood Products,,SE
@@ -1780,8 +1780,8 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 33680,WARREN POINT,United Kingdom,Northern Ireland,54.1,-6.25,Very Small,medium vessels,49.4,,45.7,,3.0,other,IEOME,EU-NEU,345,32,10,29,Mineral Products,,GB
 34350,COBH,Ireland,County Clare,51.85,-8.3,Minor,medium vessels,34.7,42.1,20.1,,3.0,tide|other,IERUS,EU-NEU,1157,430,59,309,Mineral Products,,IE
 4780,INDIANA HARBOR,United States,Indiana,41.67,-87.43,Minor,large vessels,42.1,45.7,42.1,42.1,,ice|other,USECH,NAE-CAN,181,0,181,0,Mineral Products,,US
-51504,WIDURI MARINE TERMINAL,Indonesia,Central Java,-4.67,106.65,Very Small,,12.8,,16.5,,,tide|swell|other,,,,,,,,,ID
-11205,PUERTO YABUCOA,Puerto Rico,Puerto Rico,18.05,-65.83,Very Small,large vessels,27.4,31.1,20.1,31.1,1.0,,PRPYA,NAE-CAR,46,0,0,46,Vehicles & Equipment,,
+51504,WIDURI MARINE TERMINAL,Indonesia,Central Java,-4.67,106.65,Very Small,,12.8,,16.5,,,tide|swell|other,XZWRT,,,,,,,,ID
+11205,PUERTO YABUCOA,Puerto Rico,Puerto Rico,18.05,-65.83,Very Small,large vessels,27.4,31.1,20.1,31.1,1.0,,PRPYA,NAE-CAR,46,0,0,46,Vehicles & Equipment,,PR
 62255,YATSUSHIRO KO,Japan,Kumamoto,32.5,130.53,Small,large vessels,34.7,31.1,34.7,49.4,4.0,other,,,897,90,309,289,Mineral Products,,JP
 49685,YETAGUN MARINE TERMINAL,Myanmar,Tanintharyi,13.05,96.85,Very Small,,5.5,,,5.5,1.0,tide|swell|other,,,,,,,,,MM
 61400,YOKOSUKA KO,Japan,Kanagawa,35.28,139.67,Minor,large vessels,27.4,38.4,5.5,38.4,2.0,other,JPYOS,AS-JAP,696,0,25,199,Mineral Products,,JP
@@ -1814,15 +1814,15 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 510,VESTMANNAEYJAR,Iceland,,63.43,-20.28,Small,medium vessels,42.1,49.4,5.5,,3.0,,,,,,,,,,IS
 542,QUTDLEQ,Greenland,,61.52,-42.22,Very Small,medium vessels,5.5,,5.5,,,other,,,,,,,,,
 543,KUSANARTOQ,Greenland,,61.77,-42.22,Small,medium vessels,31.1,,20.1,,6.0,ice|other,,,,,,,,,
-560,NANORTALIK HAVN,Greenland,,60.12,-45.2,Very Small,medium vessels,5.5,53.0,5.5,,3.0,ice|other,GLJNN,NAE-GRL,,,,,,,
+560,NANORTALIK HAVN,Greenland,,60.12,-45.2,Very Small,medium vessels,5.5,53.0,5.5,,3.0,ice|other,GLJNN,NAE-GRL,,,,,,,GL
 585,NARSAQ,Greenland,,60.92,-46.05,Very Small,medium vessels,5.5,34.7,12.8,,3.0,ice|other,,,,,,,,,
 590,NARSARSSUAQ,Greenland,,61.15,-45.43,Very Small,medium vessels,5.5,38.4,5.5,,3.0,other,,,,,,,,,
-610,PAAMUIT (FREDERIKSHAB),Greenland,,62.0,-49.67,Small,medium vessels,45.7,42.1,20.1,49.4,3.0,ice|other,GLJFR,NAE-GRL,,,,,,,
-670,MANIITSOQ,Greenland,,65.42,-52.92,Very Small,medium vessels,5.5,42.1,31.1,,4.0,tide|swell|ice|other,GLJSU,NAE-GRL,,,,,,,
+610,PAAMUIT (FREDERIKSHAB),Greenland,,62.0,-49.67,Small,medium vessels,45.7,42.1,20.1,49.4,3.0,ice|other,GLJFR,NAE-GRL,,,,,,,GL
+670,MANIITSOQ,Greenland,,65.42,-52.92,Very Small,medium vessels,5.5,42.1,31.1,,4.0,tide|swell|ice|other,GLJSU,NAE-GRL,,,,,,,GL
 700,ATTU,Greenland,,67.95,-53.73,Very Small,medium vessels,5.5,53.0,5.5,,,ice|other,,,,,,,,,
-760,AASIAAT,Greenland,,68.7,-52.87,Small,medium vessels,5.5,42.1,5.5,,3.0,ice|other,GLJEG,NAE-GRL,,,,,,,
+760,AASIAAT,Greenland,,68.7,-52.87,Small,medium vessels,5.5,42.1,5.5,,3.0,ice|other,GLJEG,NAE-GRL,,,,,,,GL
 790,QASIGIANNGUIT-CHRISTIANSHAB,Greenland,,68.82,-51.18,Very Small,medium vessels,42.1,42.1,31.1,,3.0,ice|other,,,,,,,,,
-810,ILLULISSAT (JAKOBSHAVN),Greenland,,69.22,-51.1,Small,medium vessels,34.7,42.1,12.8,56.7,3.0,ice|other,GLJAV,NAE-GRL,,,,,,,
+810,ILLULISSAT (JAKOBSHAVN),Greenland,,69.22,-51.1,Small,medium vessels,34.7,42.1,12.8,56.7,3.0,ice|other,GLJAV,NAE-GRL,,,,,,,GL
 840,QEQERTARSUAQ,Greenland,,69.23,-53.53,Small,medium vessels,5.5,45.7,5.5,,3.0,ice|other,,,,,,,,,
 940,KAJALLEQ UPERNAVIK,Greenland,,72.15,-55.53,Very Small,,5.5,,53.0,,5.0,ice|other,,,,,,,,,
 1000,PITUFFIK (THULE AIR BASE),Greenland,,76.53,-68.87,Very Small,large vessels,5.5,38.4,31.1,,3.0,ice|other,,,,,,,,,
@@ -1833,7 +1833,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 1605,PORT UNION,Canada,,48.5,-53.08,Very Small,medium vessels,42.1,49.4,42.1,,,ice,CACAT,NAE-CAN,,,,,,,CA
 1611,CLARENVILLE,Canada,,48.15,-53.95,Small,medium vessels,5.5,42.1,31.1,45.7,1.0,ice,CACLE,NAE-CAN,,,,,,,CA
 1710,ARGENTIA,Canada,,47.3,-53.98,Minor,medium vessels,34.7,34.7,9.1,31.1,2.0,ice|other,CANWP,NAE-CAN,126,45,11,5,Mineral Products,,CA
-1750,PORT DE ST PIERRE,Saint Pierre and Miquelon,,46.78,-56.17,Small,medium vessels,42.1,42.1,27.4,38.4,2.0,,PMFSP,NAE-CAN,,,,,,,
+1750,PORT DE ST PIERRE,Saint Pierre and Miquelon,,46.78,-56.17,Small,medium vessels,42.1,42.1,27.4,38.4,2.0,,PMFSP,NAE-CAN,,,,,,,PM
 1795,PORT AUX BASQUES,Canada,,47.57,-59.13,Small,medium vessels,20.1,42.1,27.4,,2.0,ice|other,CAPBQ,NAE-CAN,23,0,0,6,Vegetable Products,,CA
 1820,ST GEORGE'S,Canada,,48.45,-58.45,Small,large vessels,31.1,31.1,34.7,,2.0,ice,,,,,,,,,CA
 1880,BLANC SABLON,Canada,,51.42,-57.13,Very Small,medium vessels,42.1,45.7,23.8,,3.0,ice|other,,,,,,,,,CA
@@ -2037,7 +2037,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 9995,CLIFTON PIER,Bahamas,,25.0,-77.55,Very Small,large vessels,34.7,,27.4,34.7,1.0,swell|other,,,230,0,12,197,Mineral Products,,BS
 10006,COCKBURN TOWN,Bahamas,,24.05,-74.53,Very Small,,,56.7,45.7,,,other,BSCBT,NAE-CAR,,,,,,,BS
 10010,MATTHEW TOWN,Bahamas,,20.95,-73.68,Very Small,medium vessels,53.0,31.1,27.4,,2.0,other,BSMAT,,,,,,,,BS
-10025,COCKBURN HARBOR,Turks and Caicos Islands,,21.5,-71.53,Very Small,,53.0,53.0,56.7,53.0,,,TCXSC,NAE-CAR,,,,,,,
+10025,COCKBURN HARBOR,Turks and Caicos Islands,,21.5,-71.53,Very Small,,53.0,53.0,56.7,53.0,,,TCXSC,NAE-CAR,,,,,,,TC
 10080,CABANAS,Cuba,,23.0,-82.97,Minor,medium vessels,45.7,45.7,49.4,,1.0,other,,,,,,,,,CU
 10120,CARDENAS,Cuba,,23.05,-81.2,Small,large vessels,49.4,49.4,42.1,,1.0,other,CUCAR,NAE-GUS,,,,,,,CU
 10130,ISABELA DE SAGUA,Cuba,,22.95,-80.0,Small,large vessels,45.7,49.4,53.0,49.4,1.0,other,CUIDS,,,,,,,,CU
@@ -2068,17 +2068,17 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 11060,PUERTO VIEJO DE AZUA,Dominican Republic,,18.35,-70.83,Very Small,large vessels,38.4,42.1,34.7,42.1,1.0,other,DOPVA,NAE-CAR,14,0,3,11,,,DO
 11070,SANTA CRUZ DE BARAHONA,Dominican Republic,,18.2,-71.08,Small,large vessels,38.4,38.4,31.1,,1.0,other,,,23,0,7,2,,,DO
 11075,CABO ROJO,Dominican Republic,,17.92,-71.65,Very Small,large vessels,38.4,38.4,49.4,,1.0,swell|other,DOCBJ,,,,,,,,DO
-11100,ARECIBO,Puerto Rico,,18.48,-66.7,Very Small,,45.7,45.7,27.4,56.7,1.0,other,PRARE,,,,,,,,
+11100,ARECIBO,Puerto Rico,,18.48,-66.7,Very Small,,45.7,45.7,27.4,56.7,1.0,other,PRARE,,,,,,,,PR
 11160,BAHIA DE FAJARDO,Puerto Rico,,18.33,-65.63,Very Small,,49.4,56.7,49.4,,1.0,,,,,,,,,,
 11190,PLAYA DE HUMACAO,Puerto Rico,,18.17,-65.75,Very Small,medium vessels,34.7,53.0,45.7,,,swell,,,,,,,,,
-11230,ARROYO,Puerto Rico,,17.97,-66.07,Small,,42.1,56.7,45.7,,1.0,other,PRARR,NAE-CAR,,,,,,,
-11280,PLAYA DE GUANICA,Puerto Rico,,17.97,-66.92,Small,large vessels,38.4,42.1,42.1,,1.0,,PRGUX,NAE-CAR,,,,,,,
-11320,CRUZ BAY,U.S. Virgin Islands,,18.33,-64.8,Small,,53.0,53.0,53.0,,1.0,,VICZB,NAE-CAR,,,,,,,
+11230,ARROYO,Puerto Rico,,17.97,-66.07,Small,,42.1,56.7,45.7,,1.0,other,PRARR,NAE-CAR,,,,,,,PR
+11280,PLAYA DE GUANICA,Puerto Rico,,17.97,-66.92,Small,large vessels,38.4,42.1,42.1,,1.0,,PRGUX,NAE-CAR,,,,,,,PR
+11320,CRUZ BAY,U.S. Virgin Islands,,18.33,-64.8,Small,,53.0,53.0,53.0,,1.0,,VICZB,NAE-CAR,,,,,,,VI
 11330,FREDERIKSTED,U.S. Virgin Islands,,17.72,-64.88,Small,large vessels,34.7,38.4,42.1,23.8,,,,,,,,,,,
-11380,GUSTAVIA,Guadeloupe,,17.9,-62.85,Medium,medium vessels,34.7,49.4,42.1,,,other,BLSBH,NAE-CAR,138,0,0,44,,,
-11460,BASSE TERRE,Guadeloupe,,16.0,-61.73,Very Small,large vessels,,42.1,5.5,,,tide|swell|other,GPBBR,NAE-CAR,23,0,2,0,,,
-11470,PORT LOUIS,Guadeloupe,,16.42,-61.53,Very Small,large vessels,,,34.7,,1.0,,GPPTL,NAE-CAR,,,,,,,
-11620,VIEUX FORT,Saint Lucia,,13.72,-60.97,Very Small,large vessels,34.7,38.4,16.5,,1.0,swell|other,LCVIF,NAE-CAR,121,1,7,54,Mineral Products,,
+11380,GUSTAVIA,Guadeloupe,,17.9,-62.85,Medium,medium vessels,34.7,49.4,42.1,,,other,BLSBH,NAE-CAR,138,0,0,44,,,BL
+11460,BASSE TERRE,Guadeloupe,,16.0,-61.73,Very Small,large vessels,,42.1,5.5,,,tide|swell|other,GPBBR,NAE-CAR,23,0,2,0,,,GP
+11470,PORT LOUIS,Guadeloupe,,16.42,-61.53,Very Small,large vessels,,,34.7,,1.0,,GPPTL,NAE-CAR,,,,,,,GP
+11620,VIEUX FORT,Saint Lucia,,13.72,-60.97,Very Small,large vessels,34.7,38.4,16.5,,1.0,swell|other,LCVIF,NAE-CAR,121,1,7,54,Mineral Products,,LC
 11700,SCARBOROUGH,Trinidad and Tobago,,11.18,-60.73,Very Small,medium vessels,38.4,42.1,34.7,,1.0,swell,GBSCA,,,,,,,,TT
 11710,CHAGUARAMAS,Trinidad and Tobago,,10.68,-61.65,Very Small,large vessels,,38.4,5.5,49.4,1.0,swell|other,TTCHA,,50,1,5,14,Mineral Products,,TT
 11718,ANSE TEMBLADORA,Trinidad and Tobago,,10.68,-61.58,Very Small,large vessels,34.7,42.1,34.7,,1.0,,TTCRN,NAE-CAR,50,1,5,14,Mineral Products,,TT
@@ -2095,8 +2095,8 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 12270,GUIRIA,Venezuela,,10.57,-62.3,Very Small,medium vessels,49.4,49.4,38.4,,2.0,,VEGUI,,,,,,,,VE
 12275,PUERTO DE HIERRO,Venezuela,,10.63,-62.1,Small,large vessels,,49.4,45.7,,,other,VEPHO,,,,,,,,VE
 12340,CIUDAD BOLIVAR,Venezuela,,8.13,-63.55,Small,,49.4,42.1,31.1,,1.0,swell|other,VECBL,SA-WSA,,,,,,,VE
-12405,NIEUW NICKERIE,Suriname,,5.95,-57.0,Very Small,medium vessels,53.0,56.7,53.0,53.0,2.0,tide|other,SRICK,,,,,,,,
-12420,MOENGO,Suriname,,5.63,-54.42,Very Small,large vessels,56.7,45.7,,45.7,1.0,tide|other,SRMOJ,,,,,,,,
+12405,NIEUW NICKERIE,Suriname,,5.95,-57.0,Very Small,medium vessels,53.0,56.7,53.0,53.0,2.0,tide|other,SRICK,,,,,,,,SR
+12420,MOENGO,Suriname,,5.63,-54.42,Very Small,large vessels,56.7,45.7,,45.7,1.0,tide|other,SRMOJ,,,,,,,,SR
 12455,DEGRAD DES CANNES,French Guiana,,4.85,-52.27,Very Small,large vessels,53.0,49.4,42.1,,2.0,tide|other,,,214,60,2,79,Mineral Products,,
 12500,CAMETA,Brazil,,-2.25,-49.5,Very Small,,42.1,,27.4,,3.0,,BRCMA,NAE-CEN,,,,,,,BR
 12570,IQUITOS,Peru,,-3.75,-73.23,Small,large vessels,45.7,45.7,,45.7,2.0,other,PEIQT,,0,0,0,0,,,PE
@@ -2111,7 +2111,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 13070,PELOTAS,Brazil,,-31.78,-52.33,Very Small,,49.4,49.4,,,1.0,other,BRPET,,0,0,0,0,,,BR
 13130,PUERTO SAUCE,Uruguay,,-34.43,-57.45,Very Small,,53.0,53.0,53.0,,2.0,,UYJLC,SA-ESA,,,,,,,UY
 13140,COLONIA,Uruguay,,-34.47,-57.85,Very Small,medium vessels,56.7,49.4,45.7,,1.0,other,UYCYR,,,,,,,,UY
-13250,PUERTO DE ASUNCION,Paraguay,,-25.27,-57.68,Very Small,,56.7,56.7,,,,,PYASU,SA-ESA,,,,,,,
+13250,PUERTO DE ASUNCION,Paraguay,,-25.27,-57.68,Very Small,,56.7,56.7,,,,,PYASU,SA-ESA,,,,,,,PY
 13690,PUERTO IBICUY,Argentina,,-33.75,-59.18,Very Small,,,45.7,42.1,,,,ARIBY,SA-ESA,,,,,,,AR
 13720,CONCORDIA,Argentina,,-31.4,-58.03,Very Small,,53.0,56.7,,,,tide|other,,,,,,,,,AR
 13830,PUERTO NACIONAL,Argentina,,-38.8,-62.28,Very Small,,45.7,45.7,38.4,,10.0,,ARINW,SA-ESA,726,33,458,213,Vegetable Products,,AR
@@ -2126,7 +2126,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 13980,USHUAIA,Argentina,,-54.82,-68.3,Small,medium vessels,56.7,42.1,31.1,34.7,2.0,swell,ARUSH,SA-WSA,29,29,0,0,,,AR
 14020,PRINCE OLAV HARBOR,South Georgia and the South Sandwich Islands,,-54.03,-37.15,Very Small,,,,5.5,,,swell|other,,,,,,,,,GE
 14040,STROMNESS HARBOR,South Georgia and the South Sandwich Islands,,-54.15,-36.7,Very Small,,,,5.5,,2.0,swell|other,,,,,,,,,GE
-14060,GRYTVIKEN,South Georgia and the South Sandwich Islands,,-54.27,-36.5,Very Small,,,45.7,,34.7,,other,,,,,,,,,GE
+14060,GRYTVIKEN,South Georgia and the South Sandwich Islands,,-54.27,-36.5,Very Small,,,45.7,,34.7,,other,GSGRV,,,,,,,,GE
 14075,PUERTO WILLIAMS,Chile,,-54.93,-67.6,Very Small,medium vessels,,42.1,9.1,38.4,2.0,other,CLWPU,SA-WSA,,,,,,,CL
 14110,BAHIA AGUA FRESCA,Chile,,-53.38,-70.97,Very Small,,,,49.4,,,,,,,,,,,,CL
 14130,PORT SAN JUAN DE LA JUAN,Chile,,-53.63,-70.92,Very Small,,,,27.4,,4.0,,,,,,,,,,CL
@@ -2152,7 +2152,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 15200,CALETA LOBITOS,Peru,,-4.45,-81.28,Very Small,,31.1,45.7,20.1,38.4,1.0,tide|swell|other,,,,,,,,,PE
 15210,PUERTO CABO BLANCO,Peru,,-4.25,-81.23,Very Small,large vessels,,,23.8,27.4,1.0,other,,,,,,,,,PE
 15445,PEDREGAL,Panama,,8.35,-82.43,Small,medium vessels,53.0,49.4,12.8,,3.0,tide|other,PAPED,,,,,,,,PA
-15480,GOLFITO,Costa Rica,,8.63,-83.17,Small,large vessels,42.1,42.1,31.1,42.1,3.0,,CRGLF,NAE-CEN,63,1,2,29,Mineral Products,,
+15480,GOLFITO,Costa Rica,,8.63,-83.17,Small,large vessels,42.1,42.1,31.1,42.1,3.0,,CRGLF,NAE-CEN,63,1,2,29,Mineral Products,,CR
 15490,PUERTO QUEPOS,Costa Rica,,9.43,-84.17,Very Small,medium vessels,,42.1,5.5,,2.0,swell|other,,,,,,,,,
 15600,LA UNION,El Salvador,,13.33,-87.83,Very Small,large vessels,49.4,27.4,34.7,45.7,2.0,tide|other,SVLUN,,,,,,,,SV
 15645,ACAJUTLA OFFSHORE TERMINAL,El Salvador,,13.58,-89.87,Medium,large vessels,,,20.1,20.1,2.0,,SVAQJ,NAE-CEN,661,178,186,223,Vegetable Products,,SV
@@ -2443,9 +2443,9 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 20500,COPPERMINE,Canada,,67.8,-115.05,Very Small,,,56.7,34.7,,1.0,ice|other,CACOP,,,,,,,,CA
 20510,CAMBRIDGE BAY,Canada,,69.12,-105.07,Very Small,,,,53.0,,1.0,ice|other,CAYCB,NAW-CAN,,,,,,,CA
 20520,RESOLUTE BAY,Canada,,74.68,-95.9,Very Small,,31.1,,49.4,,6.0,ice|other,CAREB,,,,,,,,CA
-20560,BARENTSBURG,Svalbard,,78.07,14.23,Very Small,,,42.1,5.5,,,ice|other,SJBAR,EU-SCA,,,,,,,
-20570,LONGYEARBYEN,Svalbard,,78.2,15.7,Very Small,medium vessels,,42.1,5.5,,3.0,ice|other,NOLYR,EU-SCA,,,,,,,
-20580,NY ALESUND,Svalbard,,78.92,11.95,Very Small,medium vessels,,42.1,5.5,,,ice|other,SJNYA,EU-SCA,,,,,,,
+20560,BARENTSBURG,Svalbard,,78.07,14.23,Very Small,,,42.1,5.5,,,ice|other,SJBAR,EU-SCA,,,,,,,SJ
+20570,LONGYEARBYEN,Svalbard,,78.2,15.7,Very Small,medium vessels,,42.1,5.5,,3.0,ice|other,NOLYR,EU-SCA,,,,,,,SJ
+20580,NY ALESUND,Svalbard,,78.92,11.95,Very Small,medium vessels,,42.1,5.5,,,ice|other,SJNYA,EU-SCA,,,,,,,SJ
 20690,VADSO,Norway,,70.07,29.75,Small,medium vessels,45.7,49.4,49.4,45.7,3.0,tide|other,NOVDS,EU-RUS,,,,,,,NO
 20695,BATSFJORDEN,Norway,,70.63,29.73,Small,medium vessels,,49.4,34.7,,,,NOBJF,EU-RUS,,,,,,,NO
 20700,VARDO,Norway,,70.37,31.12,Small,medium vessels,20.1,45.7,45.7,,3.0,tide|swell|other,NOVAO,EU-RUS,,,,,,,NO
@@ -2828,14 +2828,14 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 32430,WHITEHALL,United Kingdom,,59.13,-2.6,Very Small,,53.0,56.7,56.7,,7.0,tide|other,GBWHL,EU-NEU,,,,,,,GB
 32450,STROMNESS,United Kingdom,,58.97,-3.3,Very Small,medium vessels,49.4,45.7,45.7,,3.0,tide|other,GBSNS,,,,,,,,GB
 32590,SCALLOWAY,United Kingdom,,60.13,-1.28,Very Small,medium vessels,45.7,45.7,,,1.0,other,GBHMV,EU-NEU,,,,,,,GB
-32676,VAGUR,Faroe Islands,,61.48,-6.8,Very Small,medium vessels,34.7,45.7,34.7,42.1,,,FOVAG,EU-NEU,,,,,,,
-32680,TVOROYRI,Faroe Islands,,61.55,-6.8,Very Small,medium vessels,49.4,49.4,27.4,,2.0,,FOTVO,EU-NEU,,,,,,,
-32700,KONGSHAVN,Faroe Islands,,62.12,-6.73,Very Small,,31.1,38.4,5.5,49.4,,,FORVK,EU-NEU,56,26,0,0,,,
-32702,RUNAVIK,Faroe Islands,,62.12,-6.72,Very Small,medium vessels,27.4,49.4,5.5,,,other,FORVK,EU-NEU,56,26,0,0,,,
+32676,VAGUR,Faroe Islands,,61.48,-6.8,Very Small,medium vessels,34.7,45.7,34.7,42.1,,,FOVAG,EU-NEU,,,,,,,FO
+32680,TVOROYRI,Faroe Islands,,61.55,-6.8,Very Small,medium vessels,49.4,49.4,27.4,,2.0,,FOTVO,EU-NEU,,,,,,,FO
+32700,KONGSHAVN,Faroe Islands,,62.12,-6.73,Very Small,,31.1,38.4,5.5,49.4,,,FORVK,EU-NEU,56,26,0,0,,,FO
+32702,RUNAVIK,Faroe Islands,,62.12,-6.72,Very Small,medium vessels,27.4,49.4,5.5,,,other,FORVK,EU-NEU,56,26,0,0,,,FO
 32720,VESTMANNA,Faroe Islands,,62.15,-7.17,Very Small,,53.0,45.7,31.1,,5.0,other,,,,,,,,,
-32730,SORVAGUR,Faroe Islands,,62.08,-7.25,Very Small,medium vessels,5.5,42.1,5.5,42.1,2.0,tide|swell|other,FOSRV,EU-NEU,,,,,,,
+32730,SORVAGUR,Faroe Islands,,62.08,-7.25,Very Small,medium vessels,5.5,42.1,5.5,42.1,2.0,tide|swell|other,FOSRV,EU-NEU,,,,,,,FO
 32740,FUGLAFJORDUR,Faroe Islands,,62.25,-6.8,Very Small,,45.7,49.4,5.5,49.4,2.0,other,,,126,9,0,17,,,
-32750,KLAKSVIK,Faroe Islands,,62.23,-6.58,Very Small,medium vessels,53.0,42.1,5.5,42.1,1.0,swell,FOKVI,,,,,,,,
+32750,KLAKSVIK,Faroe Islands,,62.23,-6.58,Very Small,medium vessels,53.0,42.1,5.5,42.1,1.0,swell,FOKVI,,,,,,,,FO
 32820,ULLAPOOL,United Kingdom,,57.9,-5.15,Very Small,medium vessels,45.7,49.4,5.5,,4.0,tide|other,GBULL,,,,,,,,GB
 32850,GAIRLOCH,United Kingdom,,57.72,-5.68,Very Small,medium vessels,,49.4,5.5,,,other,GBGAR,EU-NEU,,,,,,,GB
 32890,PLOCKTON,United Kingdom,,57.33,-5.65,Very Small,medium vessels,49.4,,53.0,,,,GBPLO,EU-NEU,0,0,0,0,,,GB
@@ -2867,8 +2867,8 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 33560,AYR,United Kingdom,,55.47,-4.63,Very Small,medium vessels,53.0,49.4,45.7,49.4,2.0,swell|other,GBAYR,EU-NEU,,,,,,,GB
 33570,STRANRAER,United Kingdom,,54.9,-5.03,Very Small,medium vessels,49.4,49.4,49.4,,3.0,other,GBSTR,,,,,,,,GB
 33577,BANGOR,United Kingdom,,54.65,-5.67,Very Small,medium vessels,49.4,56.7,42.1,,3.0,tide|other,GBGRO,EU-NEU,,,,,,,GB
-33610,DOUGLAS,Isle of Man,,54.15,-4.47,Small,medium vessels,45.7,53.0,34.7,53.0,15.0,tide|other,IMDGS,EU-NEU,23,0,0,14,,,
-33620,RAMSEY,Isle of Man,,54.32,-4.37,Small,,45.7,53.0,49.4,,4.0,tide,IMRAM,EU-NEU,,,,,,,
+33610,DOUGLAS,Isle of Man,,54.15,-4.47,Small,medium vessels,45.7,53.0,34.7,53.0,15.0,tide|other,IMDGS,EU-NEU,23,0,0,14,,,IM
+33620,RAMSEY,Isle of Man,,54.32,-4.37,Small,,45.7,53.0,49.4,,4.0,tide,IMRAM,EU-NEU,,,,,,,IM
 33690,ARDGLASS,United Kingdom,,54.27,-5.62,Very Small,medium vessels,49.4,56.7,34.7,,4.0,tide,GBAGL,EU-NEU,,,,,,,GB
 33820,COLERAINE,United Kingdom,,55.13,-6.67,Small,medium vessels,53.0,53.0,34.7,,2.0,other,GBCLR,,,,,,,,GB
 33880,RATHMULLAN,Ireland,,55.1,-7.53,Very Small,,38.4,45.7,20.1,,4.0,tide|other,IERAT,EU-NEU,,,,,,,IE
@@ -2916,7 +2916,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 35870,DEAUVILLE,France,,49.37,0.08,Very Small,medium vessels,,53.0,31.1,,7.0,tide|other,FRTJE,EU-NEU,,,,,,,FR
 35885,OUISTREHAM,France,,49.28,-0.25,Very Small,medium vessels,45.7,42.1,34.7,42.1,7.0,tide|other,FROUI,EU-NEU,94,3,8,0,Mineral Products,,FR
 35980,ALDERNEY HARBOUR,Guernsey,,49.73,-2.2,Very Small,medium vessels,53.0,49.4,27.4,49.4,6.0,tide|swell|other,,,,,,,,,
-35990,SAINT SAMPSON,Guernsey,,49.48,-2.52,Very Small,medium vessels,,45.7,31.1,45.7,8.0,tide|other,GGSPT,EU-NEU,,,,,,,
+35990,SAINT SAMPSON,Guernsey,,49.48,-2.52,Very Small,medium vessels,,45.7,31.1,45.7,8.0,tide|other,GGSPT,EU-NEU,,,,,,,GG
 36110,GRANVILLE,France,,48.83,-1.6,Very Small,medium vessels,,42.1,45.7,,11.0,tide|other,FRC2H,EU-NEU,,,,,,,FR
 36220,LE LEGUE,France,,48.53,-2.75,Very Small,medium vessels,,49.4,45.7,,10.0,tide|other,FRSBK,EU-NEU,109,6,0,0,Wood & Wood Products,,FR
 36260,PAIMPOL,France,,48.78,-3.05,Very Small,medium vessels,,53.0,42.1,,9.0,ice,FRPAI,EU-NEU,,,,,,,FR
@@ -2953,7 +2953,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 38960,CANNES,France,,43.55,7.02,Small,medium vessels,42.1,49.4,5.5,,,other,FRCEQ,EU-SEU,,,,,,,FR
 38980,ANTIBES,France,,43.58,7.13,Very Small,medium vessels,45.7,45.7,38.4,,1.0,,FRANT,EU-SEU,,,,,,,FR
 39000,VILLEFRANCHE,France,,43.7,7.32,Very Small,medium vessels,49.4,,5.5,,,,FRVFM,EU-SEU,70,5,49,0,Mineral Products,,FR
-39025,MONACO,Monaco,,43.73,7.42,Very Small,medium vessels,42.1,34.7,5.5,,,other,MCMCM,EU-SEU,,,,,,,
+39025,MONACO,Monaco,,43.73,7.42,Very Small,medium vessels,42.1,34.7,5.5,,,other,MCMCM,EU-SEU,,,,,,,MC
 39070,PORTO VECCHIO,France,,41.58,9.28,Very Small,,49.4,42.1,12.8,,,other,FRPVO,EU-SEU,,,,,,,FR
 39090,PORT DE PROPRIANO,France,,41.68,8.9,Very Small,medium vessels,38.4,49.4,38.4,,,swell,FRPRP,EU-SEU,,,,,,,FR
 39110,CALVI,France,,42.57,8.75,Very Small,medium vessels,38.4,38.4,5.5,,,other,FRCLY,EU-SEU,,,,,,,FR
@@ -2991,7 +2991,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 40985,BRSICA,Croatia,,45.03,14.05,Very Small,,,34.7,34.7,,,other,HRRAS,EU-ADR,,,,,,,HR
 41090,SENJ,Croatia,,44.98,14.9,Very Small,medium vessels,27.4,56.7,31.1,,1.0,tide|swell|other,HRSEN,EU-ADR,,,,,,,HR
 41290,SIBENIK,Croatia,,43.73,15.88,Small,medium vessels,9.1,49.4,27.4,,1.0,other,HRSIB,EU-EEU,,,,,,,HR
-41415,NEUM,Bosnia and Herzegovina,,42.92,17.6,Small,,,,,,,,BANEM,EU-EEU,,,,,,,
+41415,NEUM,Bosnia and Herzegovina,,42.92,17.6,Small,,,,,,,,BANEM,EU-EEU,,,,,,,BA
 41420,KORCULA,Croatia,,42.93,17.13,Very Small,medium vessels,5.5,5.5,45.7,,,other,HRKOR,EU-EEU,,,,,,,HR
 41590,RISAN,Montenegro,,42.52,18.7,Very Small,,56.7,49.4,12.8,,,swell|other,MERSN,EU-BLA,,,,,,,ME
 41610,KOTOR,Montenegro,,42.42,18.77,Very Small,medium vessels,23.8,49.4,27.4,,1.0,other,MEKOT,EU-BLA,,,,,,,ME
@@ -3119,8 +3119,8 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 45838,BISSAU,Guinea-Bissau,,11.87,-15.63,Very Small,large vessels,34.7,42.1,49.4,53.0,6.0,tide,GWOXB,,169,37,15,29,Vegetable Products,,GN
 45845,VICTORIA,Guinea,,10.82,-14.57,Very Small,,49.4,,45.7,,14.0,tide|other,SCVIC,,142,0,38,0,,,GN
 45857,BENTI,Guinea,,9.17,-13.2,Very Small,,53.0,34.7,27.4,,3.0,tide|other,,,,,,,,,GN
-45867,BONTHE,Sierra Leone,,7.53,-12.5,Very Small,medium vessels,53.0,45.7,45.7,,3.0,other,SLBTE,,,,,,,,
-45910,PORTO DA PRAIA,Cabo Verde,,14.92,-23.52,Small,,45.7,42.1,23.8,,1.0,swell,CVRAI,AF-WAF,398,83,9,109,Mineral Products,,
+45867,BONTHE,Sierra Leone,,7.53,-12.5,Very Small,medium vessels,53.0,45.7,45.7,,3.0,other,SLBTE,,,,,,,,SL
+45910,PORTO DA PRAIA,Cabo Verde,,14.92,-23.52,Small,,45.7,42.1,23.8,,1.0,swell,CVRAI,AF-WAF,398,83,9,109,Mineral Products,,CV
 45952,GREENVILLE,Liberia,,4.98,-9.05,Very Small,medium vessels,38.4,49.4,31.1,49.4,1.0,swell|other,USGLH,,,,,,,,LR
 46008,ESPOIR MARINE TERMINAL,Côte d'Ivoire,,5.05,-4.45,Very Small,large vessels,5.5,,5.5,5.5,,swell|other,,,,,,,,,CI
 46045,SEKONDI,Ghana,,4.95,-1.7,Very Small,,38.4,34.7,49.4,,1.0,swell|other,GHSEK,,6,0,0,6,Prepared Foodstuffs & Beverages,,GH
@@ -3134,9 +3134,9 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 46207,OKRIKA,Nigeria,,4.72,7.08,Very Small,large vessels,42.1,,31.1,42.1,5.0,tide|swell|other,NGOKR,,17,0,0,17,,,NG
 46239,EGINA OIL TERMINAL,Nigeria,,3.07,6.7,Very Small,large vessels,5.5,42.1,5.5,5.5,,swell,,,1,0,0,1,,,NG
 46340,COGO,Equatorial Guinea,,1.08,9.7,Very Small,medium vessels,45.7,34.7,20.1,,2.0,tide|swell,GQCOG,,,,,,,,GN
-46375,SANTO ANTONIO,São Tomé and Príncipe,,1.65,7.45,Very Small,,53.0,53.0,34.7,,5.0,,STSAA,,,,,,,,
+46375,SANTO ANTONIO,São Tomé and Príncipe,,1.65,7.45,Very Small,,53.0,53.0,34.7,,5.0,,STSAA,,,,,,,,ST
 46380,SAO TOME,São Tomé and Príncipe,,0.35,6.73,Very Small,,49.4,56.7,49.4,,,other,,,,,,,,,
-46445,CAP LOPEZ,Gabon,,-0.63,8.72,Very Small,large vessels,5.5,,5.5,5.5,2.0,tide|swell|other,,,49,0,0,49,,,GA
+46445,CAP LOPEZ,Gabon,,-0.63,8.72,Very Small,large vessels,5.5,,5.5,5.5,2.0,tide|swell|other,GACLZ,,49,0,0,49,,,GA
 46454,M'BYA OIL TERMINAL,Gabon,,-3.88,10.93,Very Small,large vessels,5.5,,5.5,5.5,1.0,other,,,6,0,0,6,,,GA
 46459,DUSSAFU TERMINAL,Republic of the Congo,,-4.25,10.82,Very Small,large vessels,5.5,5.5,5.5,5.5,,swell,,,8,0,0,8,,,CG
 46485,TAKULA TERMINAL,Angola,,-5.22,11.78,Small,large vessels,,,5.5,5.5,1.0,swell|other,AOTAK,,,,,,,,AO
@@ -3148,7 +3148,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 46570,PORTO AMBOIM,Angola,,-10.73,13.75,Very Small,,5.5,53.0,16.5,,1.0,swell,AOPBN,AF-SAF,,,,,,,AO
 46580,SUMBE,Angola,,-11.2,13.83,Very Small,,5.5,53.0,42.1,,1.0,swell,AONDD,,,,,,,,AO
 46650,LUDERITZ BAY,Namibia,,-26.65,15.15,Small,medium vessels,42.1,42.1,16.5,45.7,1.0,other,NALUD,AF-SAF,72,9,29,23,Mineral Products,,NA
-46690,JAMESTOWN,Saint Helena,,-15.92,-5.72,Very Small,large vessels,5.5,56.7,5.5,,1.0,tide|swell|other,SHRPT,AF-SAF,,,,,,,
+46690,JAMESTOWN,Saint Helena,,-15.92,-5.72,Very Small,large vessels,5.5,56.7,5.5,,1.0,tide|swell|other,SHRPT,AF-SAF,,,,,,,SH
 46710,EDINBURGH OF THE SEVEN SEAS,Saint Helena,,-37.05,-12.3,Very Small,medium vessels,5.5,,5.5,,2.0,other,,,,,,,,,
 46880,INHAMBANE,Mozambique,,-23.92,35.4,Small,,49.4,45.7,34.7,,3.0,swell,MZINH,,,,,,,,MZ
 46900,CHINDE,Mozambique,,-18.57,36.5,Small,medium vessels,56.7,,49.4,,3.0,other,MZINE,,,,,,,,MZ
@@ -3167,9 +3167,9 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 47130,KISMAAYO,Somalia,,-0.37,42.55,Very Small,large vessels,42.1,42.1,42.1,,2.0,swell|other,SOKMU,AF-EAF,54,11,8,7,,,SO
 47140,BARAAWE,Somalia,,1.1,44.05,Very Small,,5.5,,23.8,,5.0,,,,,,,,,,SO
 47150,MARKA,Somalia,,1.72,44.78,Very Small,,5.5,56.7,9.1,,3.0,tide|other,,,,,,,,,SO
-47300,MORONI,Comoros,,-11.7,43.25,Very Small,medium vessels,5.5,53.0,9.1,53.0,3.0,other,KMYVA,AF-ISL,90,33,17,11,Prepared Foodstuffs & Beverages,,
+47300,MORONI,Comoros,,-11.7,43.25,Very Small,medium vessels,5.5,53.0,9.1,53.0,3.0,other,KMYVA,AF-ISL,90,33,17,11,Prepared Foodstuffs & Beverages,,KM
 47310,FOMBONI,Comoros,,-12.27,43.75,Very Small,medium vessels,5.5,23.8,20.1,,2.0,swell|other,,,,,,,,,
-47320,MOUTSAMOUDU,Comoros,,-12.15,44.4,Very Small,medium vessels,38.4,42.1,5.5,34.7,2.0,other,KMMUT,AF-ISL,79,28,5,10,Mineral Products,,
+47320,MOUTSAMOUDU,Comoros,,-12.15,44.4,Very Small,medium vessels,38.4,42.1,5.5,34.7,2.0,other,KMMUT,AF-ISL,79,28,5,10,Mineral Products,,KM
 47420,MAINTIRANO,Madagascar,,-18.07,44.02,Very Small,,53.0,,42.1,,2.0,swell|other,MGMXT,,,,,,,,MG
 47430,MORONDAVA,Madagascar,,-20.28,44.3,Very Small,,27.4,56.7,42.1,,5.0,swell,MGMOQ,,,,,,,,MG
 47500,MANAKARA,Madagascar,,-22.12,48.05,Very Small,,42.1,56.7,27.4,,,tide|swell|other,MGWVK,,,,,,,,MG
@@ -3177,8 +3177,8 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 47590,MAROANTSETRA,Madagascar,,-15.45,49.82,Very Small,,5.5,,34.7,,,other,MGWMN,,,,,,,,MG
 47620,IHARANA,Madagascar,,-13.35,50.0,Very Small,medium vessels,27.4,49.4,27.4,,8.0,,,,,,,,,,MG
 47625,ANTSOHIM BONDRONA,Madagascar,,-13.08,48.83,Very Small,,42.1,42.1,42.1,,,other,,,,,,,,,MG
-47680,SAINT-DENIS,Réunion,,-20.87,55.45,Very Small,large vessels,5.5,,20.1,,,swell|other,RERUN,,,,,,,,
-47700,SAINT-PIERRE,Réunion,,-21.35,55.47,Very Small,,27.4,56.7,5.5,,2.0,swell|other,PMFSP,,,,,,,,
+47680,SAINT-DENIS,Réunion,,-20.87,55.45,Very Small,large vessels,5.5,,20.1,,,swell|other,RERUN,,,,,,,,RE
+47700,SAINT-PIERRE,Réunion,,-21.35,55.47,Very Small,,27.4,56.7,5.5,,2.0,swell|other,PMFSP,,,,,,,,PM
 47750,PORT MATHURIN,Mauritius,,-19.68,63.42,Very Small,,42.1,,23.8,,4.0,swell|other,MUPMA,AF-ISL,,,,,,,MU
 47830,BOOSAASO,Somalia,,11.28,49.18,Small,medium vessels,,45.7,20.1,,,other,,,81,1,6,13,Vegetable Products,,SO
 47942,AL KHAIR OIL TERMINAL,Sudan,,19.58,37.25,Small,,,,,27.4,,,,,535,135,88,128,Mineral Products,,SD
@@ -3348,19 +3348,19 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 55370,OTAGO HARBOR,New Zealand,,-45.82,170.63,Small,medium vessels,27.4,31.1,5.5,49.4,2.0,tide|other,NZPOE,OC-OCE,330,167,76,76,,,NZ
 55440,GREYMOUTH,New Zealand,,-42.43,171.22,Very Small,medium vessels,56.7,49.4,20.1,,3.0,tide|other,NZGMN,OC-OCE,,,,,,,NZ
 55450,WESTPORT,New Zealand,,-41.75,171.6,Very Small,medium vessels,53.0,53.0,20.1,,2.0,tide|other,NZWSZ,OC-OCE,,,,,,,NZ
-55500,KINGSTON,Norfolk Island,,-29.07,167.95,Very Small,medium vessels,56.7,56.7,20.1,34.7,4.0,tide|swell|other,NFNLK,OC-OCE,,,,,,,
+55500,KINGSTON,Norfolk Island,,-29.07,167.95,Very Small,medium vessels,56.7,56.7,20.1,34.7,4.0,tide|swell|other,NFNLK,OC-OCE,,,,,,,JM
 55556,MALAI,Fiji,,-16.35,179.37,Very Small,,38.4,34.7,23.8,34.7,2.0,other,FJMAL,OC-OCE,48,0,3,44,Prepared Foodstuffs & Beverages,,FJ
 55560,SAVUSAVU BAY,Fiji,,-16.77,179.33,Very Small,medium vessels,56.7,49.4,5.5,,1.0,other,,,4,0,0,0,,,FJ
-55600,PANGAI,Tonga,,-19.8,-174.35,Very Small,medium vessels,49.4,56.7,5.5,,2.0,other,TOPAN,,,,,,,,
-55610,NEIAFU,Tonga,,-18.65,-173.98,Very Small,medium vessels,49.4,42.1,5.5,,1.0,other,TONEI,OC-OCE,39,3,0,3,Animal & Animal Products,,
+55600,PANGAI,Tonga,,-19.8,-174.35,Very Small,medium vessels,49.4,56.7,5.5,,2.0,other,TOPAN,,,,,,,,TO
+55610,NEIAFU,Tonga,,-18.65,-173.98,Very Small,medium vessels,49.4,42.1,5.5,,1.0,other,TONEI,OC-OCE,39,3,0,3,Animal & Animal Products,,TO
 55617,FUNAFUTI ATOLL,Tuvalu,,-8.52,179.13,Very Small,medium vessels,49.4,49.4,31.1,42.1,4.0,tide|swell|other,,,23,9,0,9,Animal & Animal Products,,
 55650,MATA-UTU,Wallis and Futuna,,-13.28,-176.13,Very Small,medium vessels,45.7,53.0,34.7,,4.0,other,,,,,,,,,
-55695,ALOFI,Niue,,-19.03,-169.93,Very Small,,5.5,56.7,5.5,,2.0,,NUALO,OC-OCE,,,,,,,
-55770,VAITAPE,French Polynesia,,-16.5,-151.75,Very Small,medium vessels,38.4,53.0,5.5,,,other,PFVAI,,,,,,,,
-55800,UTUROA,French Polynesia,,-16.73,-151.45,Very Small,,34.7,45.7,5.5,,,swell|other,PFUTU,OC-OCE,178,19,0,0,Prepared Foodstuffs & Beverages,,
+55695,ALOFI,Niue,,-19.03,-169.93,Very Small,,5.5,56.7,5.5,,2.0,,NUALO,OC-OCE,,,,,,,NU
+55770,VAITAPE,French Polynesia,,-16.5,-151.75,Very Small,medium vessels,38.4,53.0,5.5,,,other,PFVAI,,,,,,,,PF
+55800,UTUROA,French Polynesia,,-16.73,-151.45,Very Small,,34.7,45.7,5.5,,,swell|other,PFUTU,OC-OCE,178,19,0,0,Prepared Foodstuffs & Beverages,,PF
 55960,PORT RIKITEA,French Polynesia,,-23.12,-134.97,Very Small,medium vessels,42.1,56.7,5.5,,2.0,other,,,,,,,,,
 56010,ATUONA,French Polynesia,,-9.82,-139.03,Very Small,,31.1,,38.4,,3.0,other,,,,,,,,,
-56015,BAIE TAIOHAE,French Polynesia,,-8.93,-140.08,Very Small,,38.4,,31.1,,3.0,tide|swell|other,PFTAI,OC-OCE,,,,,,,
+56015,BAIE TAIOHAE,French Polynesia,,-8.93,-140.08,Very Small,,38.4,,31.1,,3.0,tide|swell|other,PFTAI,OC-OCE,,,,,,,PF
 56025,CANTON ISLAND,Kiribati,,-2.83,-171.72,Very Small,,42.1,42.1,45.7,,3.0,swell|other,,,,,,,,,
 56039,ENGLISH HARBOR,Kiribati,,3.85,-159.37,Very Small,medium vessels,5.5,,20.1,,1.0,tide|swell|other,,,,,,,,,
 56070,HONOKAA,United States,,20.1,-155.47,Very Small,,31.1,56.7,31.1,,2.0,,,,,,,,,,US
@@ -3387,12 +3387,12 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 56350,ENITWETAK ISLAND,Marshall Islands,,11.33,162.33,Very Small,,31.1,42.1,12.8,,1.0,other,,,,,,,,,
 56450,TARAWA ATOLL,Kiribati,,1.33,172.93,Very Small,medium vessels,42.1,45.7,42.1,,3.0,other,,,49,24,0,11,Prepared Foodstuffs & Beverages,,
 56530,TINIAN,Northern Mariana Islands,,14.97,145.62,Very Small,medium vessels,42.1,42.1,20.1,,1.0,other,,,15,0,0,8,Prepared Foodstuffs & Beverages,,
-56540,ROTA,Northern Mariana Islands,,14.13,145.15,Very Small,,5.5,56.7,5.5,,1.0,other,ESROT,,16,0,0,7,Metals,,
+56540,ROTA,Northern Mariana Islands,,14.13,145.15,Very Small,,5.5,56.7,5.5,,1.0,other,ESROT,,16,0,0,7,Metals,,ES
 56570,LELE HARBOR,Micronesia,,5.33,163.03,Very Small,,27.4,42.1,31.1,42.1,1.0,swell|other,,,,,,,,,
 56590,POHNPEI HARBOR,Micronesia,,6.98,158.2,Small,medium vessels,38.4,38.4,5.5,42.1,2.0,other,,,66,37,0,12,Animal & Animal Products,,
-56600,MOEN,Micronesia,,7.43,151.83,Very Small,,42.1,42.1,,42.1,1.0,other,BEMNO,,39,18,0,9,Animal & Animal Products,,
-56630,COLONIA,Micronesia,,9.52,138.13,Very Small,medium vessels,5.5,42.1,5.5,,1.0,other,FMYAP,OC-OCE,50,29,0,7,Animal & Animal Products,,
-56660,MALAKAL HARBOR,Palau,,7.33,134.45,Very Small,medium vessels,31.1,45.7,20.1,45.7,4.0,swell|other,PWROR,OC-OCE,57,35,0,9,Prepared Foodstuffs & Beverages,,
+56600,MOEN,Micronesia,,7.43,151.83,Very Small,,42.1,42.1,,42.1,1.0,other,BEMNO,,39,18,0,9,Animal & Animal Products,,BE
+56630,COLONIA,Micronesia,,9.52,138.13,Very Small,medium vessels,5.5,42.1,5.5,,1.0,other,FMYAP,OC-OCE,50,29,0,7,Animal & Animal Products,,FM
+56660,MALAKAL HARBOR,Palau,,7.33,134.45,Very Small,medium vessels,31.1,45.7,20.1,45.7,4.0,swell|other,PWROR,OC-OCE,57,35,0,9,Prepared Foodstuffs & Beverages,,PW
 56710,LONGAN ISLAND,Papua New Guinea,,-1.22,144.3,Very Small,,34.7,56.7,42.1,,2.0,other,,,,,,,,,PG
 56738,WEWAK HARBOR,Papua New Guinea,,-3.57,143.63,Small,medium vessels,23.8,45.7,23.8,,1.0,tide|swell,PGWWK,OC-OCE,99,31,21,22,Mineral Products,,PG
 56740,HAMBURG HARBOR,Papua New Guinea,,-1.63,149.97,Very Small,medium vessels,31.1,42.1,23.8,,2.0,other,,,,,,,,,PG
@@ -3401,12 +3401,12 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 56835,KIMBE,Papua New Guinea,,-5.13,150.53,Very Small,medium vessels,,34.7,,34.7,1.0,other,PGKIM,,,,,,,,PG
 56840,BIALLA,Papua New Guinea,,-5.3,150.98,Very Small,,,,,31.1,1.0,,,,16,1,0,14,,,PG
 56945,QUEEN CAROLA HARBOR,Papua New Guinea,,-5.17,154.55,Very Small,medium vessels,20.1,56.7,34.7,,2.0,other,,,,,,,,,PG
-56970,GIZO HARBOR,Solomon Islands,,-8.1,156.85,Very Small,medium vessels,31.1,49.4,5.5,,1.0,swell|other,SBGZO,OC-OCE,0,0,0,0,,,
-57005,RINGGI COVE,Solomon Islands,,-8.12,157.1,Small,medium vessels,5.5,42.1,,,1.0,,SBRIN,OC-OCE,6,0,3,0,,,
-57070,YANDINA,Solomon Islands,,-9.08,159.22,Very Small,medium vessels,5.5,45.7,5.5,,1.0,other,SBXYA,OC-OCE,,,,,,,
+56970,GIZO HARBOR,Solomon Islands,,-8.1,156.85,Very Small,medium vessels,31.1,49.4,5.5,,1.0,swell|other,SBGZO,OC-OCE,0,0,0,0,,,SB
+57005,RINGGI COVE,Solomon Islands,,-8.12,157.1,Small,medium vessels,5.5,42.1,,,1.0,,SBRIN,OC-OCE,6,0,3,0,,,SB
+57070,YANDINA,Solomon Islands,,-9.08,159.22,Very Small,medium vessels,5.5,45.7,5.5,,1.0,other,SBXYA,OC-OCE,,,,,,,SB
 57100,TULAGHI,Solomon Islands,,-9.1,160.15,Very Small,medium vessels,5.5,56.7,5.5,,1.0,other,,,,,,,,,
 57245,FORARI BAY,Vanuatu,,-17.68,168.55,Very Small,medium vessels,,42.1,12.8,,,swell,,,,,,,,,
-57275,BAIE DE KOUAOUA,New Caledonia,,-21.38,165.82,Very Small,medium vessels,49.4,42.1,12.8,,,,NCKOU,OC-OCE,12,0,12,0,Mineral Products,,
+57275,BAIE DE KOUAOUA,New Caledonia,,-21.38,165.82,Very Small,medium vessels,49.4,42.1,12.8,,,,NCKOU,OC-OCE,12,0,12,0,Mineral Products,,NC
 57325,BAIE UGUE,New Caledonia,,-21.15,165.55,Very Small,large vessels,,34.7,27.4,,1.0,other,,,11,0,11,0,Mineral Products,,
 57420,KUALA TRENGGANU,Malaysia,,5.35,103.13,Very Small,,49.4,,42.1,,4.0,other,,,,,,,,,MY
 57425,TAPIS MARINE TERMINAL A,Malaysia,,5.52,105.02,Major,large vessels,5.5,,,5.5,,other,,,,,,,,,MY
@@ -3582,7 +3582,7 @@ wpi_id,name,country,state,latitude,longitude,port_size,max_vessel_size,channel_d
 63070,ELLEFSEN HARBOR,Antarctica,,-60.73,-45.03,Very Small,,34.7,,5.5,,,ice|other,,,,,,,,,
 63080,SCOTIA BAY,Antarctica,,-60.75,-44.72,Very Small,,5.5,,27.4,,,ice|other,,,,,,,,,
 63090,ADMIRALTY BAY,Antarctica,,-62.08,-58.42,Very Small,,5.5,,5.5,,,ice,,,,,,,,,
-63095,PORT FOSTER,Antarctica,,-62.95,-60.63,Very Small,,5.5,,9.1,,,ice,,,,,,,,,
+63095,PORT FOSTER,Antarctica,,-62.95,-60.63,Very Small,,5.5,,9.1,,,ice,AQPFS,,,,,,,,AQ
 63100,PORT LOCKROY,Antarctica,,-64.82,-63.5,Very Small,,12.8,,20.1,,3.0,ice,,,,,,,,,
 63110,MELCHIOR HARBOR,Antarctica,,-64.32,-63.0,Very Small,,49.4,,5.5,,,swell|ice,,,,,,,,,
 63120,ANDERSEN HARBOR,Antarctica,,-64.32,-62.93,Very Small,,5.5,,12.8,,,swell|ice,,,,,,,,,
