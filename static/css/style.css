@@ -119,6 +119,11 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 /* ── Detail card (right side, no overlap) ── */
 #pcard{position:absolute;top:var(--map-edge);right:var(--map-edge);width:var(--shipcard-w);max-height:var(--panel-h);pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:var(--fs-sm);transform:translateX(calc(100% + 20px));transition:transform .22s ease;overflow:hidden;z-index:20}
 #pcard.open{transform:translateX(0)}
+/* ── Intro card (left, beside rail) ── */
+#introcard{position:absolute;top:var(--map-edge);left:var(--vlist-left);width:var(--vlist-w);max-height:var(--panel-h);pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:var(--fs-sm);overflow:hidden;overflow-y:auto;z-index:15}
+#introcard:empty{display:none}
+#introcard .close{position:absolute;top:var(--s2);right:var(--s2);cursor:pointer;color:var(--text3);background:none;border:none;padding:4px}
+#introcard .close:hover{color:var(--text)}
 .sc-head{padding:var(--s3) var(--s4);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1);position:relative}
 .sc-title{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
 .sc-name{font-size:15px;font-weight:700;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

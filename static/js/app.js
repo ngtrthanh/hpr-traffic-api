@@ -869,33 +869,25 @@ async function loadStats() {
 }
 
 function showIntroCard() {
-  document.getElementById('pcardIcon').textContent = '🌐';
-  document.getElementById('pcardName').innerHTML = 'HPRadar Traffic';
-  document.getElementById('pcardType').textContent = 'v1.5';
-  document.getElementById('pcardMeta').innerHTML = 'Aviation & Maritime Data Explorer';
-  document.getElementById('pcardBody').innerHTML = `
+  const el = document.getElementById('introcard');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="sc-head"><div class="sc-title"><span>🌐</span><span class="sc-name">HPRadar Traffic</span><span class="sc-type">v1.5</span></div><div class="sc-meta">Aviation & Maritime Data Explorer</div><button class="close btn-icon" onclick="document.getElementById('introcard').innerHTML=''" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="sc-body">
     <div class="sc-section">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0">
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">🚢 Marine</div>
           <div style="font-size:11px;color:var(--text2);line-height:1.8">
-            <div>747k vessels</div>
-            <div>3,630 seaports</div>
-            <div>29.5k sea lanes</div>
-            <div>98 operators</div>
-            <div>44 notable ships</div>
-            <div>Dijkstra routing</div>
+            <div>747k vessels</div><div>3,630 seaports</div><div>29.5k sea lanes</div>
+            <div>98 operators</div><div>44 notable ships</div><div>Dijkstra routing</div>
           </div>
         </div>
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">✈ Aviation</div>
           <div style="font-size:11px;color:var(--text2);line-height:1.8">
-            <div>566k aircraft</div>
-            <div>8,001 airports</div>
-            <div>521k flight routes</div>
-            <div>2,111 airlines</div>
-            <div>Multi-hop graph</div>
-            <div>Great-circle arcs</div>
+            <div>566k aircraft</div><div>8,001 airports</div><div>521k flight routes</div>
+            <div>2,111 airlines</div><div>Multi-hop graph</div><div>Great-circle arcs</div>
           </div>
         </div>
       </div>
@@ -903,9 +895,9 @@ function showIntroCard() {
     <div class="sc-section"><div class="st">Quick Start</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.8">
         <b>Search:</b> "Singapore to Rotterdam" or "VVNB to KLAX"<br>
-        <b>Click:</b> any port or airport for details + routes<br>
-        <b>Layers:</b> toggle ports, airports, shipping lanes<br>
-        <b>List:</b> browse ports, operators, airports, airlines
+        <b>Click:</b> any port or airport for details<br>
+        <b>Layers:</b> toggle map data<br>
+        <b>List:</b> ports, operators, airports, airlines
       </div>
     </div>
     <div class="sc-section"><div class="st">Connections</div>
@@ -913,34 +905,22 @@ function showIntroCard() {
         <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">REST /v1/*</span>
         <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">WebSocket /ws</span>
         <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">Binary HPRA</span>
-        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">MCP /mcp</span>
+        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">MCP</span>
         <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">GeoJSON</span>
       </div>
     </div>
     <div class="sc-section">
-      <div style="font-size:10px;color:var(--text3);line-height:1.6">
-        <b>Data Credits:</b><br>
-        Flight routes & aircraft — <a href="https://adsbdb.com" target="_blank" style="color:var(--text2)">adsbdb.com</a> (CC)<br>
-        Airports — <a href="https://ourairports.com" target="_blank" style="color:var(--text2)">OurAirports</a> (Public domain)<br>
-        Airlines — <a href="https://github.com/vradarserver/standing-data" target="_blank" style="color:var(--text2)">VRS Standing Data</a> (Open source)<br>
-        Seaports — <a href="https://msi.nga.mil/Publications/WPI" target="_blank" style="color:var(--text2)">NGA World Port Index</a> (US Gov PD)<br>
-        Sea distances — <a href="https://msi.nga.mil/Publications/Distances" target="_blank" style="color:var(--text2)">NGA PUB 151</a> (US Gov PD)<br>
-        Ship registry — <a href="https://www.itu.int" target="_blank" style="color:var(--text2)">ITU List V 2025</a> (ITU publication)<br>
-        Shipping lanes — <a href="https://github.com/newzealandpaul/Shipping-Lanes" target="_blank" style="color:var(--text2)">Paul Benden / CIA</a> (CC BY 4.0)<br>
-        Maritime network — <a href="https://github.com/eurostat/searoute" target="_blank" style="color:var(--text2)">eurostat/searoute</a> (EUPL-1.2)<br>
-        Port performance — <a href="https://www.worldbank.org/en/topic/transport/publication/cppi" target="_blank" style="color:var(--text2)">World Bank CPPI 2025</a><br>
-        Data cleanup & enrichment — <a href="https://hpradar.com" target="_blank" style="color:var(--text2)">HPRadar</a> (TEU, coords, classification)<br>
-        Flags — <a href="https://github.com/lipis/flag-icons" target="_blank" style="color:var(--text2)">flag-icons</a> (MIT)
+      <div style="font-size:10px;color:var(--text3);line-height:1.5">
+        <b>Credits:</b> adsbdb · OurAirports · VRS · NGA WPI/PUB151 · ITU List V · CIA/Paul Benden · eurostat · World Bank CPPI · HPRadar · flag-icons
       </div>
     </div>
     <div class="sc-section">
       <div style="font-size:11px;color:var(--text2);line-height:1.6;text-align:center">
-        ⭐ Open source — contributions welcome!<br>
-        <a href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank" style="color:var(--accent);font-weight:600">Star · Fork · PR</a>
+        ⭐ Open source — <a href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank" style="color:var(--accent);font-weight:600">Star · Fork · PR</a>
       </div>
-    </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank">⭐ GitHub</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a><button class="act" onclick="closeCard()">Explore Map</button>`;
-  openCard();
+    </div>
+    </div>
+    <div class="sc-actions"><a class="act" href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank">⭐ GitHub</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a><a class="act" href="https://hpradar.com" target="_blank">HPRadar</a></div>`;
 }
 
 // List stays closed until user opens it

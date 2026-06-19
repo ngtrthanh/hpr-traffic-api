@@ -1556,16 +1556,52 @@ func main() {
 	// === Sea routes v1 ===
 
 	mux.HandleFunc("/v1/sea-routes/from/", func(w http.ResponseWriter, r *http.Request) {
-		origin := r.URL.Path[len("/v1/sea-routes/from/"):]
+		origin := strings.TrimSpace(r.URL.Path[len("/v1/sea-routes/from/"):])
 		key := strings.ToUpper(origin)
 		rts := seaRoutesByOrigin[key]
 		if len(rts) == 0 {
-			keyNoSpc := strings.ReplaceAll(key, " ", "")
+			keyNoSpc := strings.ReplaceAll(strings.ReplaceAll(key, " ", ""), "-", "")
 			for k, v := range seaRoutesByOrigin {
 				ku := strings.ToUpper(k)
-				if strings.Contains(ku, key) || strings.Contains(strings.ReplaceAll(ku, " ", ""), keyNoSpc) {
+				if strings.Contains(ku, key) || strings.Contains(strings.ReplaceAll(strings.ReplaceAll(ku, " ", ""), "-", ""), keyNoSpc) {
 					rts = v
 					break
+				}
+			}
+		}
+		// Dijkstra fallback: compute routes to major ports via marnet graph
+		if len(rts) == 0 {
+			var port *Seaport
+			qu := strings.ToUpper(strings.TrimSpace(origin))
+			qn := strings.ReplaceAll(strings.ReplaceAll(qu, " ", ""), "-", "")
+			for i := range seaports {
+				n := strings.ToUpper(seaports[i].Name)
+				if n == qu || strings.Contains(n, qu) || strings.Contains(strings.ReplaceAll(strings.ReplaceAll(n, " ", ""), "-", ""), qn) {
+					port = &seaports[i]
+					break
+				}
+			}
+			if port != nil {
+				srcNode, srcDist := nearestNode(port.Lon, port.Lat)
+				if srcNode >= 0 && srcDist < 200 {
+					// Compute distances to top ports by TEU
+					for i := range seaports {
+						dp := &seaports[i]
+						if dp.TEUThousands == 0 || dp.Name == port.Name {
+							continue
+						}
+						dstNode, dstDist := nearestNode(dp.Lon, dp.Lat)
+						if dstNode < 0 || dstDist > 200 {
+							continue
+						}
+						_, dist, _ := dijkstraRoute(srcNode, dstNode)
+						if dist > 0 {
+							rts = append(rts, SeaRoute{Origin: port.Name, Destination: dp.Name + ", " + dp.Country, DistanceNM: math.Round(dist), Type: "port"})
+						}
+						if len(rts) >= 30 {
+							break
+						}
+					}
 				}
 			}
 		}
