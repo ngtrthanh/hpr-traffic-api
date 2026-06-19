@@ -21,7 +21,7 @@ The API will be available at `http://localhost:8081`.
 | Aircraft | 566k | [adsbdb.com](https://www.adsbdb.com/) |
 | Flight Routes | 507k | [adsbdb.com](https://www.adsbdb.com/) |
 | Airlines | 6,118 | [VRS Standing Data](https://github.com/vradarserver/standing-data) |
-| Airports | 8,001 | [OurAirports](https://ourairports.com/) |
+| Airports | 9,208 | [OurAirports](https://ourairports.com/) |
 | Ships | 746k | [ITU List V 2025](https://www.itu.int/en/publications/Pages/default.aspx) |
 | Seaports | 17,699 | [UN/LOCODE 2024-2](https://unece.org/trade/uncefact/unlocode) + [NGA WPI](https://msi.nga.mil/Publications/WPI) |
 | Sea Distances | 23,293 pairs | [NGA PUB 151](https://msi.nga.mil/Publications/Distances) |

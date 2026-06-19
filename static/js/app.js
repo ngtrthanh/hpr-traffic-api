@@ -887,7 +887,7 @@ function showIntroCard() {
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">✈ Aviation</div>
           <div style="font-size:11px;color:var(--text2);line-height:1.8">
-            <div>566k aircraft</div><div>8,001 airports</div><div>521k flight routes</div>
+            <div>566k aircraft</div><div>9.2k airports</div><div>521k flight routes</div>
             <div>2,111 airlines</div><div>Multi-hop graph</div><div>Great-circle arcs</div>
           </div>
         </div>

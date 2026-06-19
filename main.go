@@ -171,12 +171,14 @@ type Airport struct {
 	ICAO        string  `json:"icao_code"`
 	IATA        string  `json:"iata_code"`
 	Name        string  `json:"name"`
-	City        string  `json:"municipality"`
-	Country     string  `json:"country_name"`
-	CountryCode string  `json:"country_code"`
+	City        string  `json:"municipality,omitempty"`
+	Country     string  `json:"country_code"`
+	CountryCode string  `json:"-"`
 	Lat         float64 `json:"latitude"`
 	Lon         float64 `json:"longitude"`
-	Elevation   int     `json:"elevation"`
+	Elevation   int     `json:"elevation,omitempty"`
+	Type        string  `json:"type,omitempty"`
+	Scheduled   bool    `json:"scheduled_service"`
 }
 
 type Route struct {
@@ -365,17 +367,33 @@ func loadAirports(path string) error {
 	}
 	defer f.Close()
 	r := csv.NewReader(f)
+	r.FieldsPerRecord = -1
 	r.Read()
-	airports = make(map[string]Airport, 8000)
+	airports = make(map[string]Airport, 10000)
 	for {
 		rec, err := r.Read()
 		if err != nil {
 			break
 		}
+		if len(rec) < 8 {
+			continue
+		}
 		lat, _ := strconv.ParseFloat(rec[5], 64)
 		lon, _ := strconv.ParseFloat(rec[6], 64)
 		elev, _ := strconv.Atoi(rec[7])
-		airports[rec[0]] = Airport{ICAO: rec[0], IATA: rec[1], Name: rec[2], City: rec[3], Country: rec[4], CountryCode: icaoCountryCode(rec[0]), Lat: lat, Lon: lon, Elevation: elev}
+		cc := rec[4]
+		if cc == "" {
+			cc = icaoCountryCode(rec[0])
+		}
+		var aptType string
+		var scheduled bool
+		if len(rec) > 8 {
+			aptType = rec[8]
+		}
+		if len(rec) > 9 {
+			scheduled = rec[9] == "yes"
+		}
+		airports[rec[0]] = Airport{ICAO: rec[0], IATA: rec[1], Name: rec[2], City: rec[3], Country: cc, CountryCode: cc, Lat: lat, Lon: lon, Elevation: elev, Type: aptType, Scheduled: scheduled}
 	}
 	return nil
 }
