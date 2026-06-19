@@ -107,7 +107,8 @@ async function loadPorts() {
       const flags = dv.getUint8(o + 13);
       const teu = dv.getUint16(o + 14, true);
       const countryRaw = strings[countryIdx] || '';
-      const [country, cc] = countryRaw.includes('|') ? countryRaw.split('|') : [countryRaw, ''];
+      const cc = countryRaw || '';
+      const country = cc;
       const flag = cc ? `<span class="fi fi-${cc.toLowerCase()}"></span>` : '';
       features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] }, properties: {
         name: strings[nameIdx] || '', country, country_code: cc, flag,
@@ -879,7 +880,7 @@ function showIntroCard() {
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">🚢 Marine</div>
           <div style="font-size:11px;color:var(--text2);line-height:1.8">
-            <div>747k vessels</div><div>3,630 seaports</div><div>29.5k sea lanes</div>
+            <div>747k vessels</div><div>17.7k seaports</div><div>29.5k sea lanes</div>
             <div>98 operators</div><div>44 notable ships</div><div>Dijkstra routing</div>
           </div>
         </div>

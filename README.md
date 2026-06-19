@@ -23,7 +23,7 @@ The API will be available at `http://localhost:8081`.
 | Airlines | 6,118 | [VRS Standing Data](https://github.com/vradarserver/standing-data) |
 | Airports | 8,001 | [OurAirports](https://ourairports.com/) |
 | Ships | 746k | [ITU List V 2025](https://www.itu.int/en/publications/Pages/default.aspx) |
-| Seaports | 3,630 | [NGA World Port Index](https://msi.nga.mil/Publications/WPI) |
+| Seaports | 17,699 | [UN/LOCODE 2024-2](https://unece.org/trade/uncefact/unlocode) + [NGA WPI](https://msi.nga.mil/Publications/WPI) |
 | Sea Distances | 23,293 pairs | [NGA PUB 151](https://msi.nga.mil/Publications/Distances) |
 | Shipping Lanes | 3 tiers | [CIA World Oceans Map](https://github.com/newzealandpaul/Shipping-Lanes) |
 
@@ -267,7 +267,8 @@ This project integrates multiple open datasets. Full credit to their creators:
 | Flight routes & aircraft | [adsbdb.com](https://www.adsbdb.com/) — David Taylor (Edinburgh) & Jim Mason (Glasgow) | Community-sourced ADS-B data |
 | Airline reference | [VRS Standing Data](https://github.com/vradarserver/standing-data) | Open source |
 | Airport reference | [OurAirports](https://ourairports.com/data/) | Public domain |
-| Seaport data (WPI) | [NGA World Port Index](https://msi.nga.mil/Publications/WPI) — enriched by [Jordan Taylor](https://linkedin.com/in/tayljordan) | US Government public domain |
+| Seaport data | [UN/LOCODE 2024-2](https://unece.org/trade/uncefact/unlocode) — backbone (17.7k ports) | UNECE open data |
+| Seaport enrichment (WPI) | [NGA World Port Index](https://msi.nga.mil/Publications/WPI) — depths, vessel sizes | US Government public domain |
 | Ship registry | [ITU List V 2025](https://www.itu.int/en/publications/Pages/default.aspx) — International Telecommunication Union | ITU publication |
 | Sea distances (PUB 151) | [NGA Distances Between Ports](https://msi.nga.mil/Publications/Distances) — parsed by [kaklin](https://github.com/kaklin/sea-routes) | US Government public domain |
 | Shipping lanes | [Paul Benden](https://github.com/newzealandpaul/Shipping-Lanes) / CIA World Oceans Map | CC BY 4.0 |

@@ -201,29 +201,21 @@ type CountItem struct {
 }
 
 type Seaport struct {
-	WPIID              string  `json:"wpi_id"`
-	Name               string  `json:"name"`
-	Country            string  `json:"country"`
-	State              string  `json:"state,omitempty"`
-	Lat                float64 `json:"latitude"`
-	Lon                float64 `json:"longitude"`
-	PortSize           string  `json:"port_size"`
-	MaxVesselSize      string  `json:"max_vessel_size"`
-	ChannelDepth       float64 `json:"channel_depth_m,omitempty"`
-	CargoDepth         float64 `json:"cargo_depth_m,omitempty"`
-	AnchorageDepth     float64 `json:"anchorage_depth_m,omitempty"`
-	OilTerminalDepth   float64 `json:"oil_terminal_depth_m,omitempty"`
-	TidalRange         float64 `json:"tidal_range_m,omitempty"`
-	EntranceRestriction string `json:"entrance_restriction,omitempty"`
-	LOCODE             string  `json:"locode,omitempty"`
-	ZoneCode           string  `json:"zone_code,omitempty"`
-	VesselCountTotal   int     `json:"vessel_count_total,omitempty"`
-	VesselCountContainer int   `json:"vessel_count_container,omitempty"`
-	VesselCountDryBulk int     `json:"vessel_count_dry_bulk,omitempty"`
-	VesselCountTanker  int     `json:"vessel_count_tanker,omitempty"`
-	IndustryTop1       string  `json:"industry_top1,omitempty"`
-	TEUThousands       int     `json:"teu_thousands,omitempty"`
-	CountryCode        string  `json:"country_code,omitempty"`
+	LOCODE        string  `json:"locode"`
+	Name          string  `json:"name"`
+	CountryCode   string  `json:"country_code"`
+	Lat           float64 `json:"latitude"`
+	Lon           float64 `json:"longitude"`
+	PortSize      string  `json:"port_size,omitempty"`
+	MaxVesselSize string  `json:"max_vessel_size,omitempty"`
+	ChannelDepth  float64 `json:"channel_depth_m,omitempty"`
+	CargoDepth    float64 `json:"cargo_depth_m,omitempty"`
+	TEUThousands  int     `json:"teu_thousands,omitempty"`
+	ZoneCode      string  `json:"zone_code,omitempty"`
+	WPIID         string  `json:"wpi_id,omitempty"`
+	Function      string  `json:"function,omitempty"`
+	Status        string  `json:"status,omitempty"`
+	Active        bool    `json:"active"`
 }
 
 type SeaRoute struct {
@@ -431,8 +423,9 @@ func loadSeaports(path string) error {
 	}
 	defer f.Close()
 	r := csv.NewReader(f)
-	r.Read() // skip header
-	portByLOCODE = make(map[string]*Seaport, 4000)
+	r.FieldsPerRecord = -1
+	r.Read() // skip header: locode,name,country_code,latitude,longitude,port_size,max_vessel_size,channel_depth_m,cargo_depth_m,teu_thousands,zone_code,wpi_id,function,status,active
+	portByLOCODE = make(map[string]*Seaport, 18000)
 	portByWPI = make(map[string]*Seaport, 4000)
 	portsByCountry = make(map[string][]*Seaport)
 	portsByZone = make(map[string][]*Seaport)
@@ -441,42 +434,31 @@ func loadSeaports(path string) error {
 		if err != nil {
 			break
 		}
-		lat, _ := strconv.ParseFloat(rec[4], 64)
-		lon, _ := strconv.ParseFloat(rec[5], 64)
-		chD, _ := strconv.ParseFloat(rec[8], 64)
-		caD, _ := strconv.ParseFloat(rec[9], 64)
-		anD, _ := strconv.ParseFloat(rec[10], 64)
-		oiD, _ := strconv.ParseFloat(rec[11], 64)
-		tid, _ := strconv.ParseFloat(rec[12], 64)
-		vt, _ := strconv.Atoi(rec[16])
-		vc, _ := strconv.Atoi(rec[17])
-		vb, _ := strconv.Atoi(rec[18])
-		vk, _ := strconv.Atoi(rec[19])
-		var teu int
-		if len(rec) > 21 && rec[21] != "" {
-			teu, _ = strconv.Atoi(rec[21])
+		if len(rec) < 15 {
+			continue
 		}
-		var cc string
-		if len(rec) > 22 {
-			cc = rec[22]
-		}
+		lat, _ := strconv.ParseFloat(rec[3], 64)
+		lon, _ := strconv.ParseFloat(rec[4], 64)
+		chD, _ := strconv.ParseFloat(rec[7], 64)
+		caD, _ := strconv.ParseFloat(rec[8], 64)
+		teu, _ := strconv.Atoi(rec[9])
 		sp := Seaport{
-			WPIID: rec[0], Name: rec[1], Country: rec[2], State: rec[3],
+			LOCODE: rec[0], Name: rec[1], CountryCode: rec[2],
 			Lat: lat, Lon: lon,
-			PortSize: rec[6], MaxVesselSize: rec[7],
-			ChannelDepth: chD, CargoDepth: caD, AnchorageDepth: anD, OilTerminalDepth: oiD,
-			TidalRange: tid, EntranceRestriction: rec[13],
-			LOCODE: rec[14], ZoneCode: rec[15],
-			VesselCountTotal: vt, VesselCountContainer: vc, VesselCountDryBulk: vb, VesselCountTanker: vk,
-			IndustryTop1: rec[20], TEUThousands: teu, CountryCode: cc,
+			PortSize: rec[5], MaxVesselSize: rec[6],
+			ChannelDepth: chD, CargoDepth: caD,
+			TEUThousands: teu, ZoneCode: rec[10], WPIID: rec[11],
+			Function: rec[12], Status: rec[13], Active: rec[14] == "1",
 		}
 		seaports = append(seaports, sp)
 		ptr := &seaports[len(seaports)-1]
 		if sp.LOCODE != "" {
 			portByLOCODE[sp.LOCODE] = ptr
 		}
-		portByWPI[sp.WPIID] = ptr
-		portsByCountry[strings.ToUpper(sp.Country)] = append(portsByCountry[strings.ToUpper(sp.Country)], ptr)
+		if sp.WPIID != "" {
+			portByWPI[sp.WPIID] = ptr
+		}
+		portsByCountry[strings.ToUpper(sp.CountryCode)] = append(portsByCountry[strings.ToUpper(sp.CountryCode)], ptr)
 		if sp.ZoneCode != "" {
 			portsByZone[sp.ZoneCode] = append(portsByZone[sp.ZoneCode], ptr)
 		}
@@ -1164,10 +1146,7 @@ func buildPortsBinary() []byte {
 	pts := make([]bp, len(seaports))
 	for i := range seaports {
 		p := &seaports[i]
-		cs := p.Country
-		if p.CountryCode != "" {
-			cs = p.Country + "|" + p.CountryCode
-		}
+		cs := p.CountryCode
 		pts[i] = bp{int32(p.Lat * 1e6), int32(p.Lon * 1e6), sizeMap[p.PortSize], addStr(p.Name), addStr(cs), 0, uint16(p.TEUThousands)}
 		if p.LOCODE != "" {
 			pts[i].flags |= 0x01
@@ -1606,7 +1585,7 @@ func main() {
 						}
 						_, dist, _ := dijkstraRoute(srcNode, dstNode)
 						if dist > 0 {
-							rts = append(rts, SeaRoute{Origin: port.Name, Destination: dp.Name + ", " + dp.Country, DistanceNM: math.Round(dist), Type: "port"})
+							rts = append(rts, SeaRoute{Origin: port.Name, Destination: dp.Name + " (" + dp.CountryCode + ")", DistanceNM: math.Round(dist), Type: "port"})
 						}
 						if len(rts) >= 30 {
 							break
@@ -2403,7 +2382,7 @@ func main() {
 			features = append(features, feat{
 				Type: "Feature",
 				Geom: map[string]any{"type": "Point", "coordinates": []float64{p.Lon, p.Lat}},
-				Prop: map[string]any{"name": p.Name, "country": p.Country, "port_size": p.PortSize, "locode": p.LOCODE, "zone_code": p.ZoneCode, "wpi_id": p.WPIID, "max_vessel_size": p.MaxVesselSize, "channel_depth_m": p.ChannelDepth, "cargo_depth_m": p.CargoDepth},
+				Prop: map[string]any{"name": p.Name, "country_code": p.CountryCode, "port_size": p.PortSize, "locode": p.LOCODE, "zone_code": p.ZoneCode, "wpi_id": p.WPIID, "max_vessel_size": p.MaxVesselSize, "channel_depth_m": p.ChannelDepth, "cargo_depth_m": p.CargoDepth},
 			})
 		}
 		writeJSON(w, map[string]any{"type": "FeatureCollection", "features": features})
