@@ -1263,18 +1263,18 @@ func main() {
 		fn   func(string) error
 		path string
 	}{
-		{"aircraft", loadAircraft, "aircraft.csv"},
-		{"airlines", loadAirlines, "airlines.csv"},
-		{"airports", loadAirports, "airports.csv"},
-		{"routes", loadRoutes, "routes.csv"},
-		{"seaports", loadSeaports, "seaports.csv"},
-		{"sea_routes", loadSeaRoutes, "sea_distances.csv"},
-		{"sea_distance_ports", loadSeaDistancePorts, "sea_distance_ports.csv"},
-		{"shipping_lanes", loadShippingLanes, "shipping_lanes.geojson"},
-		{"marnet", loadMarnet, "marnet.geojson"},
-		{"ships", loadShips, "ships.csv"},
-		{"companies", loadCompanies, "shipping_companies.csv"},
-		{"notable_ships", loadNotableShips, "notable_ships.csv"},
+		{"aircraft", loadAircraft, "data/aircraft.csv"},
+		{"airlines", loadAirlines, "data/airlines.csv"},
+		{"airports", loadAirports, "data/airports.csv"},
+		{"routes", loadRoutes, "data/routes.csv"},
+		{"seaports", loadSeaports, "data/seaports.csv"},
+		{"sea_routes", loadSeaRoutes, "data/sea_distances.csv"},
+		{"sea_distance_ports", loadSeaDistancePorts, "data/sea_distance_ports.csv"},
+		{"shipping_lanes", loadShippingLanes, "data/shipping_lanes.geojson"},
+		{"marnet", loadMarnet, "data/marnet.geojson"},
+		{"ships", loadShips, "data/ships.csv"},
+		{"companies", loadCompanies, "data/shipping_companies.csv"},
+		{"notable_ships", loadNotableShips, "data/notable_ships.csv"},
 	} {
 		if err := l.fn(l.path); err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to load %s: %v\n", l.name, err)

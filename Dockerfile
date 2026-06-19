@@ -7,7 +7,5 @@ RUN go build -o /app
 FROM alpine:3.19
 WORKDIR /app
 COPY --from=build /app .
-COPY *.csv .
-COPY shipping_lanes.geojson .
-COPY marnet.geojson .
+COPY data/ data/
 CMD ["./app"]

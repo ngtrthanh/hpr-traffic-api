@@ -3,4 +3,5 @@ api-route-go
 *.exe
 update-tool
 port-data/
-missing_callsigns.txt
+docs/
+sample/

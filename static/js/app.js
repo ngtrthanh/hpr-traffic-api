@@ -870,12 +870,28 @@ function showIntroCard() {
       </div>
     </div>
     <div class="sc-section">
-      <div style="font-size:9px;color:var(--text3);line-height:1.5">
-        Data: NGA · ITU · adsbdb · OurAirports · eurostat · VRS · CIA · Alphaliner<br>
-        Built by <a href="https://hpradar.com" target="_blank" style="color:var(--accent)">HPRadar</a> — Zero dependencies, pure Go, 18k req/s
+      <div style="font-size:10px;color:var(--text3);line-height:1.6">
+        <b>Data Credits:</b><br>
+        Flight routes & aircraft — <a href="https://adsbdb.com" target="_blank" style="color:var(--text2)">adsbdb.com</a> (CC)<br>
+        Airports — <a href="https://ourairports.com" target="_blank" style="color:var(--text2)">OurAirports</a> (Public domain)<br>
+        Airlines — <a href="https://github.com/vradarserver/standing-data" target="_blank" style="color:var(--text2)">VRS Standing Data</a> (Open source)<br>
+        Seaports — <a href="https://msi.nga.mil/Publications/WPI" target="_blank" style="color:var(--text2)">NGA World Port Index</a> (US Gov PD)<br>
+        Sea distances — <a href="https://msi.nga.mil/Publications/Distances" target="_blank" style="color:var(--text2)">NGA PUB 151</a> (US Gov PD)<br>
+        Ship registry — <a href="https://www.itu.int" target="_blank" style="color:var(--text2)">ITU List V 2025</a> (ITU publication)<br>
+        Shipping lanes — <a href="https://github.com/newzealandpaul/Shipping-Lanes" target="_blank" style="color:var(--text2)">Paul Benden / CIA</a> (CC BY 4.0)<br>
+        Maritime network — <a href="https://github.com/eurostat/searoute" target="_blank" style="color:var(--text2)">eurostat/searoute</a> (EUPL-1.2)<br>
+        Port performance — <a href="https://www.worldbank.org/en/topic/transport/publication/cppi" target="_blank" style="color:var(--text2)">World Bank CPPI 2025</a><br>
+        Data cleanup & enrichment — <a href="https://hpradar.com" target="_blank" style="color:var(--text2)">HPRadar</a> (TEU, coords, classification)<br>
+        Flags — <a href="https://github.com/lipis/flag-icons" target="_blank" style="color:var(--text2)">flag-icons</a> (MIT)
+      </div>
+    </div>
+    <div class="sc-section">
+      <div style="font-size:11px;color:var(--text2);line-height:1.6;text-align:center">
+        ⭐ Open source — contributions welcome!<br>
+        <a href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank" style="color:var(--accent);font-weight:600">Star · Fork · PR</a>
       </div>
     </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="https://hpradar.com" target="_blank">HPRadar.com</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a><button class="act" onclick="closeCard()">Explore Map</button>`;
+  document.getElementById('pcardActions').innerHTML = `<a class="act" href="https://github.com/ngtrthanh/hpr-traffic-api" target="_blank">⭐ GitHub</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a><button class="act" onclick="closeCard()">Explore Map</button>`;
   openCard();
 }
 
@@ -914,6 +930,16 @@ function makeDraggable(el) {
   pinBtn.onmousedown = e => e.stopPropagation();
   pinBtn.onclick = () => togglePin(el, pinBtn);
   toolbar.appendChild(pinBtn);
+  // Add close button for pcard
+  if (id === 'pcard') {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'pin-btn';
+    closeBtn.title = 'Close';
+    closeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    closeBtn.onmousedown = e => e.stopPropagation();
+    closeBtn.onclick = () => closeCard();
+    toolbar.appendChild(closeBtn);
+  }
   el.insertBefore(toolbar, el.firstChild);
 
   // Restore pinned position

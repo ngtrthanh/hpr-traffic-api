@@ -272,7 +272,9 @@ This project integrates multiple open datasets. Full credit to their creators:
 | Sea distances (PUB 151) | [NGA Distances Between Ports](https://msi.nga.mil/Publications/Distances) — parsed by [kaklin](https://github.com/kaklin/sea-routes) | US Government public domain |
 | Shipping lanes | [Paul Benden](https://github.com/newzealandpaul/Shipping-Lanes) / CIA World Oceans Map | CC BY 4.0 |
 | Port LOCODE reference | [UPPLY](https://www.upply.com/) | Reference data |
-| Vessel traffic stats | [MarineTraffic](https://www.marinetraffic.com/) / community data | Aggregated statistics |
+| Maritime routing network | [eurostat/searoute](https://github.com/eurostat/searoute) | EUPL-1.2 |
+| Port enrichment (TEU, CPPI) | [World Bank CPPI 2025](https://www.worldbank.org/en/topic/transport/publication/cppi) | Public report |
+| Data cleanup & enrichment | [HPRadar](https://hpradar.com/) | Original work (coords, TEU, classification) |
 
 ## License
 
