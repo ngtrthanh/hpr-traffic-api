@@ -1,6 +1,6 @@
 FROM golang:1.24-alpine AS build
 WORKDIR /src
-COPY go.mod main.go ./
+COPY go.mod *.go ./
 COPY static/ static/
 RUN go build -o /app
 

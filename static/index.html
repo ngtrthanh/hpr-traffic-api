@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HPRadar Traffic — Aviation & Maritime Data Explorer</title>
   <link rel="stylesheet" href="css/maplibre-gl.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,9 +22,11 @@
 
       <span class="spacer"></span>
       <div id="topbar-fixed">
-        <span class="pill" style="--pill-c:var(--port-major)"><span class="n" id="sRoutes">—</span> routes</span>
+        <span class="pill" style="--pill-c:var(--port-major)"><span class="n" id="sRoutes">—</span> flights</span>
         <span class="pill" style="--pill-c:var(--port-medium)"><span class="n" id="sPorts">—</span> ports</span>
-        <span class="pill" style="--pill-c:var(--airport)"><span class="n" id="sShips">—</span> ships</span>
+        <span class="pill" style="--pill-c:var(--airport)"><span class="n" id="sAirports">—</span> airports</span>
+        <span class="pill" style="--pill-c:#94a3b8"><span class="n" id="sShips">—</span> ships</span>
+        <span class="pill" style="--pill-c:#f59e0b"><span class="n" id="sCompanies">—</span> operators</span>
         <button class="btn btn-icon" id="theme-tog" onclick="toggleTheme()" title="Toggle theme"></button>
       </div>
     </div>

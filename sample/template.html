@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HPR - Marine Tracking Dashboard</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <!-- MapLibre CSS (loaded early to avoid FOUC) -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+    <style>
+        /* Reset & base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #020617;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .map-container .maplibregl-map {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        @keyframes pulse-glow {
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <!-- MapLibre JS (loaded before React mounts) -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js">
+    </script>
+
+    <!-- React + ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js">
+    </script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js">
+    </script>
+
+    <!-- Babel standalone for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js">
+    </script>
+
+    <!-- Our app code (transformed by Babel) -->
+    <script type="text/babel">
+        // ---- START OF APP ----
+        const { useState, useEffect, useRef } = React;
+
+        // ---- Lucide icons as inline SVG components ----
+        const Icon = ({ name, size = 16, className = "", ...props }) => {
+            const iconMap = {
+                Search: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+                MapIcon: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 21 15 18 9 21 3 18"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="6" x2="15" y2="18"/></svg>',
+                Globe: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+                Anchor: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>',
+                LayoutDashboard: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+                Bell: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+                Bookmark: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+                Layers: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+                Sun: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+                HelpCircle: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                Settings: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+                ChevronDown: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+                Filter: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 13 10 21 14 18 14 13 22 3"/></svg>',
+                Star: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+                Plus: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+                Minus: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+                Navigation: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>',
+                Play: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+                RotateCcw: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
+                RotateCw: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>',
+                X: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+                ChevronRight: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+                Activity: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+                ArrowRight: '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+            };
+            const svg = iconMap[name] || '';
+            return React.createElement('span', {
+                dangerouslySetInnerHTML: { __html: svg },
+                className: className,
+                ...props
+            });
+        };
+
+        // ---- ToggleSwitch ----
+        const ToggleSwitch = ({ isOn, colorClass = "bg-cyan-500" }) => {
+            return React.createElement('div', {
+                className: `w-8 h-4 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-200 ${isOn ? colorClass : 'bg-slate-700'}`
+            },
+                React.createElement('div', {
+                    className: `bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-200 ${isOn ? 'translate-x-4' : 'translate-x-0'}`
+                })
+            );
+        };
+
+        // ---- ProgressBar ----
+        const ProgressBar = ({ progress, colorClass = "bg-cyan-500" }) => {
+            return React.createElement('div', { className: "w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden" },
+                React.createElement('div', {
+                    className: `${colorClass} h-1.5 rounded-full transition-all duration-500`,
+                    style: { width: `${progress}%` }
+                })
+            );
+        };
+
+        // ---- Sidebar (unchanged) ----
+        const Sidebar = () => {
+            // ... (keep as before)
+            return React.createElement('div', {
+                className: "w-64 bg-slate-950 text-slate-300 flex flex-col h-screen border-r border-slate-800 overflow-y-auto custom-scrollbar shrink-0 z-20"
+            },
+                // Logo
+                React.createElement('div', { className: "p-4 flex items-center gap-3" },
+                    React.createElement('div', {
+                        className: "w-8 h-8 rounded-full border border-cyan-500 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                    },
+                        React.createElement('svg', { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", className: "w-5 h-5" },
+                            React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" })
+                        )
+                    ),
+                    React.createElement('span', { className: "font-bold text-lg tracking-widest text-white" }, "HPR-Marine")
+                ),
+                // Navigation sections (keep all buttons as in original)
+                React.createElement('div', { className: "flex-1 px-3 py-2 space-y-6" },
+                    // OVERVIEW
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] font-semibold text-slate-500 mb-2 px-3 tracking-wider" }, "OVERVIEW"),
+                        React.createElement('div', { className: "space-y-1" },
+                            React.createElement('button', { className: "w-full flex items-center gap-3 px-3 py-2 bg-slate-800/60 text-cyan-400 rounded-lg text-sm font-medium border border-slate-700/50 shadow-inner" },
+                                React.createElement(Icon, { name: "MapIcon", size: 16 }), " Marine Map"
+                            ),
+                            React.createElement('button', { className: "w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement(Icon, { name: "Globe", size: 16, className: "text-slate-400" }), " 3D Globe"
+                            ),
+                            React.createElement('button', { className: "w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement(Icon, { name: "Anchor", size: 16, className: "text-slate-400" }), " Vessels & AtoN"
+                            ),
+                            React.createElement('button', { className: "w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement(Icon, { name: "LayoutDashboard", size: 16, className: "text-slate-400" }), " Dashboard"
+                            )
+                        )
+                    ),
+                    // INTELLIGENCE
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] font-semibold text-slate-500 mb-2 px-3 tracking-wider" }, "INTELLIGENCE"),
+                        React.createElement('div', { className: "space-y-1" },
+                            React.createElement('button', { className: "w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement(Icon, { name: "Search", size: 16, className: "text-slate-400" }), " Search"
+                            ),
+                            React.createElement('button', { className: "w-full flex items-center justify-between px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement('div', { className: "flex items-center gap-3" },
+                                    React.createElement(Icon, { name: "Bookmark", size: 16, className: "text-slate-400" }), " Watchlist"
+                                ),
+                                React.createElement('span', { className: "bg-slate-800 text-xs px-2 py-0.5 rounded text-slate-300" }, "8")
+                            ),
+                            React.createElement('button', { className: "w-full flex items-center justify-between px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement('div', { className: "flex items-center gap-3" },
+                                    React.createElement(Icon, { name: "Bell", size: 16, className: "text-slate-400" }), " Alerts"
+                                ),
+                                React.createElement('span', { className: "bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded border border-red-500/30" }, "12")
+                            ),
+                            React.createElement('button', { className: "w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-800/30 rounded-lg text-sm transition-colors" },
+                                React.createElement(Icon, { name: "Star", size: 16, className: "text-slate-400" }), " Saved Views"
+                            )
+                        )
+                    ),
+                    // LAYERS
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] font-semibold text-slate-500 mb-2 px-3 tracking-wider" }, "LAYERS"),
+                        React.createElement('div', { className: "space-y-2 px-3 text-sm" },
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('div', { className: "flex items-center gap-2" },
+                                    React.createElement(Icon, { name: "Anchor", size: 14, className: "text-cyan-500" }), " Cargo Vessels"
+                                ),
+                                React.createElement(ToggleSwitch, { isOn: true, colorClass: "bg-cyan-500" })
+                            ),
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('div', { className: "flex items-center gap-2" },
+                                    React.createElement('div', { className: "w-3 h-3 rounded-full border-2 border-orange-400" }), " Tankers"
+                                ),
+                                React.createElement(ToggleSwitch, { isOn: true, colorClass: "bg-orange-400" })
+                            ),
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('div', { className: "flex items-center gap-2" },
+                                    React.createElement('div', { className: "w-3 h-3 rounded-full border-2 border-purple-400" }), " Tugs & Pilot"
+                                ),
+                                React.createElement(ToggleSwitch, { isOn: true, colorClass: "bg-purple-400" })
+                            ),
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('div', { className: "flex items-center gap-2" },
+                                    React.createElement('div', { className: "w-3 h-3 rounded-full border-2 border-green-400" }), " Nav Aids (AtoN)"
+                                ),
+                                React.createElement(ToggleSwitch, { isOn: true, colorClass: "bg-green-400" })
+                            ),
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('div', { className: "flex items-center gap-2" },
+                                    React.createElement('div', { className: "w-3 h-3 rounded-full bg-blue-500/50" }), " Weather / Wind"
+                                ),
+                                React.createElement(ToggleSwitch, { isOn: true, colorClass: "bg-blue-500" })
+                            ),
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('div', { className: "flex items-center gap-2" },
+                                    React.createElement(Icon, { name: "Activity", size: 14, className: "text-orange-500" }), " AIS Density"
+                                ),
+                                React.createElement(ToggleSwitch, { isOn: true, colorClass: "bg-orange-500" })
+                            ),
+                            React.createElement('button', { className: "text-xs text-slate-500 hover:text-slate-300 mt-2 flex items-center justify-between w-full group" },
+                                "More Marine Layers ",
+                                React.createElement(Icon, { name: "ChevronRight", size: 12, className: "group-hover:translate-x-1 transition-transform" })
+                            )
+                        )
+                    )
+                ),
+                // Traffic Density
+                React.createElement('div', { className: "p-4 border-t border-slate-800 bg-slate-900/30" },
+                    React.createElement('div', { className: "flex items-center justify-between mb-1" },
+                        React.createElement('span', { className: "text-[10px] font-semibold text-slate-500 tracking-wider" }, "TRAFFIC DENSITY"),
+                        React.createElement('span', { className: "text-[10px] text-green-400 flex items-center gap-1" },
+                            React.createElement('div', { className: "w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" }), " LIVE"
+                        )
+                    ),
+                    React.createElement('div', { className: "text-xs text-slate-400 mb-2" }, "Global ", React.createElement('span', { className: "text-slate-500" }, "(Now)")),
+                    React.createElement('div', { className: "flex items-end gap-2 mb-2" },
+                        React.createElement('span', { className: "text-xl text-orange-500 font-bold" }, "8.7"),
+                        React.createElement('span', { className: "text-sm text-slate-500 mb-0.5" }, "/10")
+                    ),
+                    React.createElement('div', { className: "h-12 w-full flex items-end gap-[1px] relative mb-2" },
+                        React.createElement('div', { className: "absolute inset-0 bg-gradient-to-t from-orange-500/20 to-transparent bottom-0" }),
+                        React.createElement('svg', { className: "absolute inset-0 w-full h-full drop-shadow-md", preserveAspectRatio: "none", viewBox: "0 0 100 100" },
+                            React.createElement('polyline', { points: "0,80 10,75 20,60 30,50 40,30 50,20 60,10 70,15 80,20 90,25 100,20", fill: "none", stroke: "#f97316", strokeWidth: "2", vectorEffect: "non-scaling-stroke" })
+                        ),
+                        ...Array.from({ length: 20 }, (_, i) =>
+                            React.createElement('div', {
+                                key: i,
+                                className: "flex-1 bg-orange-500/30 rounded-t-sm",
+                                style: { height: `${Math.random() * 40 + 20}%` }
+                            })
+                        )
+                    ),
+                    React.createElement('div', { className: "flex justify-between text-[10px] text-slate-500" },
+                        React.createElement('button', { className: "hover:text-slate-300 transition-colors" }, "1H"),
+                        React.createElement('button', { className: "hover:text-slate-300 transition-colors" }, "6H"),
+                        React.createElement('button', { className: "text-cyan-400 bg-slate-800 px-2 rounded font-medium" }, "24H"),
+                        React.createElement('button', { className: "hover:text-slate-300 transition-colors" }, "7D")
+                    )
+                )
+            );
+        };
+
+        // ---- TopBar (unchanged) ----
+        const TopBar = () => {
+            return React.createElement('div', {
+                className: "h-14 border-b border-slate-800 bg-slate-950/95 backdrop-blur-sm flex items-center justify-between px-4 shrink-0 z-20 sticky top-0"
+            },
+                // Search
+                React.createElement('div', { className: "flex-1 max-w-xl relative group" },
+                    React.createElement(Icon, { name: "Search", size: 16, className: "absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" }),
+                    React.createElement('input', {
+                        type: "text",
+                        placeholder: "Search vessels, ports, mmsi, imo, callsign, atons...",
+                        className: "w-full bg-slate-900 border border-slate-700 text-sm text-slate-200 rounded-lg pl-10 pr-10 py-1.5 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder-slate-500"
+                    }),
+                    React.createElement('div', { className: "absolute right-3 top-1/2 -translate-y-1/2 flex gap-1" },
+                        React.createElement('span', { className: "text-[10px] border border-slate-700 rounded px-1 text-slate-500" }, "⌘"),
+                        React.createElement('span', { className: "text-[10px] border border-slate-700 rounded px-1 text-slate-500" }, "K")
+                    )
+                ),
+                // Stats
+                React.createElement('div', { className: "flex items-center gap-8 ml-8" },
+                    React.createElement('div', { className: "flex flex-col" },
+                        React.createElement('span', { className: "text-[10px] text-slate-400 flex items-center gap-1" },
+                            React.createElement('div', { className: "w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" }), " GLOBAL LIVE"
+                        ),
+                        React.createElement('span', { className: "text-sm font-semibold text-white" }, "41,302")
+                    ),
+                    React.createElement('div', { className: "flex flex-col" },
+                        React.createElement('span', { className: "text-[10px] text-slate-500" }, "41,302"),
+                        React.createElement('span', { className: "text-xs text-slate-400" }, "VESSELS")
+                    ),
+                    React.createElement('div', { className: "flex flex-col" },
+                        React.createElement('span', { className: "text-[10px] text-slate-500" }, "12,847"),
+                        React.createElement('span', { className: "text-xs text-slate-400" }, "ATON / BUOYS")
+                    ),
+                    React.createElement('div', { className: "flex flex-col" },
+                        React.createElement('span', { className: "text-[10px] text-slate-500" }, "ZSTD DECODE/S"),
+                        React.createElement('span', { className: "text-sm font-semibold text-white" }, "23,842")
+                    ),
+                    React.createElement('div', { className: "flex flex-col" },
+                        React.createElement('span', { className: "text-[10px] text-slate-500" }, "LATENCY"),
+                        React.createElement('span', { className: "text-sm font-semibold text-green-400" }, "42ms")
+                    ),
+                    React.createElement('div', { className: "flex flex-col border-l border-slate-800 pl-8" },
+                        React.createElement('span', { className: "text-[10px] text-slate-500" }, "14:42:18"),
+                        React.createElement('span', { className: "text-xs text-slate-400" }, "UTC")
+                    )
+                ),
+                // Actions
+                React.createElement('div', { className: "flex items-center gap-4 ml-6 text-slate-400" },
+                    React.createElement('button', { className: "hover:text-white transition-colors" },
+                        React.createElement(Icon, { name: "Sun", size: 18 })
+                    ),
+                    React.createElement('button', { className: "hover:text-white transition-colors relative" },
+                        React.createElement(Icon, { name: "Bell", size: 18 }),
+                        React.createElement('span', { className: "absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-slate-950" })
+                    ),
+                    React.createElement('button', { className: "hover:text-white transition-colors" },
+                        React.createElement(Icon, { name: "HelpCircle", size: 18 })
+                    ),
+                    React.createElement('div', { className: "w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-xs text-white border border-slate-700 cursor-pointer shadow-sm font-medium" }, "AD")
+                )
+            );
+        };
+
+        // ---- DetailPanel (unchanged) ----
+        const DetailPanel = () => {
+            return React.createElement('div', {
+                className: "w-80 bg-slate-950 border-l border-slate-800 flex flex-col h-full shrink-0 overflow-y-auto custom-scrollbar z-20 shadow-[-10px_0_20px_rgba(0,0,0,0.3)]"
+            },
+                // Header
+                React.createElement('div', { className: "p-4 flex items-center justify-between sticky top-0 bg-slate-950/90 backdrop-blur z-10" },
+                    React.createElement('div', { className: "flex items-center gap-2" },
+                        React.createElement('span', { className: "text-lg font-bold text-white tracking-wide drop-shadow-sm" }, "EVER GIVEN"),
+                        React.createElement(Icon, { name: "Star", size: 16, className: "text-slate-500 cursor-pointer hover:text-yellow-500 transition-colors" })
+                    ),
+                    React.createElement(Icon, { name: "X", size: 18, className: "text-slate-500 cursor-pointer hover:text-white transition-colors" })
+                ),
+                React.createElement('div', { className: "px-4 pb-2 flex items-center gap-2" },
+                    React.createElement('div', { className: "w-5 h-5 rounded bg-green-900/50 flex items-center justify-center border border-green-700" },
+                        React.createElement('img', {
+                            src: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Evergreen_Marine_logo.svg/120px-Evergreen_Marine_logo.svg.png",
+                            alt: "logo",
+                            className: "w-3 h-3 object-contain opacity-80",
+                            onError: (e) => e.target.style.display = 'none'
+                        })
+                    ),
+                    React.createElement('span', { className: "text-sm text-slate-400" }, "Evergreen Marine")
+                ),
+                // Vessel Image
+                React.createElement('div', { className: "px-4 py-2" },
+                    React.createElement('div', { className: "w-full h-36 bg-slate-800 rounded-lg overflow-hidden relative group shadow-inner" },
+                        React.createElement('img', {
+                            src: "https://images.unsplash.com/photo-1572074360408-2e389d4fb9f8?q=80&w=2070&auto=format&fit=crop",
+                            alt: "Vessel",
+                            className: "w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500"
+                        }),
+                        React.createElement('div', { className: "absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" })
+                    )
+                ),
+                // Route Info
+                React.createElement('div', { className: "px-4 py-4 border-b border-slate-800" },
+                    React.createElement('div', { className: "flex items-center justify-between mb-4" },
+                        React.createElement('div', null,
+                            React.createElement('div', { className: "text-2xl font-bold text-white" }, "YTN"),
+                            React.createElement('div', { className: "text-xs text-slate-400" }, "Yantian")
+                        ),
+                        React.createElement('div', { className: "flex-1 px-4 flex flex-col items-center justify-center relative" },
+                            React.createElement('div', { className: "w-full h-[1px] border-t border-dashed border-slate-600 relative flex items-center justify-center" },
+                                React.createElement(Icon, { name: "Anchor", size: 16, className: "text-cyan-400 absolute bg-slate-950 px-1 -mt-[2px]" })
+                            )
+                        ),
+                        React.createElement('div', { className: "text-right" },
+                            React.createElement('div', { className: "text-2xl font-bold text-white" }, "RTM"),
+                            React.createElement('div', { className: "text-xs text-slate-400" }, "Rotterdam")
+                        )
+                    ),
+                    React.createElement('div', { className: "flex justify-between text-xs text-slate-400 mb-4" },
+                        React.createElement('div', null, "ATD ", React.createElement('span', { className: "text-slate-300" }, "May 14, 08:30 UTC")),
+                        React.createElement('div', null, "ETA ", React.createElement('span', { className: "text-slate-300" }, "Jun 17, 14:00 UTC"))
+                    ),
+                    React.createElement('div', { className: "flex justify-between text-xs mb-1" },
+                        React.createElement('span', { className: "text-cyan-400 flex items-center gap-1" },
+                            React.createElement('div', { className: "w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" }), " Underway Using Engine"
+                        ),
+                        React.createElement('span', { className: "text-slate-400" }, "32 days remaining")
+                    ),
+                    React.createElement(ProgressBar, { progress: 45 })
+                ),
+                // Stats Grid
+                React.createElement('div', { className: "p-4 grid grid-cols-2 gap-y-4 gap-x-2 border-b border-slate-800" },
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "SPEED OVER GROUND"),
+                        React.createElement('div', { className: "text-sm text-slate-200" }, "18.4 kn")
+                    ),
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "COURSE / HEADING"),
+                        React.createElement('div', { className: "text-sm text-slate-200" }, "284° / 285°")
+                    ),
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "DRAFT"),
+                        React.createElement('div', { className: "text-sm text-slate-200" }, "15.7 m")
+                    ),
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "LENGTH / BEAM"),
+                        React.createElement('div', { className: "text-sm text-slate-200" }, "400 m / 59 m")
+                    ),
+                    React.createElement('div', { className: "col-span-2 mt-2" },
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "VESSEL TYPE"),
+                        React.createElement('div', { className: "text-sm text-slate-200" }, "Cargo - Hazard A (Major)")
+                    ),
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "MMSI"),
+                        React.createElement('div', { className: "text-sm text-cyan-400 font-mono" }, "353136000")
+                    ),
+                    React.createElement('div', null,
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "IMO"),
+                        React.createElement('div', { className: "text-sm text-slate-200" }, "9811000")
+                    ),
+                    React.createElement('div', { className: "col-span-2 mt-2" },
+                        React.createElement('div', { className: "text-[10px] text-slate-500 mb-1" }, "DATA SOURCE"),
+                        React.createElement('div', { className: "text-sm text-slate-200 flex items-center justify-between" },
+                            "Terrestrial AIS",
+                            React.createElement('span', { className: "flex items-center gap-1 text-green-400 text-xs" },
+                                React.createElement(Icon, { name: "Activity", size: 12 }), " Class A"
+                            )
+                        )
+                    )
+                ),
+                // Action Buttons
+                React.createElement('div', { className: "p-4 flex gap-2 border-b border-slate-800" },
+                    React.createElement('button', { className: "flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm transition-colors border border-slate-700 shadow-sm" }, "More Details"),
+                    React.createElement('button', { className: "flex-1 py-2 bg-cyan-900/50 hover:bg-cyan-900 text-cyan-400 rounded text-sm transition-colors border border-cyan-800/50 shadow-[0_0_10px_rgba(6,182,212,0.15)]" }, "Add to Watchlist")
+                ),
+                // Tabs
+                React.createElement('div', { className: "flex border-b border-slate-800 text-xs text-slate-500" },
+                    React.createElement('button', { className: "flex-1 py-3 text-cyan-400 border-b-2 border-cyan-400 font-medium" }, "VOYAGE"),
+                    React.createElement('button', { className: "flex-1 py-3 hover:text-slate-300 transition-colors" }, "TRACK"),
+                    React.createElement('button', { className: "flex-1 py-3 hover:text-slate-300 transition-colors" }, "WEATHER"),
+                    React.createElement('button', { className: "flex-1 py-3 hover:text-slate-300 transition-colors" }, "NEARBY")
+                ),
+                // Route Detail
+                React.createElement('div', { className: "p-4" },
+                    React.createElement('div', { className: "flex justify-between items-center mb-2" },
+                        React.createElement('div', { className: "text-sm font-bold text-white" }, "YTN"),
+                        React.createElement('div', { className: "text-xs text-slate-400 bg-slate-900 px-2 rounded-full border border-slate-800" }, "10,982 nm"),
+                        React.createElement('div', { className: "text-sm font-bold text-white" }, "RTM")
+                    ),
+                    React.createElement('div', { className: "flex justify-between items-center mb-4 text-[10px] text-slate-500" },
+                        React.createElement('div', null, "Yantian"),
+                        React.createElement('div', null, "Rotterdam")
+                    ),
+                    React.createElement('div', { className: "w-full h-24 bg-slate-900 border border-slate-800 rounded mb-4 relative overflow-hidden flex items-center justify-center shadow-inner" },
+                        React.createElement('div', { className: "absolute inset-0 opacity-40", style: { backgroundImage: 'radial-gradient(circle at center, #1e293b 0%, #020617 100%)' } }),
+                        React.createElement('svg', { className: "absolute inset-0 w-full h-full drop-shadow-[0_0_3px_rgba(34,211,238,0.5)]", preserveAspectRatio: "none", viewBox: "0 0 100 50" },
+                            React.createElement('path', { d: "M 10,40 Q 50,45 90,10", fill: "none", stroke: "#22d3ee", strokeWidth: "1", strokeDasharray: "3,3" }),
+                            React.createElement('circle', { cx: "10", cy: "40", r: "2", fill: "#22d3ee" }),
+                            React.createElement('circle', { cx: "90", cy: "10", r: "2", fill: "#22d3ee" }),
+                            React.createElement('circle', { cx: "50", cy: "30", r: "3.5", fill: "#fff", className: "animate-pulse shadow-[0_0_8px_#fff]" })
+                        )
+                    ),
+                    React.createElement('div', { className: "flex justify-between text-[10px] text-slate-500" },
+                        React.createElement('div', null,
+                            React.createElement('div', null, "TOTAL DIST"),
+                            React.createElement('div', { className: "text-slate-300 text-xs font-mono" }, "10,982 nm")
+                        ),
+                        React.createElement('div', { className: "text-center" },
+                            React.createElement('div', null, "SAILED"),
+                            React.createElement('div', { className: "text-slate-300 text-xs font-mono" }, "4,412 nm")
+                        ),
+                        React.createElement('div', { className: "text-right" },
+                            React.createElement('div', null, "TO GO"),
+                            React.createElement('div', { className: "text-slate-300 text-xs font-mono" }, "6,570 nm")
+                        )
+                    )
+                )
+            );
+        };
+
+        // ---- MainMapArea (UPDATED with vector map style) ----
+        const MainMapArea = () => {
+            const mapContainerRef = React.useRef(null);
+            const mapRef = React.useRef(null);
+
+            React.useEffect(() => {
+                if (mapRef.current) return;
+
+                const loadMap = async () => {
+                    // 1. Load CSS if not present
+                    if (!document.getElementById('maplibre-css')) {
+                        const link = document.createElement('link');
+                        link.id = 'maplibre-css';
+                        link.href = 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css';
+                        link.rel = 'stylesheet';
+                        document.head.appendChild(link);
+                    }
+
+                    // 2. Load JS if not present
+                    if (!window.maplibregl) {
+                        await new Promise((resolve) => {
+                            const script = document.createElement('script');
+                            script.src = 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js';
+                            script.async = true;
+                            script.onload = resolve;
+                            document.body.appendChild(script);
+                        });
+                    }
+
+                    // 3. Initialize map with YOUR custom vector style
+                    const map = new window.maplibregl.Map({
+                        container: mapContainerRef.current,
+                        style: './mapstyles/dark-minimal.json', // <-- point to your style file
+                        center: [106.68, 20.85],
+                        zoom: 11,
+                        pitch: 45,
+                        bearing: -17.6,
+                        attributionControl: false,
+                        projection: 'globe',   // enable 3D globe
+                    });
+
+                    // 4. Add navigation controls
+                    map.addControl(
+                        new window.maplibregl.NavigationControl({ visualizePitch: true }),
+                        'top-right'
+                    );
+                    map.addControl(new window.maplibregl.FullscreenControl(), 'top-right');
+
+                    // 5. Once style loads, add your custom layers (vessels, labels, etc.)
+                    map.on('style.load', () => {
+                        // Example: add AIS vessel source (replace with your actual data source)
+                        map.addSource('ais-vessels', {
+                            type: 'geojson',
+                            data: {
+                                type: 'FeatureCollection',
+                                features: [
+                                    // Your vessel data goes here – you can fetch from WebSocket or API
+                                    // For demo, we add a few sample points
+                                    { type: 'Feature', geometry: { type: 'Point', coordinates: [106.68, 20.85] }, properties: { type: 'cargo' } },
+                                    { type: 'Feature', geometry: { type: 'Point', coordinates: [106.70, 20.82] }, properties: { type: 'tanker' } },
+                                    { type: 'Feature', geometry: { type: 'Point', coordinates: [106.65, 20.86] }, properties: { type: 'tug' } },
+                                ]
+                            }
+                        });
+
+                        // Add vessel layer (circle style – you can replace with symbol or your own)
+                        map.addLayer({
+                            id: 'vessels',
+                            type: 'circle',
+                            source: 'ais-vessels',
+                            paint: {
+                                'circle-radius': 6,
+                                'circle-color': '#22d3ee',
+                                'circle-stroke-width': 1,
+                                'circle-stroke-color': '#020617',
+                            }
+                        });
+
+                        // Optional: Add terrain (if your style supports it)
+                        // map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+
+                        // Optional: Add RainViewer or other overlays
+                        // map.addSource('rainviewer', { ... });
+                    });
+
+                    mapRef.current = map;
+                };
+
+                loadMap();
+
+                return () => {
+                    if (mapRef.current) {
+                        mapRef.current.remove();
+                        mapRef.current = null;
+                    }
+                };
+            }, []);
+
+            return React.createElement('div', { className: "flex-1 relative flex flex-col min-h-0 bg-[#0a0f18] overflow-hidden" },
+                React.createElement('div', { ref: mapContainerRef, className: "absolute inset-0 z-0" }),
+                // Map Toolbars – Top Left (unchanged)
+                React.createElement('div', { className: "absolute top-4 left-4 flex gap-2 z-10" },
+                    React.createElement('div', { className: "bg-slate-900/90 border border-slate-700/50 rounded-lg flex items-center text-sm text-slate-200 backdrop-blur-md shadow-lg" },
+                        React.createElement('button', { className: "px-3 py-1.5 flex items-center gap-2 hover:bg-slate-800/80 rounded-l-lg border-r border-slate-700/50 transition-colors" },
+                            "2D Map ", React.createElement(Icon, { name: "ChevronDown", size: 14, className: "text-slate-400" })
+                        )
+                    ),
+                    React.createElement('div', { className: "bg-slate-900/90 border border-slate-700/50 rounded-lg flex items-center text-slate-400 backdrop-blur-md shadow-lg" },
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 rounded-l-lg hover:text-white transition-colors border-r border-slate-700/50" },
+                            React.createElement(Icon, { name: "Layers", size: 16 })
+                        ),
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 hover:text-white transition-colors border-r border-slate-700/50" },
+                            React.createElement(Icon, { name: "Filter", size: 16 })
+                        ),
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 hover:text-white transition-colors border-r border-slate-700/50" },
+                            React.createElement(Icon, { name: "Star", size: 16 })
+                        ),
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 hover:text-white transition-colors rounded-r-lg" },
+                            React.createElement(Icon, { name: "Bookmark", size: 16 })
+                        )
+                    )
+                ),
+                // Top Right controls (unchanged)
+                React.createElement('div', { className: "absolute top-4 right-4 flex flex-col gap-2 z-10" },
+                    React.createElement('div', { className: "bg-slate-900/90 border border-slate-700/50 rounded-lg flex flex-col text-slate-400 backdrop-blur-md shadow-lg" },
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 rounded-t-lg hover:text-white transition-colors border-b border-slate-700/50" },
+                            React.createElement(Icon, { name: "Plus", size: 18 })
+                        ),
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 rounded-b-lg hover:text-white transition-colors" },
+                            React.createElement(Icon, { name: "Minus", size: 18 })
+                        )
+                    ),
+                    React.createElement('div', { className: "bg-slate-900/90 border border-slate-700/50 rounded-lg text-slate-400 backdrop-blur-md shadow-lg mt-2" },
+                        React.createElement('button', { className: "p-2 hover:bg-slate-800/80 rounded-lg hover:text-white transition-colors" },
+                            React.createElement(Icon, { name: "Navigation", size: 18 })
+                        )
+                    ),
+                    React.createElement('div', { className: "bg-slate-900/90 border border-slate-700/50 rounded-lg text-slate-400 backdrop-blur-md shadow-lg mt-2" },
+                        React.createElement('button', { className: "px-2 py-1.5 hover:bg-slate-800/80 rounded-lg hover:text-white transition-colors text-xs font-bold" }, "3D")
+                    )
+                ),
+                // Vessel Tooltip (unchanged)
+                React.createElement('div', { className: "absolute z-20 bg-slate-900/95 border border-slate-700 rounded-lg p-3 shadow-2xl backdrop-blur-md", style: { top: '25%', left: '56%' } },
+                    React.createElement('div', { className: "flex justify-between items-start gap-4" },
+                        React.createElement('div', null,
+                            React.createElement('div', { className: "text-white font-bold text-sm drop-shadow-sm" }, "EVER GIVEN"),
+                            React.createElement('div', { className: "text-xs text-slate-400 mb-1" }, "Cargo | MMSI: 353136000"),
+                            React.createElement('div', { className: "text-xs text-cyan-400 mb-1 flex items-center gap-1" }, "YTN ", React.createElement(Icon, { name: "ArrowRight", size: 10 }), " RTM"),
+                            React.createElement('div', { className: "text-xs text-slate-300" }, "18.4 kn • 284°")
+                        ),
+                        React.createElement(Icon, { name: "X", size: 14, className: "text-slate-500 cursor-pointer hover:text-white transition-colors" })
+                    )
+                ),
+                // Bottom Scale (unchanged)
+                React.createElement('div', { className: "absolute bottom-20 left-4 z-10 flex items-center gap-4" },
+                    React.createElement('div', { className: "bg-slate-900/80 border border-slate-800 rounded px-2 py-1 text-[10px] text-slate-400 backdrop-blur-md shadow-md" },
+                        "20.8521° N   106.6819° E"
+                    ),
+                    React.createElement('div', { className: "flex items-center gap-1" },
+                        React.createElement('div', { className: "w-16 border-b-2 border-slate-500 relative" },
+                            React.createElement('div', { className: "absolute -top-1 left-0 h-2 w-0.5 bg-slate-500" }),
+                            React.createElement('div', { className: "absolute -top-1 right-0 h-2 w-0.5 bg-slate-500" })
+                        ),
+                        React.createElement('span', { className: "text-[10px] text-slate-400 bg-slate-900/80 px-1 rounded backdrop-blur-md shadow-md" }, "10 km")
+                    )
+                ),
+                // Bottom Right time controls (unchanged)
+                React.createElement('div', { className: "absolute bottom-20 right-4 z-10 flex bg-slate-900/90 border border-slate-700/50 rounded-lg text-[10px] text-slate-400 backdrop-blur-md shadow-lg" },
+                    React.createElement('button', { className: "px-3 py-1.5 hover:bg-slate-800/80 hover:text-white rounded-l-lg border-r border-slate-700/50 bg-slate-800 text-cyan-400 font-medium" }, "1H"),
+                    React.createElement('button', { className: "px-3 py-1.5 hover:bg-slate-800/80 hover:text-white border-r border-slate-700/50 transition-colors" }, "6H"),
+                    React.createElement('button', { className: "px-3 py-1.5 hover:bg-slate-800/80 hover:text-white border-r border-slate-700/50 transition-colors" }, "24H"),
+                    React.createElement('button', { className: "px-3 py-1.5 hover:bg-slate-800/80 hover:text-white border-r border-slate-700/50 transition-colors" }, "7D"),
+                    React.createElement('button', { className: "px-3 py-1.5 hover:bg-slate-800/80 hover:text-white rounded-r-lg transition-colors" },
+                        React.createElement(Icon, { name: "LayoutDashboard", size: 12 })
+                    )
+                ),
+                // Timeline Control Bar (unchanged)
+                React.createElement('div', { className: "absolute bottom-0 left-0 right-0 h-14 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 flex items-center px-4 z-20" },
+                    React.createElement('div', { className: "flex items-center gap-2 mr-6" },
+                        React.createElement('button', { className: "w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-white border border-slate-700 transition-colors shadow-sm" },
+                            React.createElement(Icon, { name: "Play", size: 14, className: "ml-0.5" })
+                        ),
+                        React.createElement('div', { className: "flex flex-col gap-1 ml-2" },
+                            React.createElement('button', { className: "text-slate-500 hover:text-slate-300 transition-colors" },
+                                React.createElement(Icon, { name: "RotateCcw", size: 14 })
+                            ),
+                            React.createElement('button', { className: "text-slate-500 hover:text-slate-300 transition-colors" },
+                                React.createElement(Icon, { name: "RotateCw", size: 14 })
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "flex items-center gap-4 text-xs text-slate-400 border-r border-slate-800 pr-6 mr-6 h-8" },
+                        React.createElement('span', { className: "font-medium text-slate-300" }, "JUN 17"),
+                        React.createElement('span', { className: "font-mono" }, "16:30:31"),
+                        React.createElement('span', { className: "flex items-center gap-1 text-red-500 font-medium" },
+                            React.createElement('div', { className: "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" }), " LIVE"
+                        )
+                    ),
+                    React.createElement('div', { className: "flex-1 h-full relative flex flex-col justify-end pb-2" },
+                        React.createElement('div', { className: "absolute top-0 bottom-2 w-px bg-cyan-400 z-10 shadow-[0_0_5px_#22d3ee]", style: { left: '50%' } },
+                            React.createElement('div', { className: "absolute -top-1 -translate-x-1/2 bg-cyan-400 text-slate-950 text-[9px] font-bold px-1 rounded shadow-sm" }, "LIVE")
+                        ),
+                        React.createElement('div', { className: "w-full h-6 flex items-end gap-[1px]" },
+                            ...Array.from({ length: 80 }, (_, i) => {
+                                const height = Math.random() * 80 + 10;
+                                const isPast = i < 40;
+                                return React.createElement('div', {
+                                    key: i,
+                                    className: `flex-1 rounded-t-[1px] transition-all duration-300 ${isPast ? 'bg-cyan-900/40 hover:bg-cyan-800/50' : 'bg-cyan-500/80 hover:bg-cyan-400'}`,
+                                    style: { height: `${height}%` }
+                                });
+                            })
+                        ),
+                        React.createElement('div', { className: "w-full flex justify-between text-[10px] text-slate-600 mt-1 absolute bottom-0 px-2 pointer-events-none font-mono" },
+                            React.createElement('span', null, "13:00"),
+                            React.createElement('span', null, "14:00"),
+                            React.createElement('span', { className: "pl-4 text-slate-400" }, "15:00"),
+                            React.createElement('span', null, "16:00"),
+                            React.createElement('span', null, "17:00"),
+                            React.createElement('span', null, "18:00")
+                        )
+                    )
+                )
+            );
+        };
+
+        // ---- BottomWidgets (unchanged) ----
+        const BottomWidgets = () => {
+            const portData = [
+                { rank: 1, code: 'SGP', name: 'Singapore', dep: '142 arr' },
+                { rank: 2, code: 'RTM', name: 'Rotterdam', dep: '136 arr' },
+                { rank: 3, code: 'SHA', name: 'Shanghai', dep: '122 arr' },
+                { rank: 4, code: 'DXB', name: 'Jebel Ali', dep: '110 arr' },
+                { rank: 5, code: 'LAX', name: 'Los Angeles', dep: '96 arr' },
+            ];
+            const delayData = [
+                { rank: 1, code: 'NYK', name: 'New York', delay: '87 min' },
+                { rank: 2, code: 'LGB', name: 'Long Beach', delay: '76 min' },
+                { rank: 3, code: 'YVR', name: 'Vancouver', delay: '63 min' },
+                { rank: 4, code: 'HAM', name: 'Hamburg', delay: '48 min' },
+                { rank: 5, code: 'ANT', name: 'Antwerp', delay: '43 min' },
+            ];
+            const congestionData = [
+                { rank: 1, name: 'Singapore', val: '82%', color: 'text-red-500' },
+                { rank: 2, name: 'Rotterdam', val: '74%', color: 'text-orange-500' },
+                { rank: 3, name: 'Shanghai', val: '71%', color: 'text-orange-400' },
+                { rank: 4, name: 'Los Angeles', val: '66%', color: 'text-yellow-500' },
+                { rank: 5, name: 'Hamburg', val: '63%', color: 'text-yellow-400' },
+            ];
+            const watchlistData = [
+                { code: 'EVER GIVEN', route: 'YTN → RTM', fl: '18.4kn', label: 'EG', color: 'green' },
+                { code: 'MSC GULSUN', route: 'SHA → ALG', fl: '16.2kn', label: 'MSC', color: 'yellow' },
+                { code: 'CMA CGM', route: 'DXB → JFK', fl: '19.1kn', label: 'CMA', color: 'blue' },
+            ];
+
+            return React.createElement('div', {
+                className: "h-64 bg-slate-950 border-t border-slate-800 p-4 grid grid-cols-4 gap-4 shrink-0 overflow-hidden relative z-10"
+            },
+                // Widget 1: Top Ports
+                React.createElement('div', { className: "bg-slate-900/40 rounded-lg border border-slate-800/80 p-3 flex flex-col hover:bg-slate-900/60 transition-colors" },
+                    React.createElement('div', { className: "flex justify-between items-center mb-3" },
+                        React.createElement('div', { className: "text-xs font-semibold text-slate-300 tracking-wider" }, "TOP PORTS ", React.createElement('span', { className: "text-slate-500 font-normal" }, "(Arrivals)")),
+                        React.createElement('div', { className: "text-[9px] text-green-400 flex items-center gap-1" },
+                            React.createElement('div', { className: "w-1 h-1 rounded-full bg-green-400" }), " LIVE"
+                        )
+                    ),
+                    React.createElement('div', { className: "flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2" },
+                        ...portData.map(port =>
+                            React.createElement('div', { key: port.code, className: "flex justify-between items-center text-sm group" },
+                                React.createElement('div', { className: "flex items-center gap-3" },
+                                    React.createElement('span', { className: "text-slate-600 w-4 font-mono text-xs" }, port.rank),
+                                    React.createElement('span', { className: "text-white font-medium w-8 group-hover:text-cyan-400 transition-colors" }, port.code),
+                                    React.createElement('span', { className: "text-slate-400 text-xs truncate w-16" }, port.name)
+                                ),
+                                React.createElement('span', { className: "text-slate-300 text-xs font-mono" }, port.dep)
+                            )
+                        )
+                    ),
+                    React.createElement('button', { className: "text-xs text-cyan-500 mt-2 hover:text-cyan-400 transition-colors w-full text-center py-1" }, "View All Ports")
+                ),
+                // Widget 2: Port Delays
+                React.createElement('div', { className: "bg-slate-900/40 rounded-lg border border-slate-800/80 p-3 flex flex-col hover:bg-slate-900/60 transition-colors" },
+                    React.createElement('div', { className: "flex justify-between items-center mb-3" },
+                        React.createElement('div', { className: "text-xs font-semibold text-slate-300 tracking-wider" }, "PORT DELAYS"),
+                        React.createElement('div', { className: "text-[9px] text-green-400 flex items-center gap-1" },
+                            React.createElement('div', { className: "w-1 h-1 rounded-full bg-green-400" }), " LIVE"
+                        )
+                    ),
+                    React.createElement('div', { className: "flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2" },
+                        ...delayData.map(port =>
+                            React.createElement('div', { key: port.code, className: "flex justify-between items-center text-sm group" },
+                                React.createElement('div', { className: "flex items-center gap-3" },
+                                    React.createElement('span', { className: "text-slate-600 w-4 font-mono text-xs" }, port.rank),
+                                    React.createElement('span', { className: "text-white font-medium w-8 group-hover:text-red-400 transition-colors" }, port.code),
+                                    React.createElement('span', { className: "text-slate-400 text-xs truncate w-16" }, port.name)
+                                ),
+                                React.createElement('span', { className: "text-red-400 text-xs font-mono" }, port.delay)
+                            )
+                        )
+                    ),
+                    React.createElement('button', { className: "text-xs text-cyan-500 mt-2 hover:text-cyan-400 transition-colors w-full text-center py-1" }, "View All Delays")
+                ),
+                // Widget 3: Weather
+                React.createElement('div', { className: "bg-slate-900/40 rounded-lg border border-slate-800/80 p-3 flex flex-col relative overflow-hidden group" },
+                    React.createElement('div', { className: "flex justify-between items-center mb-2 z-10 relative" },
+                        React.createElement('div', { className: "text-xs font-semibold text-white tracking-wider drop-shadow-md" }, "WEATHER OVERVIEW"),
+                        React.createElement('div', { className: "text-[9px] text-green-400 flex items-center gap-1 drop-shadow-md" },
+                            React.createElement('div', { className: "w-1 h-1 rounded-full bg-green-400" }), " LIVE"
+                        )
+                    ),
+                    React.createElement('div', { className: "absolute inset-0 top-10 rounded-b-lg overflow-hidden border-t border-slate-800" },
+                        React.createElement('img', {
+                            src: "https://images.unsplash.com/photo-1580193769210-b8d1c049a7d9?q=80&w=2074&auto=format&fit=crop",
+                            alt: "Weather Radar",
+                            className: "w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700"
+                        }),
+                        React.createElement('div', {
+                            className: "absolute inset-0 opacity-70 mix-blend-screen",
+                            style: {
+                                background: 'radial-gradient(circle at 30% 50%, rgba(234, 179, 8, 0.6) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(239, 68, 68, 0.5) 0%, transparent 30%), radial-gradient(circle at 50% 30%, rgba(34, 211, 238, 0.4) 0%, transparent 50%)'
+                            }
+                        })
+                    ),
+                    React.createElement('div', { className: "mt-auto z-10 flex justify-start" },
+                        React.createElement('button', { className: "bg-slate-900/80 text-cyan-400 text-[10px] px-2 py-1 rounded border border-slate-700/50 backdrop-blur hover:bg-slate-800 transition-colors shadow-sm" }, "Open Weather Map")
+                    )
+                ),
+                // Widget 4: Congestion + Watchlist
+                React.createElement('div', { className: "flex flex-col gap-4" },
+                    React.createElement('div', { className: "bg-slate-900/40 rounded-lg border border-slate-800/80 p-3 flex-1 flex flex-col hover:bg-slate-900/60 transition-colors" },
+                        React.createElement('div', { className: "flex justify-between items-center mb-2" },
+                            React.createElement('div', { className: "text-xs font-semibold text-slate-300 tracking-wider" }, "CONGESTION"),
+                            React.createElement('div', { className: "text-[9px] text-green-400 flex items-center gap-1" },
+                                React.createElement('div', { className: "w-1 h-1 rounded-full bg-green-400" })
+                            )
+                        ),
+                        React.createElement('div', { className: "flex-1 space-y-1.5 overflow-y-auto custom-scrollbar pr-2" },
+                            ...congestionData.map(port =>
+                                React.createElement('div', { key: port.name, className: "flex justify-between items-center text-xs" },
+                                    React.createElement('div', { className: "flex items-center gap-2" },
+                                        React.createElement('span', { className: "text-slate-600 w-3 font-mono" }, port.rank),
+                                        React.createElement('span', { className: "text-slate-300 truncate w-16" }, port.name)
+                                    ),
+                                    React.createElement('span', { className: `${port.color} font-medium font-mono` }, port.val)
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "bg-slate-900/40 rounded-lg border border-slate-800/80 p-3 flex-1 flex flex-col hover:bg-slate-900/60 transition-colors" },
+                        React.createElement('div', { className: "flex justify-between items-center mb-2" },
+                            React.createElement('div', { className: "text-xs font-semibold text-slate-300 tracking-wider" }, "WATCHLIST"),
+                            React.createElement(Icon, { name: "Settings", size: 12, className: "text-slate-500 cursor-pointer hover:text-slate-300 transition-colors" })
+                        ),
+                        React.createElement('div', { className: "flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2" },
+                            ...watchlistData.map(item => {
+                                const colorMap = { green: 'green-900', yellow: 'yellow-900', blue: 'blue-900' };
+                                const borderMap = { green: 'green-700', yellow: 'yellow-700', blue: 'blue-700' };
+                                return React.createElement('div', { key: item.code, className: "flex justify-between items-center text-xs group cursor-pointer" },
+                                    React.createElement('div', { className: "flex items-center gap-2" },
+                                        React.createElement('div', { className: `w-4 h-4 rounded bg-${colorMap[item.color]} flex items-center justify-center text-[8px] text-white border border-${borderMap[item.color]}` }, item.label),
+                                        React.createElement('span', { className: "text-slate-300 w-16 truncate group-hover:text-cyan-400 transition-colors", title: item.code }, item.code)
+                                    ),
+                                    React.createElement('span', { className: "text-slate-500 flex-1 text-center font-mono text-[10px]" }, item.route),
+                                    React.createElement('span', { className: "text-slate-400 font-mono" }, item.fl)
+                                );
+                            })
+                        ),
+                        React.createElement('button', { className: "text-[10px] text-cyan-500 mt-1 hover:text-cyan-400 transition-colors w-full text-center" }, "View All Watchlist")
+                    )
+                )
+            );
+        };
+
+        // ---- App ----
+        const App = () => {
+            return React.createElement('div', {
+                className: "h-screen w-screen bg-slate-950 text-slate-200 flex overflow-hidden font-sans selection:bg-cyan-500/30"
+            },
+                React.createElement('style', { dangerouslySetInnerHTML: { __html: `
+                    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+                    .maplibregl-map { width: 100% !important; height: 100% !important; }
+                ` } }),
+                React.createElement(Sidebar, null),
+                React.createElement('div', { className: "flex-1 flex flex-col min-w-0 shadow-[-5px_0_15px_rgba(0,0,0,0.5)] z-10" },
+                    React.createElement(TopBar, null),
+                    React.createElement('div', { className: "flex-1 flex overflow-hidden" },
+                        React.createElement('div', { className: "flex-1 flex flex-col min-w-0" },
+                            React.createElement(MainMapArea, null),
+                            React.createElement(BottomWidgets, null)
+                        ),
+                        React.createElement(DetailPanel, null)
+                    )
+                )
+            );
+        };
+
+        // ---- Render ----
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App, null));
+        // ---- END OF APP ----
+    </script>
+</body>
+</html>

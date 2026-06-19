@@ -1,0 +1,101 @@
+code,name,full_name,country_code,sector,parent,fleet_size,teu_capacity,website,ship_name_prefix,active
+MAEU,Maersk,A.P. Møller–Mærsk,DK,CS,,730,4300000,maersk.com,MAERSK,1
+MSCU,MSC,Mediterranean Shipping Company,CH,CS,,800,5800000,msc.com,MSC ,1
+CMDU,CMA CGM,CMA CGM S.A.,FR,CS,,600,3600000,cma-cgm.com,CMA CGM,1
+COSU,COSCO,China COSCO Shipping,CN,CS,,500,3100000,cosco.com,COSCO,1
+HDMU,Hapag-Lloyd,Hapag-Lloyd AG,DE,CS,,260,1800000,hapag-lloyd.com,HAPAG,1
+ONEY,ONE,Ocean Network Express,JP,CS,K Line/MOL/NYK,230,1600000,one-line.com,ONE ,1
+EGLV,Evergreen,Evergreen Marine Corporation,TW,CS,,200,1600000,evergreen-marine.com,EVER ,1
+YMLU,Yang Ming,Yang Ming Marine Transport,TW,CS,,90,680000,yangming.com,YM ,1
+HLCU,HMM,HMM Co Ltd,KR,CS,,80,820000,hmm21.com,HMM ,1
+ZIMU,ZIM,Zim Integrated Shipping Services,IL,CS,,110,500000,zim.com,ZIM ,1
+WHLC,Wan Hai,Wan Hai Lines,TW,CS,,150,420000,wanhai.com,WAN HAI,1
+PILU,PIL,Pacific International Lines,SG,CS,,100,400000,pilship.com,KOTA ,1
+KMTC,KMTC,Korea Marine Transport Co,KR,CS,,70,160000,kmtc.co.kr,,1
+SITC,SITC,SITC International Holdings,CN,CS,,150,180000,sitc.com,SITC ,1
+XPRS,X-Press Feeders,X-Press Feeders Group,SG,CS,,110,100000,x-pressfeeders.com,X-PRESS,1
+OOCL,OOCL,Orient Overseas Container Line,HK,CS,COSCO,100,850000,oocl.com,OOCL ,1
+SAFM,Safmarine,Safmarine,ZA,CS,Maersk,40,0,safmarine.com,SAFMARINE,1
+HBSA,Hamburg Süd,Hamburg Südamerikanische,DE,CS,Maersk,130,0,hamburgsud.com,CAP ,1
+SEAU,SeaLand,SeaLand – A Maersk Company,US,CS,Maersk,50,0,sealandmaersk.com,,1
+ANLC,ANL,ANL Container Line,AU,CS,CMA CGM,30,0,anl.com.au,ANL ,1
+FESO,FESCO,Far East Shipping Company,RU,CS,,40,60000,fesco.ru,FESCO,1
+IRISL,IRISL,Islamic Republic of Iran Shipping Lines,IR,CS,,60,100000,irisl.net,,1
+FRO,Frontline,Frontline Ltd,BM,TK,Hemen Holding,70,0,frontline.bm,,1
+EURN,Euronav,Euronav NV,BE,TK,,45,0,euronav.com,,1
+TNK,Teekay,Teekay Corporation,BM,TK,,55,0,teekay.com,TEEKAY,1
+SCF,Sovcomflot,PAO Sovcomflot,RU,TK,,120,0,scf-group.com,SCF ,1
+MISC,MISC,MISC Berhad,MY,TK,PETRONAS,100,0,misc.com.my,,1
+BAHR,Bahri,Bahri (National Shipping Company of Saudi Arabia),SA,TK,,90,0,bahri.sa,,1
+TORM,Torm,Dampskibsselskabet Torm,DK,TK,,80,0,torm.com,TORM ,1
+NORD,D/S Norden,Dampskibsselskabet Norden,DK,TK/BC,,45,0,ds-norden.com,,1
+ODFL,Odfjell,Odfjell SE,NO,TK,,90,0,odfjell.com,BOW ,1
+STNG,Scorpio Tankers,Scorpio Tankers Inc,MC,TK,,115,0,scorpiotankers.com,STI ,1
+ARDS,Ardmore,Ardmore Shipping,IE,TK,,25,0,ardmoreshipping.com,,1
+INSW,International Seaways,International Seaways Inc,US,TK,,75,0,intlseas.com,,1
+HAFN,Hafnia,Hafnia Ltd,SG,TK,,120,0,hafniabw.com,HAFNIA,1
+DHT,DHT Holdings,DHT Holdings Inc,BM,TK,,25,0,dhtankers.com,DHT ,1
+GNRT,Gener8,Gener8 Maritime,US,TK,,20,0,,,0
+STBK,Star Bulk,Star Bulk Carriers Corp,GR,BC,,130,0,starbulk.com,STAR ,1
+GOGL,Golden Ocean,Golden Ocean Group,BM,BC,Hemen Holding,90,0,goldenocean.bm,,1
+SBLK,Pacific Basin,Pacific Basin Shipping,HK,BC,,250,0,pacificbasin.com,,1
+DIAN,Diana Shipping,Diana Shipping Inc,GR,BC,,40,0,dianashippinginc.com,,1
+EGLE,Eagle Bulk,Eagle Bulk Shipping,US,BC,,55,0,eagleships.com,,1
+GENM,Genco Shipping,Genco Shipping & Trading,US,BC,,45,0,gencoshipping.com,,1
+OLDF,Oldendorff,Oldendorff Carriers,DE,BC,,700,0,oldendorff.com,,1
+NAVB,Navibulgar,Navigation Maritime Bulgare,BG,BC,,75,0,navbul.com,,1
+POLM,Polsteam,Polish Steamship Company,PL,BC,,60,0,polsteam.com,,1
+PANOC,Pan Ocean,Pan Ocean Co Ltd,KR,BC,,70,0,panocean.com,,1
+WWL,Wallenius Wilhelmsen,Wallenius Wilhelmsen ASA,NO,RR,,130,0,2wglobal.com,TOREADOR,1
+EUKR,EUKOR,EUKOR Car Carriers Inc,KR,CC,,80,0,eukor.com,MORNING ,1
+GRIM,Grimaldi,Grimaldi Group,IT,RR,,130,0,grimaldi.napoli.it,GRANDE ,1
+HGVS,Hyundai Glovis,Hyundai Glovis Co Ltd,KR,CC,,80,0,glovis.net,GLOVIS ,1
+KESS,K Line KESS,K Line European Sea Highway,JP,CC,K Line,60,0,kess.jp,,1
+MOLM,MOL,Mitsui O.S.K. Lines,JP,BC/CC/TK,,800,0,mol.co.jp,MOL ,1
+NYKK,NYK,Nippon Yusen Kaisha,JP,BC/CC/TK,,600,0,nyk.com,NYK ,1
+KKCL,K Line,Kawasaki Kisen Kaisha,JP,BC/CC/RR,,400,0,kline.co.jp,,1
+TOYO,Toyofuji,Toyofuji Shipping Co Ltd,JP,CC,,50,0,toyofuji.co.jp,,1
+NOCC,NOCC,Norwegian Car Carriers,NO,CC,,30,0,,,1
+NQEA,Nakilat,Qatar Gas Transport (Nakilat),QA,LNG,,70,0,nakilat.com,,1
+GLNG,GasLog,GasLog Ltd,MC,LNG,,35,0,gaslogltd.com,,1
+GLNG,Höegh LNG,Höegh LNG Holdings,NO,LNG,,10,0,hoeghlng.com,,1
+AWLG,Awilco LNG,Awilco LNG ASA,NO,LNG,,4,0,awilcolng.com,,1
+GOLR,Golar LNG,Golar LNG Ltd,BM,LNG,,14,0,golarlng.com,,1
+FLEX,FLEX LNG,FLEX LNG Ltd,NO,LNG,,13,0,flexlng.com,,1
+COOL,CoolCo,Cool Company Ltd,NO,LNG,,14,0,coolcoltd.com,,1
+CCL,Carnival,Carnival Corporation & plc,US,PAX,,90,0,carnival.com,CARNIVAL,1
+RCL,Royal Caribbean,Royal Caribbean Group,US,PAX,,60,0,royalcaribbean.com,,1
+NCLH,Norwegian Cruise,Norwegian Cruise Line Holdings,US,PAX,,30,0,ncl.com,NORWEGIAN,1
+MSCC,MSC Cruises,MSC Cruises SA,CH,PAX,MSC,22,0,msccruises.com,MSC ,1
+VIK,Viking,Viking Holdings Ltd,NO,PAX,,90,0,viking.com,VIKING ,1
+DSNYLC,Disney Cruise,Disney Cruise Line,US,PAX,Walt Disney,5,0,disneycruise.disney.go.com,DISNEY ,1
+HOLL,Holland America,Holland America Line,US,PAX,Carnival,10,0,hollandamerica.com,,1
+PRCS,Princess Cruises,Princess Cruises,US,PAX,Carnival,15,0,princess.com,,1
+CSTA,Costa Cruises,Costa Crociere,IT,PAX,Carnival,12,0,costacruises.com,COSTA ,1
+CUNRD,Cunard,Cunard Line,GB,PAX,Carnival,4,0,cunard.com,QUEEN ,1
+CELB,Celebrity Cruises,Celebrity Cruises,US,PAX,Royal Caribbean,16,0,celebritycruises.com,CELEBRITY,1
+TUI,TUI Cruises,TUI Cruises GmbH,DE,PAX,,7,0,tuicruises.com,MEIN SCHIFF,1
+PONO,Ponant,Compagnie du Ponant,FR,PAX,,14,0,ponant.com,LE ,1
+SLST,Solstad,Solstad Offshore ASA,NO,OFF,,120,0,solstad.com,,1
+TDWT,Tidewater,Tidewater Inc,US,OFF,,200,0,tdw.com,,1
+BOUR,Bourbon,Bourbon Offshore,FR,OFF,,260,0,bourbonoffshore.com,BOURBON ,1
+DOF,DOF,DOF ASA,NO,OFF,,70,0,dof.com,,1
+HAVC,Havila,Havila Shipping ASA,NO,OFF,,25,0,havila.no,,1
+SWTL,Swire,The China Navigation Company,HK,BC/RR,Swire Group,65,0,chinanav.com.hk,,1
+SAFR,Safeen,AD Ports - Safeen,AE,OFF,,50,0,safeen.ae,,1
+ESL,Ethiopian Shipping,Ethiopian Shipping Lines,ET,CS,,10,0,,,1
+SCI,SCI,Shipping Corporation of India,IN,TK/BC,,60,0,shipindia.com,SCI ,1
+PNSC,PNSC,Pakistan National Shipping Corporation,PK,TK/BC,,10,0,pnsc.com.pk,,1
+CSAV,CSAV,Compañía Sudamericana de Vapores,CL,CS,Hapag-Lloyd,30,0,csav.com,,1
+CROW,Crowley,Crowley Maritime Corporation,US,RR/TK,,150,0,crowley.com,,1
+MATS,Matson,Matson Navigation Company,US,CS,,25,0,matson.com,MATSON,1
+APL,APL,American President Lines,US,CS,CMA CGM,55,0,apl.com,APL ,1
+DLMS,Delmas,Delmas Shipping,FR,CS,CMA CGM,30,0,,,0
+KNUT,Knutsen,Knutsen OAS Shipping,NO,TK/LNG,,30,0,knutsenoas.com,,1
+STLT,Stolt-Nielsen,Stolt-Nielsen Ltd,NO,TK,,80,0,stolt-nielsen.com,STOLT ,1
+WSTR,Western Bulk,Western Bulk Chartering,NO,BC,,40,0,westernbulk.com,,1
+LAEI,Laeisz,F. Laeisz,DE,BC,,55,0,laeisz.de,,1
+CMB,CMB,Compagnie Maritime Belge,BE,TK/BC,,180,0,cmb.be,,1
+FDRN,Fednav,Fednav Ltd,CA,BC,,60,0,fednav.com,FEDERAL ,1
+ALGM,Algoma,Algoma Central Corporation,CA,BC,,50,0,algoma.com,ALGOMA ,1
+BRGS,Bergesen,BW Group (ex-Bergesen),NO,TK/LNG,,150,0,bw-group.com,BW ,1

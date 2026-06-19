@@ -168,14 +168,15 @@ type Airline struct {
 }
 
 type Airport struct {
-	ICAO      string  `json:"icao_code"`
-	IATA      string  `json:"iata_code"`
-	Name      string  `json:"name"`
-	City      string  `json:"municipality"`
-	Country   string  `json:"country_name"`
-	Lat       float64 `json:"latitude"`
-	Lon       float64 `json:"longitude"`
-	Elevation int     `json:"elevation"`
+	ICAO        string  `json:"icao_code"`
+	IATA        string  `json:"iata_code"`
+	Name        string  `json:"name"`
+	City        string  `json:"municipality"`
+	Country     string  `json:"country_name"`
+	CountryCode string  `json:"country_code"`
+	Lat         float64 `json:"latitude"`
+	Lon         float64 `json:"longitude"`
+	Elevation   int     `json:"elevation"`
 }
 
 type Route struct {
@@ -237,11 +238,45 @@ type Ship struct {
 	CallSign     string `json:"call_sign,omitempty"`
 	Name         string `json:"name"`
 	Country      string `json:"country,omitempty"`
+	CountryCode  string `json:"country_code,omitempty"`
 	GrossTonnage int    `json:"gross_tonnage,omitempty"`
 	ShipType     int    `json:"ship_type,omitempty"`
 	LengthM      int    `json:"length_m,omitempty"`
 	BeamM        int    `json:"beam_m,omitempty"`
 	Class        string `json:"class,omitempty"`
+}
+
+type ShippingCompany struct {
+	Code        string `json:"code"`
+	Name        string `json:"name"`
+	FullName    string `json:"full_name"`
+	CountryCode string `json:"country_code"`
+	Sector      string `json:"sector"`
+	Parent      string `json:"parent,omitempty"`
+	FleetSize   int    `json:"fleet_size"`
+	TEUCapacity int    `json:"teu_capacity,omitempty"`
+	Website     string `json:"website,omitempty"`
+	NamePrefix  string `json:"-"`
+	Active      bool   `json:"active"`
+}
+
+type NotableShip struct {
+	IMO          string `json:"imo"`
+	MMSI         string `json:"mmsi,omitempty"`
+	Name         string `json:"name"`
+	OperatorCode string `json:"operator_code,omitempty"`
+	TEU          int    `json:"teu,omitempty"`
+	DWT          int    `json:"dwt,omitempty"`
+	GT           int    `json:"gross_tonnage,omitempty"`
+	LengthM      int    `json:"length_m,omitempty"`
+	BeamM        int    `json:"beam_m,omitempty"`
+	YearBuilt    int    `json:"year_built,omitempty"`
+	Builder      string `json:"builder,omitempty"`
+	VesselClass  string `json:"vessel_class,omitempty"`
+	Sector       string `json:"sector"`
+	Status       string `json:"status"`
+	Photo1       string `json:"photo1,omitempty"`
+	Photo2       string `json:"photo2,omitempty"`
 }
 
 // ===================== DATA STORES =====================
@@ -268,8 +303,15 @@ var (
 	seaRoutesByOrigin map[string][]SeaRoute
 	seaDistancePorts  map[string]SeaDistancePort
 	shippingLanesJSON []byte
+	combinedLanesJSON []byte
 	ships          map[string]*Ship
 	shipsByCallSign map[string]*Ship
+	companies       []*ShippingCompany
+	companyByCode   map[string]*ShippingCompany
+	companyPrefixes []struct{ prefix, code string }
+	notableShips    []*NotableShip
+	notableByMMSI   map[string]*NotableShip
+	notableByName   map[string]*NotableShip
 	startTime   time.Time
 )
 
@@ -341,7 +383,7 @@ func loadAirports(path string) error {
 		lat, _ := strconv.ParseFloat(rec[5], 64)
 		lon, _ := strconv.ParseFloat(rec[6], 64)
 		elev, _ := strconv.Atoi(rec[7])
-		airports[rec[0]] = Airport{ICAO: rec[0], IATA: rec[1], Name: rec[2], City: rec[3], Country: rec[4], Lat: lat, Lon: lon, Elevation: elev}
+		airports[rec[0]] = Airport{ICAO: rec[0], IATA: rec[1], Name: rec[2], City: rec[3], Country: rec[4], CountryCode: icaoCountryCode(rec[0]), Lat: lat, Lon: lon, Elevation: elev}
 	}
 	return nil
 }
@@ -503,6 +545,7 @@ type nodeID int32
 type graphEdge struct {
 	to     nodeID
 	dist   float64
+	pass   string       // canal/strait name if this edge is a named passage
 	coords [][2]float64 // full polyline [lon,lat] pairs including endpoints
 }
 
@@ -523,17 +566,29 @@ func loadMarnet(path string) error {
 	if err != nil {
 		return err
 	}
-	marnetJSON = data
 	var gj struct {
 		Features []struct {
 			Geometry struct {
+				Type        string      `json:"type"`
 				Coordinates [][]float64 `json:"coordinates"`
 			} `json:"geometry"`
+			Properties map[string]any `json:"properties"`
 		} `json:"features"`
 	}
 	if err := json.Unmarshal(data, &gj); err != nil {
 		return err
 	}
+
+	// Build tiered GeoJSON with distance-based tier classification
+	type tieredFeat struct {
+		Type string `json:"type"`
+		Geom struct {
+			Type   string      `json:"type"`
+			Coords [][]float64 `json:"coordinates"`
+		} `json:"geometry"`
+		Props map[string]any `json:"properties"`
+	}
+	tieredFeatures := make([]tieredFeat, 0, len(gj.Features))
 
 	// Build node index (deduplicate by rounded coords)
 	nodeMap := make(map[[2]int32]nodeID)
@@ -562,6 +617,30 @@ func loadMarnet(path string) error {
 		for i := 1; i < len(coords); i++ {
 			dist += haversineNM(coords[i-1][1], coords[i-1][0], coords[i][1], coords[i][0])
 		}
+		// Tier: 1=major ocean(>=200nm), 2=regional(50-200), 3=coastal(20-50), 4=local(<20)
+		tier := 4
+		if dist >= 200 {
+			tier = 1
+		} else if dist >= 50 {
+			tier = 2
+		} else if dist >= 20 {
+			tier = 3
+		}
+		// Named passages always tier 1
+		var passName string
+		if feat.Properties != nil {
+			if v, ok := feat.Properties["pass"]; ok && v != nil {
+				tier = 1
+				passName, _ = v.(string)
+			}
+		}
+		var tf tieredFeat
+		tf.Type = "Feature"
+		tf.Geom.Type = "LineString"
+		tf.Geom.Coords = coords
+		tf.Props = map[string]any{"tier": tier}
+		tieredFeatures = append(tieredFeatures, tf)
+
 		// Store polyline coords
 		poly := make([][2]float64, len(coords))
 		for i, c := range coords {
@@ -571,9 +650,18 @@ func loadMarnet(path string) error {
 		for i, c := range poly {
 			polyRev[len(poly)-1-i] = c
 		}
-		marnetAdj[a] = append(marnetAdj[a], graphEdge{to: b, dist: dist, coords: poly})
-		marnetAdj[b] = append(marnetAdj[b], graphEdge{to: a, dist: dist, coords: polyRev})
+		marnetAdj[a] = append(marnetAdj[a], graphEdge{to: b, dist: dist, pass: passName, coords: poly})
+		marnetAdj[b] = append(marnetAdj[b], graphEdge{to: a, dist: dist, pass: passName, coords: polyRev})
 	}
+
+	// Serialize tiered GeoJSON — only marnet local detail (tier 4, <20nm edges)
+	var localFeatures []tieredFeat
+	for _, f := range tieredFeatures {
+		if f.Props["tier"] == 4 {
+			localFeatures = append(localFeatures, f)
+		}
+	}
+	marnetJSON, _ = json.Marshal(map[string]any{"type": "FeatureCollection", "features": localFeatures})
 
 	// Build spatial grid
 	marnetGrid = make(map[[2]int][]nodeID, len(marnetNodes)/4)
@@ -629,12 +717,105 @@ func greatCircleArc(lat1, lon1, lat2, lon2 float64) [][]float64 {
 		z := a*math.Sin(φ1) + b*math.Sin(φ2)
 		lat := math.Atan2(z, math.Sqrt(x*x+y*y)) * rad2deg
 		lon := math.Atan2(y, x) * rad2deg
+		// Unwrap longitude to avoid anti-meridian jumps
+		if i > 0 {
+			for lon-pts[i-1][0] > 180 {
+				lon -= 360
+			}
+			for lon-pts[i-1][0] < -180 {
+				lon += 360
+			}
+		}
 		pts[i] = []float64{lon, lat}
 	}
 	return pts
 }
 
 // Find nearest graph node to given lon,lat within search radius
+// findAirRoute uses Dijkstra on the flight route network to find shortest multi-hop path.
+func findAirRoute(fromICAO, toICAO string) []string {
+	// BFS/Dijkstra with haversine distance weights
+	type airNode struct {
+		icao string
+		dist float64
+	}
+	dist := make(map[string]float64)
+	prev := make(map[string]string)
+	dist[fromICAO] = 0
+
+	// Priority queue using sorted slice (flight network is sparse enough)
+	h := &airPQ{{icao: fromICAO, dist: 0}}
+	heap.Init(h)
+
+	for h.Len() > 0 {
+		cur := heap.Pop(h).(*airPQItem)
+		if cur.icao == toICAO {
+			break
+		}
+		if cur.dist > dist[cur.icao] {
+			continue
+		}
+		curAP, ok := airports[cur.icao]
+		if !ok {
+			continue
+		}
+		// Expand neighbors (all airports connected by a route)
+		seen := make(map[string]bool)
+		for _, rt := range byAirport[cur.icao] {
+			parts := strings.Split(rt.AirportCodes, "-")
+			for _, p := range parts {
+				if p == cur.icao || p == "" || seen[p] {
+					continue
+				}
+				seen[p] = true
+				destAP, ok := airports[p]
+				if !ok {
+					continue
+				}
+				nd := cur.dist + haversineNM(curAP.Lat, curAP.Lon, destAP.Lat, destAP.Lon)
+				if old, exists := dist[p]; !exists || nd < old {
+					dist[p] = nd
+					prev[p] = cur.icao
+					heap.Push(h, &airPQItem{icao: p, dist: nd})
+				}
+			}
+		}
+	}
+
+	if _, ok := dist[toICAO]; !ok {
+		// No route found, fall back to direct
+		return []string{fromICAO, toICAO}
+	}
+
+	// Reconstruct path
+	var path []string
+	for cur := toICAO; cur != ""; cur = prev[cur] {
+		path = append(path, cur)
+		if cur == fromICAO {
+			break
+		}
+	}
+	// Reverse
+	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
+		path[i], path[j] = path[j], path[i]
+	}
+	return path
+}
+
+// Priority queue for air routing
+type airPQItem struct {
+	icao string
+	dist float64
+	idx  int
+}
+type airPQ []*airPQItem
+
+func (h airPQ) Len() int            { return len(h) }
+func (h airPQ) Less(i, j int) bool  { return h[i].dist < h[j].dist }
+func (h airPQ) Swap(i, j int)       { h[i], h[j] = h[j], h[i]; h[i].idx = i; h[j].idx = j }
+func (h *airPQ) Push(x any)         { it := x.(*airPQItem); it.idx = len(*h); *h = append(*h, it) }
+func (h *airPQ) Pop() any           { old := *h; it := old[len(old)-1]; *h = old[:len(old)-1]; return it }
+
 func nearestNode(lon, lat float64) (nodeID, float64) {
 	bestDist := math.MaxFloat64
 	bestNode := nodeID(-1)
@@ -668,7 +849,7 @@ func (h *pq) Push(x any)         { it := x.(*pqItem); it.idx = len(*h); *h = app
 func (h *pq) Pop() any           { old := *h; it := old[len(old)-1]; *h = old[:len(old)-1]; return it }
 
 // Dijkstra returns shortest path as polyline coords and total distance in nm
-func dijkstraRoute(from, to nodeID) ([][2]float64, float64) {
+func dijkstraRoute(from, to nodeID) ([][2]float64, float64, []string) {
 	n := len(marnetNodes)
 	dist := make([]float64, n)
 	prev := make([]nodeID, n)
@@ -702,14 +883,19 @@ func dijkstraRoute(from, to nodeID) ([][2]float64, float64) {
 	}
 
 	if dist[to] == math.MaxFloat64 {
-		return nil, 0
+		return nil, 0, nil
 	}
 
-	// Reconstruct path
+	// Reconstruct path + collect passes
 	var path [][2]float64
+	seen := make(map[string]bool)
+	var passes []string
 	for cur := to; cur != from; cur = prev[cur] {
 		edge := marnetAdj[prev[cur]][prevEdge[cur]]
-		// edge.coords goes from prev[cur] → cur, append in reverse order (skip last to avoid dup)
+		if edge.pass != "" && !seen[edge.pass] {
+			seen[edge.pass] = true
+			passes = append(passes, edge.pass)
+		}
 		for i := len(edge.coords) - 1; i >= 1; i-- {
 			path = append(path, edge.coords[i])
 		}
@@ -720,7 +906,11 @@ func dijkstraRoute(from, to nodeID) ([][2]float64, float64) {
 	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
 		path[i], path[j] = path[j], path[i]
 	}
-	return path, dist[to]
+	// Reverse passes (collected backwards)
+	for i, j := 0, len(passes)-1; i < j; i, j = i+1, j-1 {
+		passes[i], passes[j] = passes[j], passes[i]
+	}
+	return path, dist[to], passes
 }
 
 
@@ -745,12 +935,107 @@ func loadShips(path string) error {
 		bm, _ := strconv.Atoi(rec[18])
 		s := &Ship{
 			MMSI: rec[0], CallSign: rec[1], Name: rec[3], Country: rec[4],
+			CountryCode: ituCountryCode(rec[4]),
 			GrossTonnage: gt, ShipType: st, LengthM: ln, BeamM: bm, Class: rec[7],
 		}
 		ships[rec[0]] = s
 		if rec[1] != "" {
 			shipsByCallSign[strings.ToUpper(rec[1])] = s
 		}
+	}
+	return nil
+}
+
+func loadCompanies(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil // optional file
+	}
+	defer f.Close()
+	r := csv.NewReader(f)
+	r.FieldsPerRecord = -1
+	r.Read() // header
+	companyByCode = make(map[string]*ShippingCompany, 120)
+	for {
+		rec, err := r.Read()
+		if err != nil {
+			break
+		}
+		if len(rec) < 11 {
+			continue
+		}
+		fleet, _ := strconv.Atoi(rec[6])
+		teu, _ := strconv.Atoi(rec[7])
+		c := &ShippingCompany{
+			Code: rec[0], Name: rec[1], FullName: rec[2], CountryCode: rec[3],
+			Sector: rec[4], Parent: rec[5], FleetSize: fleet, TEUCapacity: teu,
+			Website: rec[8], NamePrefix: rec[9], Active: rec[10] == "1",
+		}
+		companies = append(companies, c)
+		companyByCode[c.Code] = c
+		if c.NamePrefix != "" {
+			companyPrefixes = append(companyPrefixes, struct{ prefix, code string }{strings.ToUpper(c.NamePrefix), c.Code})
+		}
+	}
+	// Sort prefixes longest first for greedy match
+	sort.Slice(companyPrefixes, func(i, j int) bool {
+		return len(companyPrefixes[i].prefix) > len(companyPrefixes[j].prefix)
+	})
+	return nil
+}
+
+func matchOperator(shipName string) *ShippingCompany {
+	upper := strings.ToUpper(shipName)
+	for _, p := range companyPrefixes {
+		if strings.HasPrefix(upper, p.prefix) {
+			return companyByCode[p.code]
+		}
+	}
+	return nil
+}
+
+func loadNotableShips(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil // optional
+	}
+	defer f.Close()
+	r := csv.NewReader(f)
+	r.FieldsPerRecord = -1
+	r.Read() // header
+	notableByMMSI = make(map[string]*NotableShip, 100)
+	notableByName = make(map[string]*NotableShip, 100)
+	for {
+		rec, err := r.Read()
+		if err != nil {
+			break
+		}
+		if len(rec) < 14 {
+			continue
+		}
+		teu, _ := strconv.Atoi(rec[4])
+		dwt, _ := strconv.Atoi(rec[5])
+		gt, _ := strconv.Atoi(rec[6])
+		ln, _ := strconv.Atoi(rec[7])
+		bm, _ := strconv.Atoi(rec[8])
+		yr, _ := strconv.Atoi(rec[9])
+		ns := &NotableShip{
+			IMO: rec[0], MMSI: rec[1], Name: rec[2], OperatorCode: rec[3],
+			TEU: teu, DWT: dwt, GT: gt, LengthM: ln, BeamM: bm,
+			YearBuilt: yr, Builder: rec[10], VesselClass: rec[11],
+			Sector: rec[12], Status: rec[13],
+		}
+		if len(rec) > 14 {
+			ns.Photo1 = rec[14]
+		}
+		if len(rec) > 15 {
+			ns.Photo2 = rec[15]
+		}
+		notableShips = append(notableShips, ns)
+		if ns.MMSI != "" {
+			notableByMMSI[ns.MMSI] = ns
+		}
+		notableByName[strings.ToUpper(ns.Name)] = ns
 	}
 	return nil
 }
@@ -934,7 +1219,11 @@ func buildAirportsBinary() []byte {
 	type ba struct{ lat, lon int32; ni, ii, ai, rc uint16 }
 	pts := make([]ba, 0, len(airports))
 	for _, a := range airports {
-		pts = append(pts, ba{int32(a.Lat * 1e6), int32(a.Lon * 1e6), addStr(a.Name), addStr(a.ICAO), addStr(a.IATA), uint16(len(byAirport[a.ICAO]))})
+		nameStr := a.Name
+		if a.CountryCode != "" {
+			nameStr = a.Name + "|" + a.CountryCode
+		}
+		pts = append(pts, ba{int32(a.Lat * 1e6), int32(a.Lon * 1e6), addStr(nameStr), addStr(a.ICAO), addStr(a.IATA), uint16(len(byAirport[a.ICAO]))})
 	}
 	stSize := 2
 	for _, s := range strList {
@@ -984,6 +1273,8 @@ func main() {
 		{"shipping_lanes", loadShippingLanes, "shipping_lanes.geojson"},
 		{"marnet", loadMarnet, "marnet.geojson"},
 		{"ships", loadShips, "ships.csv"},
+		{"companies", loadCompanies, "shipping_companies.csv"},
+		{"notable_ships", loadNotableShips, "notable_ships.csv"},
 	} {
 		if err := l.fn(l.path); err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to load %s: %v\n", l.name, err)
@@ -991,6 +1282,38 @@ func main() {
 		}
 	}
 	startTime = time.Now()
+
+	// Build combined shipping lanes: CIA (tiers 1-3) + marnet local detail (tier 4)
+	var ciaGJ struct {
+		Features []json.RawMessage `json:"features"`
+	}
+	json.Unmarshal(shippingLanesJSON, &ciaGJ)
+	tierMap := map[string]int{"Major": 1, "Middle": 2, "Minor": 3}
+	var combinedFeats []map[string]any
+	for _, raw := range ciaGJ.Features {
+		var f map[string]any
+		json.Unmarshal(raw, &f)
+		props, _ := f["properties"].(map[string]any)
+		if props != nil {
+			if t, ok := props["Type"].(string); ok {
+				props["tier"] = tierMap[t]
+			}
+		}
+		combinedFeats = append(combinedFeats, f)
+	}
+	// Append marnet tier-4 features
+	var marnetGJ struct {
+		Features []json.RawMessage `json:"features"`
+	}
+	json.Unmarshal(marnetJSON, &marnetGJ)
+	for _, raw := range marnetGJ.Features {
+		var f map[string]any
+		json.Unmarshal(raw, &f)
+		combinedFeats = append(combinedFeats, f)
+	}
+	combinedLanesJSON, _ = json.Marshal(map[string]any{"type": "FeatureCollection", "features": combinedFeats})
+	fmt.Printf("  combined lanes: %d CIA + %d marnet-local features\n", len(ciaGJ.Features), len(marnetGJ.Features))
+
 	fmt.Printf("Loaded: %d aircraft, %d airlines, %d airports, %d routes, %d seaports, %d sea-route origins, %d ships\n",
 		len(aircraft), len(airlines), len(airports), len(routes), len(seaports), len(seaRoutesByOrigin), len(ships))
 
@@ -1351,13 +1674,12 @@ func main() {
 
 	mux.HandleFunc("/v1/shipping-lanes", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/geo+json")
-		w.Write(shippingLanesJSON)
+		w.Write(combinedLanesJSON)
 	})
 
-	// Marnet network as lanes visualization (alternative to CIA data)
-	mux.HandleFunc("/v1/shipping-lanes/marnet", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/shipping-lanes/legacy", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/geo+json")
-		w.Write(marnetJSON)
+		w.Write(shippingLanesJSON)
 	})
 
 	// Sea route (Dijkstra on marnet graph)
@@ -1395,7 +1717,7 @@ func main() {
 			w.Write([]byte(`{"error":"no graph node within 200nm of given coordinates"}`))
 			return
 		}
-		path, dist := dijkstraRoute(srcNode, dstNode)
+		path, dist, _ := dijkstraRoute(srcNode, dstNode)
 		if path == nil {
 			w.WriteHeader(404)
 			w.Write([]byte(`{"error":"no route found between these points"}`))
@@ -1422,6 +1744,323 @@ func main() {
 		})
 	})
 
+	// === Unified Route Engine ===
+
+	// Resolve port by name, LOCODE, or WPI ID
+	resolvePort := func(q string) *Seaport {
+		q = strings.TrimSpace(q)
+		qu := strings.ToUpper(q)
+		// Try LOCODE exact
+		for i := range seaports {
+			if strings.ToUpper(seaports[i].LOCODE) == qu {
+				return &seaports[i]
+			}
+		}
+		// Try WPI ID
+		if p, ok := portByWPI[q]; ok {
+			return p
+		}
+		// Try name exact
+		for i := range seaports {
+			if strings.ToUpper(seaports[i].Name) == qu {
+				return &seaports[i]
+			}
+		}
+		// Fuzzy name match
+		for i := range seaports {
+			if strings.Contains(strings.ToUpper(seaports[i].Name), qu) {
+				return &seaports[i]
+			}
+		}
+		return nil
+	}
+
+	// Resolve airport by ICAO or IATA
+	resolveAirport := func(q string) *Airport {
+		qu := strings.ToUpper(strings.TrimSpace(q))
+		if ap, ok := airports[qu]; ok {
+			return &ap
+		}
+		// Try IATA
+		for _, ap := range airports {
+			if strings.ToUpper(ap.IATA) == qu {
+				a := ap
+				return &a
+			}
+		}
+		// Fuzzy name
+		for _, ap := range airports {
+			if strings.Contains(strings.ToUpper(ap.Name), qu) {
+				a := ap
+				return &a
+			}
+		}
+		return nil
+	}
+
+	mux.HandleFunc("/v1/routes/sea", func(w http.ResponseWriter, r *http.Request) {
+		fromQ := r.URL.Query().Get("from")
+		toQ := r.URL.Query().Get("to")
+		if fromQ == "" || toQ == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"from and to parameters required (port name or LOCODE)"}`))
+			return
+		}
+		fromPort := resolvePort(fromQ)
+		toPort := resolvePort(toQ)
+		if fromPort == nil {
+			notFound(w, "Origin port not found: "+fromQ)
+			return
+		}
+		if toPort == nil {
+			notFound(w, "Destination port not found: "+toQ)
+			return
+		}
+		srcNode, srcDist := nearestNode(fromPort.Lon, fromPort.Lat)
+		dstNode, dstDist := nearestNode(toPort.Lon, toPort.Lat)
+		if srcNode < 0 || dstNode < 0 || srcDist > 200 || dstDist > 200 {
+			w.WriteHeader(404)
+			w.Write([]byte(`{"error":"ports too far from maritime network"}`))
+			return
+		}
+		path, distNM, passes := dijkstraRoute(srcNode, dstNode)
+		if path == nil {
+			w.WriteHeader(404)
+			w.Write([]byte(`{"error":"no sea route found"}`))
+			return
+		}
+		speedKn := 14.0
+		if s := r.URL.Query().Get("speed_kn"); s != "" {
+			if v, err := strconv.ParseFloat(s, 64); err == nil && v > 0 {
+				speedKn = v
+			}
+		}
+		coords := make([][]float64, len(path))
+		for i, p := range path {
+			coords[i] = []float64{p[0], p[1]}
+		}
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"type":     "Feature",
+			"geometry": map[string]any{"type": "LineString", "coordinates": coords},
+			"properties": map[string]any{
+				"mode": "sea",
+				"from": map[string]any{"name": fromPort.Name, "code": fromPort.LOCODE, "country_code": fromPort.CountryCode, "lat": fromPort.Lat, "lon": fromPort.Lon, "teu_thousands": fromPort.TEUThousands},
+				"to":   map[string]any{"name": toPort.Name, "code": toPort.LOCODE, "country_code": toPort.CountryCode, "lat": toPort.Lat, "lon": toPort.Lon, "teu_thousands": toPort.TEUThousands},
+				"distance_nm":    math.Round(distNM*10) / 10,
+				"distance_km":    math.Round(distNM*1.852*10) / 10,
+				"speed_kn":       speedKn,
+				"estimated_hours": math.Round(distNM/speedKn*10) / 10,
+				"passes":         passes,
+				"nodes_in_path":  len(path),
+			},
+		})
+	})
+
+	mux.HandleFunc("/v1/routes/air", func(w http.ResponseWriter, r *http.Request) {
+		fromQ := r.URL.Query().Get("from")
+		toQ := r.URL.Query().Get("to")
+		if fromQ == "" || toQ == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"from and to parameters required (ICAO or IATA)"}`))
+			return
+		}
+		fromAP := resolveAirport(fromQ)
+		toAP := resolveAirport(toQ)
+		if fromAP == nil {
+			notFound(w, "Origin airport not found: "+fromQ)
+			return
+		}
+		if toAP == nil {
+			notFound(w, "Destination airport not found: "+toQ)
+			return
+		}
+		speedKn := 480.0
+		if s := r.URL.Query().Get("speed_kn"); s != "" {
+			if v, err := strconv.ParseFloat(s, 64); err == nil && v > 0 {
+				speedKn = v
+			}
+		}
+
+		// Find multi-hop route via BFS/Dijkstra on flight network
+		hops := findAirRoute(fromAP.ICAO, toAP.ICAO)
+
+		// Build concatenated great-circle arcs through hops
+		var allCoords [][]float64
+		var totalDist float64
+		type hopInfo struct {
+			Code string `json:"code"`
+			IATA string `json:"iata"`
+			Name string `json:"name"`
+			CC   string `json:"country_code"`
+			Lat  float64 `json:"lat"`
+			Lon  float64 `json:"lon"`
+		}
+		type segInfo struct {
+			From     string   `json:"from"`
+			To       string   `json:"to"`
+			Dist     float64  `json:"distance_nm"`
+			Airlines []string `json:"airlines"`
+		}
+		var hopList []hopInfo
+		var segments []segInfo
+
+		for i, icao := range hops {
+			ap, ok := airports[icao]
+			if !ok {
+				continue
+			}
+			hopList = append(hopList, hopInfo{icao, ap.IATA, ap.Name, ap.CountryCode, ap.Lat, ap.Lon})
+			if i > 0 {
+				prevAP := airports[hops[i-1]]
+				segDist := haversineNM(prevAP.Lat, prevAP.Lon, ap.Lat, ap.Lon)
+				totalDist += segDist
+				arc := greatCircleArc(prevAP.Lat, prevAP.Lon, ap.Lat, ap.Lon)
+				// Skip first point of subsequent arcs to avoid duplicates
+				start := 0
+				if len(allCoords) > 0 {
+					start = 1
+				}
+				for j := start; j < len(arc); j++ {
+					allCoords = append(allCoords, arc[j])
+				}
+				// Find airlines for this segment
+				var segAirlines []string
+				seenAl := make(map[string]bool)
+				pair1 := hops[i-1] + "-" + icao
+				pair2 := icao + "-" + hops[i-1]
+				for _, rt := range byAirport[hops[i-1]] {
+					if strings.Contains(rt.AirportCodes, pair1) || strings.Contains(rt.AirportCodes, pair2) {
+						if !seenAl[rt.AirlineCode] {
+							seenAl[rt.AirlineCode] = true
+							segAirlines = append(segAirlines, rt.AirlineCode)
+							if len(segAirlines) >= 5 {
+								break
+							}
+						}
+					}
+				}
+				segments = append(segments, segInfo{hops[i-1], icao, math.Round(segDist*10) / 10, segAirlines})
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"type":     "Feature",
+			"geometry": map[string]any{"type": "LineString", "coordinates": allCoords},
+			"properties": map[string]any{
+				"mode": "air",
+				"from": map[string]any{"name": fromAP.Name, "code": fromAP.ICAO, "iata": fromAP.IATA, "country_code": fromAP.CountryCode, "lat": fromAP.Lat, "lon": fromAP.Lon},
+				"to":   map[string]any{"name": toAP.Name, "code": toAP.ICAO, "iata": toAP.IATA, "country_code": toAP.CountryCode, "lat": toAP.Lat, "lon": toAP.Lon},
+				"distance_nm":    math.Round(totalDist*10) / 10,
+				"distance_km":    math.Round(totalDist*1.852*10) / 10,
+				"speed_kn":       speedKn,
+				"estimated_hours": math.Round(totalDist/speedKn*10) / 10,
+				"hops":           hopList,
+				"segments":       segments,
+				"arc_points":     len(allCoords),
+			},
+		})
+	})
+
+	mux.HandleFunc("/v1/routes/sea/voyage", func(w http.ResponseWriter, r *http.Request) {
+		latS := r.URL.Query().Get("lat")
+		lonS := r.URL.Query().Get("lon")
+		toQ := r.URL.Query().Get("to")
+		if latS == "" || lonS == "" || toQ == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"lat, lon, and to parameters required"}`))
+			return
+		}
+		lat, _ := strconv.ParseFloat(latS, 64)
+		lon, _ := strconv.ParseFloat(lonS, 64)
+		toPort := resolvePort(toQ)
+		if toPort == nil {
+			notFound(w, "Destination port not found: "+toQ)
+			return
+		}
+		speedKn := 14.0
+		if s := r.URL.Query().Get("speed_kn"); s != "" {
+			if v, err := strconv.ParseFloat(s, 64); err == nil && v > 0 {
+				speedKn = v
+			}
+		}
+		srcNode, _ := nearestNode(lon, lat)
+		dstNode, _ := nearestNode(toPort.Lon, toPort.Lat)
+		if srcNode < 0 || dstNode < 0 {
+			w.WriteHeader(404)
+			w.Write([]byte(`{"error":"position or port too far from maritime network"}`))
+			return
+		}
+		path, remainNM, passes := dijkstraRoute(srcNode, dstNode)
+		if path == nil {
+			w.WriteHeader(404)
+			w.Write([]byte(`{"error":"no route found"}`))
+			return
+		}
+		coords := make([][]float64, len(path))
+		for i, p := range path {
+			coords[i] = []float64{p[0], p[1]}
+		}
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"type":     "Feature",
+			"geometry": map[string]any{"type": "LineString", "coordinates": coords},
+			"properties": map[string]any{
+				"mode":             "sea",
+				"destination":      map[string]any{"name": toPort.Name, "code": toPort.LOCODE, "country_code": toPort.CountryCode},
+				"current_position": []float64{lon, lat},
+				"remaining_nm":     math.Round(remainNM*10) / 10,
+				"remaining_km":     math.Round(remainNM*1.852*10) / 10,
+				"speed_kn":         speedKn,
+				"eta_hours":        math.Round(remainNM/speedKn*10) / 10,
+				"passes_remaining": passes,
+				"nodes_in_path":    len(path),
+			},
+		})
+	})
+
+	mux.HandleFunc("/v1/routes/air/voyage", func(w http.ResponseWriter, r *http.Request) {
+		latS := r.URL.Query().Get("lat")
+		lonS := r.URL.Query().Get("lon")
+		toQ := r.URL.Query().Get("to")
+		if latS == "" || lonS == "" || toQ == "" {
+			w.WriteHeader(400)
+			w.Write([]byte(`{"error":"lat, lon, and to parameters required"}`))
+			return
+		}
+		lat, _ := strconv.ParseFloat(latS, 64)
+		lon, _ := strconv.ParseFloat(lonS, 64)
+		toAP := resolveAirport(toQ)
+		if toAP == nil {
+			notFound(w, "Destination airport not found: "+toQ)
+			return
+		}
+		speedKn := 480.0
+		if s := r.URL.Query().Get("speed_kn"); s != "" {
+			if v, err := strconv.ParseFloat(s, 64); err == nil && v > 0 {
+				speedKn = v
+			}
+		}
+		remainNM := haversineNM(lat, lon, toAP.Lat, toAP.Lon)
+		arc := greatCircleArc(lat, lon, toAP.Lat, toAP.Lon)
+		w.Header().Set("Content-Type", "application/geo+json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"type":     "Feature",
+			"geometry": map[string]any{"type": "LineString", "coordinates": arc},
+			"properties": map[string]any{
+				"mode":             "air",
+				"destination":      map[string]any{"name": toAP.Name, "code": toAP.ICAO, "iata": toAP.IATA, "country_code": toAP.CountryCode},
+				"current_position": []float64{lon, lat},
+				"remaining_nm":     math.Round(remainNM*10) / 10,
+				"remaining_km":     math.Round(remainNM*1.852*10) / 10,
+				"speed_kn":         speedKn,
+				"eta_hours":        math.Round(remainNM/speedKn*10) / 10,
+				"arc_points":       len(arc),
+			},
+		})
+	})
+
 	// === Ships v1 ===
 
 	mux.HandleFunc("/v1/ships/callsign/", func(w http.ResponseWriter, r *http.Request) {
@@ -1436,9 +2075,63 @@ func main() {
 	mux.HandleFunc("/v1/ships/", func(w http.ResponseWriter, r *http.Request) {
 		mmsi := r.URL.Path[len("/v1/ships/"):]
 		if s, ok := ships[mmsi]; ok {
-			writeJSON(w, s)
+			resp := map[string]any{
+				"mmsi": s.MMSI, "call_sign": s.CallSign, "name": s.Name,
+				"country": s.Country, "country_code": s.CountryCode,
+				"gross_tonnage": s.GrossTonnage, "ship_type": s.ShipType,
+				"length_m": s.LengthM, "beam_m": s.BeamM, "class": s.Class,
+			}
+			if op := matchOperator(s.Name); op != nil {
+				resp["operator"] = map[string]any{"code": op.Code, "name": op.Name, "country_code": op.CountryCode, "sector": op.Sector}
+			}
+			// Notable ship enrichment
+			if ns, ok := notableByMMSI[mmsi]; ok {
+				resp["notable"] = ns
+			} else if ns, ok := notableByName[strings.ToUpper(s.Name)]; ok {
+				resp["notable"] = ns
+			}
+			writeJSON(w, resp)
 		} else {
 			notFound(w, "Ship not found")
+		}
+	})
+
+	// Notable ships endpoint
+	mux.HandleFunc("/v1/ships/notable", func(w http.ResponseWriter, r *http.Request) {
+		sector := strings.ToUpper(r.URL.Query().Get("sector"))
+		var result []*NotableShip
+		for _, ns := range notableShips {
+			if sector != "" && ns.Sector != sector {
+				continue
+			}
+			result = append(result, ns)
+		}
+		writeJSON(w, result)
+	})
+
+	// === Companies v1 ===
+
+	mux.HandleFunc("/v1/companies", func(w http.ResponseWriter, r *http.Request) {
+		sector := r.URL.Query().Get("sector")
+		var result []*ShippingCompany
+		for _, c := range companies {
+			if !c.Active {
+				continue
+			}
+			if sector != "" && !strings.Contains(c.Sector, strings.ToUpper(sector)) {
+				continue
+			}
+			result = append(result, c)
+		}
+		writeJSON(w, result)
+	})
+
+	mux.HandleFunc("/v1/companies/", func(w http.ResponseWriter, r *http.Request) {
+		code := strings.ToUpper(r.URL.Path[len("/v1/companies/"):])
+		if c, ok := companyByCode[code]; ok {
+			writeJSON(w, c)
+		} else {
+			notFound(w, "Company not found")
 		}
 	})
 

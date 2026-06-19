@@ -1,0 +1,45 @@
+imo,mmsi,name,operator_code,teu,dwt_tons,gross_tonnage,length_m,beam_m,year_built,builder,vessel_class,sector,status,photo1,photo2
+9929429,,MSC IRINA,MSCU,24346,,233328,400,61,2023,Hudong-Zhonghua,Irina-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/MSC_Irina_%28ship%2C_2023%29_001.jpg/640px-MSC_Irina_%28ship%2C_2023%29_001.jpg,
+9934735,,MSC LORETO,MSCU,24346,,233328,400,61,2023,Jiangnan Shipyard,Irina-class,CS,active,,
+9930038,,MSC TESSA,MSCU,24116,,233031,400,61,2023,Hudong-Zhonghua,Tessa-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/MSC_Tessa.jpg/640px-MSC_Tessa.jpg,
+9893890,352001259,EVER ALOT,EGLV,23992,,236000,400,62,2022,Samsung Heavy Industries,A-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Ever_Alot_%28ship%2C_2022%29_001.jpg/640px-Ever_Alot_%28ship%2C_2022%29_001.jpg,
+9893955,,EVER ACE,EGLV,23992,,235579,400,62,2021,Samsung Heavy Industries,A-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ever_Ace_%28ship%2C_2021%29_001.jpg/640px-Ever_Ace_%28ship%2C_2021%29_001.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Containerschiff_Ever_Ace_%28Europoort_Rotterdam%29.jpg/640px-Containerschiff_Ever_Ace_%28Europoort_Rotterdam%29.jpg
+9939137,,ONE INNOVATION,ONEY,24000,,237160,400,62,2023,Imabari Shipbuilding,24000-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/ONE_INNOVATION_%28IMO_9939137%29_02.jpg/640px-ONE_INNOVATION_%28IMO_9939137%29_02.jpg,
+9939149,,ONE INSPIRATION,ONEY,24000,,237160,400,62,2023,Imabari Shipbuilding,24000-class,CS,active,,
+9933016,,ONE INGENUITY,ONEY,24000,,237160,400,62,2023,Japan Marine United,24000-class,CS,active,,
+9933121,,ONE INTELLIGENCE,ONEY,24000,,237160,400,62,2023,Japan Marine United,24000-class,CS,active,,
+9893979,,EVER APEX,EGLV,23992,,235579,400,62,2022,Samsung Heavy Industries,A-class,CS,active,,
+9839181,,CMA CGM JACQUES SAADE,CMDU,23112,,236583,400,61,2020,Jiangnan Shipyard,Jacques Saadé-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/CMA_CGM_JACQUES_SAADE_%28cropped%29.jpg/640px-CMA_CGM_JACQUES_SAADE_%28cropped%29.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/CMA_CGM_Jacques_Saad%C3%A9_%28ship%2C_2019%29_004.jpg/640px-CMA_CGM_Jacques_Saad%C3%A9_%28ship%2C_2019%29_004.jpg
+9461867,353800000,EVER BREED,EGLV,8452,,99902,335,46,2012,Imabari Shipbuilding,L-class,CS,active,,
+9811000,353136000,EVER GIVEN,EGLV,20124,,219079,400,59,2018,Imabari Shipbuilding,G-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Ever_Given_%28ship%2C_2018%29_002.jpg/640px-Ever_Given_%28ship%2C_2018%29_002.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Container_Ship_%27Ever_Given%27_stuck_in_the_Suez_Canal%2C_Egypt_-_March_24th%2C_2021_cropped.jpg/640px-Container_Ship_%27Ever_Given%27_stuck_in_the_Suez_Canal%2C_Egypt_-_March_24th%2C_2021_cropped.jpg
+9780433,219836000,MADRID MAERSK,MAEU,20568,,214286,399,59,2017,DSME,EEE-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Madrid_Maersk_%28ship%2C_2017%29_001.jpg/640px-Madrid_Maersk_%28ship%2C_2017%29_001.jpg,
+9780445,,MUNICH MAERSK,MAEU,20568,,214286,399,59,2017,DSME,EEE-class,CS,active,,
+9619907,,MSC GULSUN,MSCU,23756,,228948,400,62,2019,Samsung Heavy Industries,Gülsün-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MSC_G%C3%BCls%C3%BCn_%28ship%2C_2019%29_002.jpg/640px-MSC_G%C3%BCls%C3%BCn_%28ship%2C_2019%29_002.jpg,
+9776418,,CMA CGM ANTOINE DE SAINT EXUPERY,CMDU,20954,,217673,400,59,2018,Hanjin Heavy Industries,Explorer-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/CMA_CGM_Antoine_de_Saint_Exup%C3%A9ry_%28ship%2C_2018%29_002.jpg/640px-CMA_CGM_Antoine_de_Saint_Exup%C3%A9ry_%28ship%2C_2018%29_002.jpg,
+9839143,,CMA CGM CHAMPS ELYSEES,CMDU,23112,,236583,400,61,2020,Jiangnan Shipyard,Jacques Saadé-class,CS,active,,
+9461879,,HMM ALGECIRAS,HLCU,23964,,228283,400,62,2020,DSME,Algeciras-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/HMM_Algeciras_%28ship%2C_2020%29_001.jpg/640px-HMM_Algeciras_%28ship%2C_2020%29_001.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/HMM_Algeciras_passing_through_the_Suez_Canal.jpg/640px-HMM_Algeciras_passing_through_the_Suez_Canal.jpg
+9795610,477157400,COSCO SHIPPING UNIVERSE,COSU,21237,,199990,400,59,2018,Nantong COSCO KHI,Universe-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/COSCO_Shipping_Universe_%28cropped%29.jpg/640px-COSCO_Shipping_Universe_%28cropped%29.jpg,
+9773210,,MOL TRIUMPH,ONEY,20170,,210691,400,59,2017,Samsung Heavy Industries,Triumph-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/MOL_Triumph_%28ship%2C_2017%29_002.jpg/640px-MOL_Triumph_%28ship%2C_2017%29_002.jpg,
+9776224,,OOCL HONG KONG,OOCL,21413,,210890,400,59,2017,Samsung Heavy Industries,G-class,CS,active,https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/OOCL_Hong_Kong_%28ship%2C_2017%29_001.jpg/640px-OOCL_Hong_Kong_%28ship%2C_2017%29_001.jpg,
+,,WONDER OF THE SEAS,CCL,0,0,236857,362,64,2022,Chantiers de l'Atlantique,Oasis-class,PAX,active,https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Wonder_of_the_Seas_%28ship%2C_2022%29_001.jpg/640px-Wonder_of_the_Seas_%28ship%2C_2022%29_001.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Wonder_of_the_Seas_in_Civitavecchia.jpg/640px-Wonder_of_the_Seas_in_Civitavecchia.jpg
+,,ICON OF THE SEAS,RCL,0,0,250800,365,65,2024,Meyer Turku,Icon-class,PAX,active,https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Icon_of_the_Seas_at_Costa_Maya_%28cropped%29.jpg/640px-Icon_of_the_Seas_at_Costa_Maya_%28cropped%29.jpg,
+,,SYMPHONY OF THE SEAS,RCL,0,0,228081,362,66,2018,Chantiers de l'Atlantique,Oasis-class,PAX,active,https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Symphony_of_the_Seas_%28ship%2C_2018%29_001.jpg/640px-Symphony_of_the_Seas_%28ship%2C_2018%29_001.jpg,
+,,MSC WORLD EUROPA,MSCC,0,0,215863,333,47,2022,Chantiers de l'Atlantique,World-class,PAX,active,https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/MSC_World_Europa_%28ship%2C_2022%29_001.jpg/640px-MSC_World_Europa_%28ship%2C_2022%29_001.jpg,
+,,NORWEGIAN PRIMA,NCLH,0,0,142500,294,38,2022,Fincantieri,Prima-class,PAX,active,https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Norwegian_Prima_%28ship%2C_2022%29_001.jpg/640px-Norwegian_Prima_%28ship%2C_2022%29_001.jpg,
+,,VIKING SATURN,VIK,0,0,47842,229,29,2023,Fincantieri,Star-class,PAX,active,,
+,,AZZAM,,,0,0,13136,181,21,2013,Lürssen,YAC,YAC,active,https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Azzam_in_Gibraltar.jpg/640px-Azzam_in_Gibraltar.jpg,
+,,DILBAR,,,0,0,15917,156,24,2016,Lürssen,YAC,YAC,active,https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Dilbar_%28ship%2C_2016%29_002.jpg/640px-Dilbar_%28ship%2C_2016%29_002.jpg,
+,,REV OCEAN,,,0,0,17440,183,22,2024,VARD,YAC,YAC,active,https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Rev_Ocean_in_Bergen.jpg/640px-Rev_Ocean_in_Bergen.jpg,
+,,YEARS,,,0,0,12527,141,22,2023,Lloyd Werft,YAC,YAC,active,,
+,,VALE BRASIL,STBK,0,400000,0,362,65,2011,Daewoo,Valemax,BC,active,https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Vale_Brasil.jpg/640px-Vale_Brasil.jpg,
+,,ORE TIANJIN,,0,400000,0,362,65,2011,STX Offshore,Valemax,BC,active,,
+,,BERGE STAHL,,0,364767,175720,343,64,1986,Hyundai,Cape,BC,active,https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Berge_Stahl.jpg/640px-Berge_Stahl.jpg,
+,,TI EUROPE,,0,441585,234006,380,68,2002,DSME,TI-class,TK,active,https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/TI_Europe.jpg/640px-TI_Europe.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/TI_Asia.JPG/640px-TI_Asia.JPG
+,,TI OCEANIA,,0,441585,234006,380,68,2003,DSME,TI-class,TK,active,,
+,,PIONEERING SPIRIT,,0,0,403342,382,124,2014,DSME,OFF,OFF,active,https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Pieter_Schelte_2014.jpg/640px-Pieter_Schelte_2014.jpg,https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Pioneering_Spirit_%28ship%2C_2013%29_001.jpg/640px-Pioneering_Spirit_%28ship%2C_2013%29_001.jpg
+,,PRELUDE FLNG,,0,600000,260000,488,74,2017,Samsung Heavy Industries,LNG,LNG,active,https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Prelude_FLNG.jpg/640px-Prelude_FLNG.jpg,
+,,GRANDE SAN PAOLO,GRIM,0,0,56642,214,33,2021,Hyundai Mipo,Grande-class,RR,active,,
+,,TONSBERG,WWL,0,0,76420,265,33,2011,Mitsubishi,Hero-class,CC,active,https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/T%C3%B8nsberg_%28ship%2C_2011%29_001.jpg/640px-T%C3%B8nsberg_%28ship%2C_2011%29_001.jpg,
+,,MORNING CAROLINE,EUKR,0,0,71543,230,32,2015,Hyundai Samho,Cape-class,CC,active,,
+,,HAPAG-LLOYD BERLIN EXPRESS,HDMU,23500,,232000,400,62,2024,DSME,Berlin-class,CS,active,,
+,,CMA CGM NOTRE DAME,CMDU,24000,,237000,400,62,2024,Jiangnan Shipyard,Greenness-class,CS,active,,

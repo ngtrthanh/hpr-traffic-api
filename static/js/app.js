@@ -108,7 +108,7 @@ async function loadPorts() {
       const teu = dv.getUint16(o + 14, true);
       const countryRaw = strings[countryIdx] || '';
       const [country, cc] = countryRaw.includes('|') ? countryRaw.split('|') : [countryRaw, ''];
-      const flag = cc ? String.fromCodePoint(...[...cc].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : '';
+      const flag = cc ? `<span class="fi fi-${cc.toLowerCase()}"></span>` : '';
       features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] }, properties: {
         name: strings[nameIdx] || '', country, country_code: cc, flag,
         port_size: sizeNames[size] || 'Small', teu_thousands: teu, has_locode: !!(flags & 1)
@@ -130,9 +130,39 @@ async function loadPorts() {
 async function loadLanes() {
   const data = await fetch(API + '/v1/shipping-lanes').then(r => r.json());
   map.addSource('lanes', { type: 'geojson', data });
-  map.addLayer({ id: 'lanes-major', type: 'line', source: 'lanes', filter: ['==', ['get', 'Type'], 'Major'], paint: { 'line-color': '#ef4444', 'line-width': 1.5, 'line-opacity': 0.6 } });
-  map.addLayer({ id: 'lanes-middle', type: 'line', source: 'lanes', filter: ['==', ['get', 'Type'], 'Middle'], paint: { 'line-color': '#f59e0b', 'line-width': 1, 'line-opacity': 0.4 } });
-  map.addLayer({ id: 'lanes-minor', type: 'line', source: 'lanes', filter: ['==', ['get', 'Type'], 'Minor'], paint: { 'line-color': '#6b7280', 'line-width': 0.5, 'line-opacity': 0.3 } });
+
+  // CIA lanes: clean global view (low zoom) — Major red, Middle amber, Minor gray
+  map.addLayer({ id: 'lanes-t1', type: 'line', source: 'lanes', filter: ['==', ['get', 'tier'], 1], maxzoom: 7,
+    paint: { 'line-color': '#dc2626', 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.8, 4, 1.2, 6, 1.5], 'line-opacity': 0.55 } });
+  map.addLayer({ id: 'lanes-t2', type: 'line', source: 'lanes', filter: ['==', ['get', 'tier'], 2], maxzoom: 7,
+    paint: { 'line-color': '#d97706', 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.5, 4, 0.8, 6, 1], 'line-opacity': 0.4 } });
+  map.addLayer({ id: 'lanes-t3', type: 'line', source: 'lanes', filter: ['==', ['get', 'tier'], 3], maxzoom: 7,
+    paint: { 'line-color': '#6b7280', 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.3, 4, 0.5, 6, 0.7], 'line-opacity': 0.25 } });
+
+  // Marnet detail: only at z5+ (progressive)
+  map.addLayer({ id: 'lanes-t4', type: 'line', source: 'lanes', filter: ['==', ['get', 'tier'], 4], minzoom: 5,
+    paint: { 'line-color': '#0ea5e9', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.2, 8, 0.5, 11, 0.8], 'line-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.1, 8, 0.2, 11, 0.35] } });
+
+  // Top-30 port hub links
+  if (portsData) {
+    const top30 = portsData.features.filter(f => f.properties.teu > 0)
+      .sort((a,b) => b.properties.teu - a.properties.teu).slice(0, 30);
+    const hubFeats = [];
+    for (let i = 0; i < top30.length; i++) {
+      for (let j = i+1; j < top30.length; j++) {
+        const [lon1,lat1] = top30[i].geometry.coordinates;
+        const [lon2,lat2] = top30[j].geometry.coordinates;
+        const d = Math.abs(lon2-lon1) + Math.abs(lat2-lat1);
+        if (d < 5 || d > 200) continue; // skip too close or antipodal
+        hubFeats.push({ type:'Feature', geometry:{ type:'LineString', coordinates:[[lon1,lat1],[lon2,lat2]] }, properties:{} });
+      }
+    }
+    if (hubFeats.length) {
+      map.addSource('hub-lanes', { type:'geojson', data:{ type:'FeatureCollection', features: hubFeats } });
+      map.addLayer({ id:'lanes-hubs', type:'line', source:'hub-lanes', maxzoom: 6,
+        paint:{ 'line-color':'#f97316', 'line-width': ['interpolate',['linear'],['zoom'], 1, 0.4, 4, 0.8], 'line-opacity': 0.3, 'line-dasharray': [4, 3] } });
+    }
+  }
 }
 
 async function loadAirports() {
@@ -158,8 +188,11 @@ async function loadAirports() {
       const icaoIdx = dv.getUint16(o + 10, true);
       const iataIdx = dv.getUint16(o + 12, true);
       const routeCount = dv.getUint16(o + 14, true);
+      const nameRaw = strings[nameIdx] || '';
+      const [name, cc] = nameRaw.includes('|') ? nameRaw.split('|') : [nameRaw, ''];
+      const flag = cc ? `<span class="fi fi-${cc.toLowerCase()}"></span>` : '';
       features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] }, properties: {
-        name: strings[nameIdx] || '', icao: strings[icaoIdx] || '', iata: strings[iataIdx] || '', route_count: routeCount
+        name, icao: strings[icaoIdx] || '', iata: strings[iataIdx] || '', route_count: routeCount, country_code: cc, flag
       }});
     }
     airportsData = { type: 'FeatureCollection', features };
@@ -176,7 +209,7 @@ async function loadAirports() {
 
 function setLayerVis(id, vis) {
   const v = vis ? 'visible' : 'none';
-  if (id === 'lanes') { ['lanes-major', 'lanes-middle', 'lanes-minor'].forEach(l => { if (map.getLayer(l)) map.setLayoutProperty(l, 'visibility', v); }); }
+  if (id === 'lanes') { ['lanes-t1', 'lanes-t2', 'lanes-t3', 'lanes-t4', 'lanes-hubs'].forEach(l => { if (map.getLayer(l)) map.setLayoutProperty(l, 'visibility', v); }); }
   else { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', v); }
 }
 
@@ -199,7 +232,7 @@ function addAllLayers() {
 }
 
 // ── Map Load ──
-map.on('load', () => { addAllLayers(); loadStats(); });
+map.on('load', () => { addAllLayers(); loadStats(); showIntroCard(); });
 
 // ═══════════════════════════════════════════════════════════════
 // INTERACTIONS
@@ -240,7 +273,7 @@ function setupAirportInteractions() {
     const p = e.features[0].properties;
     popup = new maplibregl.Popup({ closeButton: false, offset: 10 })
       .setLngLat(e.lngLat)
-      .setHTML(`<b>${p.icao}</b>${p.iata ? ' / ' + p.iata : ''}<br><span style="font-size:11px;color:var(--text2)">${p.name}, ${p.country}</span>`)
+      .setHTML(`<b>${p.icao}</b>${p.iata ? ' / ' + p.iata : ''}<br><span style="font-size:11px;color:var(--text2)">${p.flag || ''} ${p.name}</span>`)
       .addTo(map);
   });
   map.on('mouseleave', 'airports', () => { map.getCanvas().style.cursor = ''; if (popup) { popup.remove(); popup = null; } });
@@ -290,7 +323,7 @@ function showPortCard(p) {
   document.getElementById('pcardIcon').textContent = '⚓';
   document.getElementById('pcardName').textContent = p.name;
   document.getElementById('pcardType').textContent = p.port_size;
-  document.getElementById('pcardMeta').textContent = [p.country, p.locode, p.zone_code].filter(Boolean).join(' · ');
+  document.getElementById('pcardMeta').innerHTML = [p.flag, p.country, p.locode, p.zone_code].filter(Boolean).join(' · ');
   document.getElementById('pcardBody').innerHTML = `
     <div class="sc-section"><div class="st">Port Details</div>
       ${cardField('Max Vessel', p.max_vessel_size)}${cardField('Channel Depth', p.channel_depth_m ? p.channel_depth_m + ' m' : '')}
@@ -314,13 +347,13 @@ function showAirportCard(p) {
   document.getElementById('pcardIcon').textContent = '✈';
   document.getElementById('pcardName').textContent = p.icao + (p.iata ? ' / ' + p.iata : '');
   document.getElementById('pcardType').textContent = p.route_count + ' routes';
-  document.getElementById('pcardMeta').textContent = [p.name, p.city, p.country].filter(Boolean).join(', ');
+  document.getElementById('pcardMeta').innerHTML = [p.flag, p.name, p.city].filter(Boolean).join(' · ');
   document.getElementById('pcardBody').innerHTML = `
     <div class="sc-section"><div class="st">Airport Details</div>
       ${cardField('ICAO', p.icao)}${cardField('IATA', p.iata)}${cardField('Name', p.name)}
-      ${cardField('City', p.city)}${cardField('Country', p.country)}${cardField('Routes', p.route_count)}
+      ${cardField('City', p.city)}${cardField('Country', (p.flag || '') + ' ' + (p.country_code || ''))}${cardField('Routes', p.route_count)}
     </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="${API}/v1/airports/${p.icao}" target="_blank">Try API</a><button class="act" onclick="viewJson('/v1/airports/${p.icao}')">View JSON</button>`;
+  document.getElementById('pcardActions').innerHTML = `<a class="act" href="${API}/v1/airports/${p.icao}" target="_blank">Try API</a><button class="act" onclick="drawAirLanes('${p.icao}')">Show Routes</button><button class="act" onclick="viewJson('/v1/airports/${p.icao}')">View JSON</button>`;
   openCard();
 }
 
@@ -328,11 +361,14 @@ function showShipCard(s) {
   document.getElementById('pcardIcon').textContent = '🚢';
   document.getElementById('pcardName').textContent = s.name || s.mmsi;
   document.getElementById('pcardType').textContent = s.ship_type ? 'Type ' + s.ship_type : '';
-  document.getElementById('pcardMeta').textContent = [s.country, 'MMSI ' + s.mmsi].filter(Boolean).join(' · ');
+  const shipFlag = s.country_code ? `<span class="fi fi-${s.country_code.toLowerCase()}"></span>` : '';
+  document.getElementById('pcardMeta').innerHTML = [shipFlag, s.country, 'MMSI ' + s.mmsi].filter(Boolean).join(' · ');
+  const opBadge = s.operator ? `<div class="sc-section"><div class="st">Operator</div>${cardField('Company', (s.operator.country_code ? '<span class=\"fi fi-'+s.operator.country_code.toLowerCase()+'\"></span> ' : '') + s.operator.name)}${cardField('Sector', s.operator.sector)}</div>` : '';
   document.getElementById('pcardBody').innerHTML = `
+    ${opBadge}
     <div class="sc-section"><div class="st">Ship Details</div>
       ${cardField('MMSI', s.mmsi)}${cardField('Call Sign', s.call_sign)}${cardField('Name', s.name)}
-      ${cardField('Country', s.country)}${cardField('Gross Tonnage', s.gross_tonnage ? s.gross_tonnage.toLocaleString() : '')}
+      ${cardField('Country', shipFlag + ' ' + (s.country || ''))}${cardField('Gross Tonnage', s.gross_tonnage ? s.gross_tonnage.toLocaleString() : '')}
       ${cardField('Length', s.length_m ? s.length_m + ' m' : '')}${cardField('Beam', s.beam_m ? s.beam_m + ' m' : '')}
       ${cardField('Ship Type', s.ship_type)}${cardField('Class', s.class)}
     </div>`;
@@ -467,7 +503,7 @@ function renderPortList(el) {
   el.innerHTML = sorted.slice(0, 200).map(f => {
     const p = f.properties;
     const col = { Major: '#f97316', Large: '#facc15', Medium: '#22d3ee' }[p.port_size] || '#94a3b8';
-    return `<div class="vrow" onclick="portRowClick('${p.name}')"><span class="vdot" style="background:${col}"></span><div class="vmain"><div class="vname">${p.name}</div><div class="vmeta">${p.country}${p.locode ? ' · ' + p.locode : ''}</div></div></div>`;
+    return `<div class="vrow" onclick="portRowClick('${p.name}')"><span class="vdot" style="background:${col}"></span><div class="vmain"><div class="vname">${p.flag || ''} ${p.name}</div><div class="vmeta">${p.country}${p.locode ? ' · ' + p.locode : ''}</div></div></div>`;
   }).join('');
 }
 
@@ -476,7 +512,7 @@ function renderAirportList(el) {
   const sorted = [...airportsData.features].sort((a, b) => (b.properties.route_count || 0) - (a.properties.route_count || 0));
   el.innerHTML = sorted.slice(0, 200).map(f => {
     const p = f.properties;
-    return `<div class="vrow" onclick="airportRowClick('${p.icao}')"><span class="vdot" style="background:#60a5fa"></span><div class="vmain"><div class="vname">${p.icao}${p.iata ? ' / ' + p.iata : ''}</div><div class="vmeta">${p.name}, ${p.country} · ${p.route_count || 0} routes</div></div></div>`;
+    return `<div class="vrow" onclick="airportRowClick('${p.icao}')"><span class="vdot" style="background:#60a5fa"></span><div class="vmain"><div class="vname">${p.flag || ''} ${p.icao}${p.iata ? ' / ' + p.iata : ''}</div><div class="vmeta">${p.name} · ${p.route_count || 0} routes</div></div></div>`;
   }).join('');
 }
 
@@ -628,10 +664,17 @@ function onSearchKey(e) { if (e.key === 'Escape') { hideSearchResults(); documen
 function hideSearchResults() { document.getElementById('searchResults').style.display = 'none'; }
 
 async function doSearch(q) {
+  // Route search: "X to Y" or "X → Y" or "X > Y"
+  const routeMatch = q.match(/^(.+?)\s*(?:to|→|>|->)\s*(.+)$/i);
+  if (routeMatch) {
+    const [, fromQ, toQ] = routeMatch;
+    await searchRoute(fromQ.trim(), toQ.trim());
+    return;
+  }
   const results = [];
   // MMSI (9+ digits)
   if (/^\d{5,}$/.test(q)) {
-    try { const s = await fetch(API + '/v1/ships/' + q).then(r => r.ok ? r.json() : null); if (s) results.push({ icon: '🚢', text: `${s.name || q} (${s.mmsi})`, sub: s.country, action: () => showShipCard(s) }); } catch (e) {}
+    try { const s = await fetch(API + '/v1/ships/' + q).then(r => r.ok ? r.json() : null); if (s) { const sf = s.country_code ? `<span class="fi fi-${s.country_code.toLowerCase()}"></span> ` : ''; results.push({ icon: '🚢', text: `${s.name || q} (${s.mmsi})`, sub: sf + (s.country || ''), action: () => showShipCard(s) }); } } catch (e) {}
   }
   // Callsign
   if (/^[A-Za-z]{2,4}\d/i.test(q)) {
@@ -651,6 +694,102 @@ async function doSearch(q) {
 }
 function searchAction(i) { const r = window._searchResults[i]; if (r && r.action) r.action(); hideSearchResults(); }
 
+async function searchRoute(fromQ, toQ) {
+  // Try sea first, then air
+  let data = null, mode = 'sea';
+  try {
+    const resp = await fetch(`${API}/v1/routes/sea?from=${encodeURIComponent(fromQ)}&to=${encodeURIComponent(toQ)}`);
+    if (resp.ok) data = await resp.json();
+  } catch(e) {}
+  if (!data || !data.properties) {
+    try {
+      const resp = await fetch(`${API}/v1/routes/air?from=${encodeURIComponent(fromQ)}&to=${encodeURIComponent(toQ)}`);
+      if (resp.ok) { data = await resp.json(); mode = 'air'; }
+    } catch(e) {}
+  }
+  if (!data || !data.properties) {
+    const el = document.getElementById('searchResults');
+    el.innerHTML = '<div class="sr-item" style="color:var(--text3)">No route found</div>';
+    el.style.display = 'block';
+    return;
+  }
+  hideSearchResults();
+  plotRoute(data, mode);
+}
+
+function plotRoute(geojson, mode) {
+  const p = geojson.properties;
+  // Plot line on map
+  if (map.getSource('route-line')) { map.getSource('route-line').setData(geojson); }
+  else {
+    map.addSource('route-line', { type: 'geojson', data: geojson });
+    map.addLayer({ id: 'route-line', type: 'line', source: 'route-line',
+      paint: { 'line-color': mode === 'sea' ? '#10b981' : '#a78bfa', 'line-width': 3, 'line-opacity': 0.85 } });
+  }
+  // Update line color for mode
+  map.setPaintProperty('route-line', 'line-color', mode === 'sea' ? '#10b981' : '#a78bfa');
+  // Fit bounds
+  const coords = geojson.geometry.coordinates;
+  const bounds = coords.reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(coords[0], coords[0]));
+  map.fitBounds(bounds, { padding: 60, duration: 1000 });
+  // Show route card
+  showRouteInfoCard(p, mode);
+}
+
+function showRouteInfoCard(p, mode) {
+  const icon = mode === 'sea' ? '⚓' : '✈';
+  const fromFlag = p.from.country_code ? `<span class="fi fi-${p.from.country_code.toLowerCase()}"></span>` : '';
+  const toFlag = p.to.country_code ? `<span class="fi fi-${p.to.country_code.toLowerCase()}"></span>` : '';
+  const fromCode = p.from.code || p.from.iata || '';
+  const toCode = p.to.code || p.to.iata || '';
+  const days = p.estimated_hours >= 48 ? `${(p.estimated_hours/24).toFixed(1)} days` : `${p.estimated_hours}h`;
+
+  document.getElementById('pcardIcon').textContent = icon;
+  document.getElementById('pcardName').innerHTML = `${fromCode} → ${toCode}`;
+  document.getElementById('pcardType').textContent = mode === 'sea' ? 'Sea Route' : 'Air Route';
+  document.getElementById('pcardMeta').innerHTML = `${fromFlag} ${p.from.name} → ${toFlag} ${p.to.name}`;
+  let body = `<div class="sc-section"><div class="st">Route Details</div>
+    ${cardField('Distance', `${p.distance_nm.toLocaleString()} nm / ${p.distance_km.toLocaleString()} km`)}
+    ${cardField('ETA', `${days} at ${p.speed_kn} kn`)}`;
+  if (p.passes && p.passes.length) {
+    body += cardField('Transits', p.passes.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' → '));
+  }
+  if (p.airlines && p.airlines.length) {
+    body += cardField('Airlines', p.airlines.join(', '));
+  }
+  body += `</div>
+    <div class="sc-section"><div class="st">Route Progress</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0">
+        <div style="text-align:center"><div style="font-size:18px;font-weight:700">${fromCode}</div><div style="font-size:10px;color:var(--text3)">${p.from.name}</div></div>
+        <div style="flex:1;margin:0 12px;border-top:1px dashed var(--border);position:relative;display:flex;align-items:center;justify-content:center">
+          <span style="background:var(--bg2);padding:0 6px;font-size:11px;color:var(--text2)">${p.distance_nm.toLocaleString()} nm</span>
+        </div>
+        <div style="text-align:center"><div style="font-size:18px;font-weight:700">${toCode}</div><div style="font-size:10px;color:var(--text3)">${p.to.name}</div></div>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;overflow:hidden"><div style="width:100%;height:100%;background:${mode==='sea'?'#10b981':'#a78bfa'};border-radius:4px"></div></div>
+    </div>`;
+  document.getElementById('pcardBody').innerHTML = body;
+  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="clearRoute()">Clear Route</button>`;
+  openCard();
+}
+
+function clearRoute() {
+  if (map.getSource('route-line')) map.getSource('route-line').setData({ type: 'FeatureCollection', features: [] });
+  if (map.getSource('air-lanes-src')) map.getSource('air-lanes-src').setData({ type: 'FeatureCollection', features: [] });
+  closeCard();
+}
+
+async function drawAirLanes(icao) {
+  const data = await fetch(`${API}/v1/air-lanes/geojson?icao=${icao}&limit=100`).then(r => r.json());
+  if (!data || !data.features) return;
+  if (map.getSource('air-lanes-src')) { map.getSource('air-lanes-src').setData(data); }
+  else {
+    map.addSource('air-lanes-src', { type: 'geojson', data });
+    map.addLayer({ id: 'air-lanes-layer', type: 'line', source: 'air-lanes-src',
+      paint: { 'line-color': '#a78bfa', 'line-width': 1.5, 'line-opacity': 0.6 } });
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // STATS
 // ═══════════════════════════════════════════════════════════════
@@ -659,12 +798,66 @@ async function loadStats() {
     const s = await fetch(API + '/v1/stats').then(r => r.json());
     document.getElementById('sRoutes').textContent = (s.aviation?.routes || 0).toLocaleString();
     document.getElementById('sPorts').textContent = (s.maritime?.seaports || 0).toLocaleString();
+    document.getElementById('sAirports').textContent = (s.aviation?.airports || 0).toLocaleString();
     document.getElementById('sShips').textContent = (s.maritime?.ships || 0).toLocaleString();
+    const companies = await fetch(API + '/v1/companies').then(r => r.json());
+    document.getElementById('sCompanies').textContent = (companies?.length || 0).toLocaleString();
   } catch (e) {}
 }
 
-// Open list on desktop
-if (window.innerWidth > 700) { toggleList(); }
+function showIntroCard() {
+  document.getElementById('pcardIcon').textContent = '⚓';
+  document.getElementById('pcardName').innerHTML = 'HPRadar Traffic';
+  document.getElementById('pcardType').textContent = 'Aviation & Maritime Explorer';
+  document.getElementById('pcardMeta').innerHTML = 'Real-time route intelligence · Zero dependencies · Pure Go';
+  document.getElementById('pcardBody').innerHTML = `
+    <div class="sc-section"><div class="st">What you can do</div>
+      <div style="font-size:12px;line-height:1.7;color:var(--text2)">
+        <b>🔍 Search</b> — Type port/ship/flight in search bar<br>
+        <b>🚢 Sea Routes</b> — "Singapore to Rotterdam" for Dijkstra-routed path<br>
+        <b>✈ Air Routes</b> — "VVNB to KLAX" for multi-hop flight connections<br>
+        <b>🗺 Shipping Lanes</b> — CIA + eurostat marnet network (zoom for detail)<br>
+        <b>🏢 Operators</b> — 98 shipping companies, auto-matched to vessels<br>
+        <b>⭐ Notable Ships</b> — 44 world-famous vessels with photos<br>
+        <b>📡 Binary Protocol</b> — HPRA format, 10× smaller than JSON<br>
+        <b>🌐 WebSocket</b> — Real-time binary stream at /ws
+      </div>
+    </div>
+    <div class="sc-section"><div class="st">Data</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11px;color:var(--text2)">
+        <span>521k flight routes</span><span>8k airports</span>
+        <span>747k ship registry</span><span>3.6k seaports</span>
+        <span>29.5k maritime edges</span><span>23k sea distance pairs</span>
+        <span>98 shipping operators</span><span>44 notable vessels</span>
+      </div>
+    </div>
+    <div class="sc-section"><div class="st">Connections</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6">
+        <b>REST API</b> — traffic.hpradar.com/v1/*<br>
+        <b>WebSocket</b> — ws://traffic.hpradar.com/ws<br>
+        <b>Binary</b> — /v1/ports/bin · /v1/airports/bin<br>
+        <b>MCP</b> — AI tool integration at /mcp<br>
+        <b>GeoJSON</b> — /v1/shipping-lanes · /v1/air-lanes/geojson
+      </div>
+    </div>
+    <div class="sc-section"><div class="st">Credits</div>
+      <div style="font-size:10px;color:var(--text3);line-height:1.6">
+        Flight routes: <a href="https://adsbdb.com" target="_blank" style="color:var(--text2)">adsbdb.com</a> ·
+        Airports: <a href="https://ourairports.com" target="_blank" style="color:var(--text2)">OurAirports</a> ·
+        Seaports: <a href="https://msi.nga.mil/Publications/WPI" target="_blank" style="color:var(--text2)">NGA WPI</a><br>
+        Ships: <a href="https://www.itu.int" target="_blank" style="color:var(--text2)">ITU List V 2025</a> ·
+        Sea distances: <a href="https://msi.nga.mil/Publications/Distances" target="_blank" style="color:var(--text2)">NGA PUB 151</a><br>
+        Shipping lanes: <a href="https://github.com/newzealandpaul/Shipping-Lanes" target="_blank" style="color:var(--text2)">CIA World Oceans</a> ·
+        Maritime graph: <a href="https://github.com/eurostat/searoute" target="_blank" style="color:var(--text2)">eurostat/searoute</a><br>
+        Airlines: <a href="https://github.com/vradarserver/standing-data" target="_blank" style="color:var(--text2)">VRS Standing Data</a> ·
+        Flags: <a href="https://github.com/lipis/flag-icons" target="_blank" style="color:var(--text2)">flag-icons</a>
+      </div>
+    </div>`;
+  document.getElementById('pcardActions').innerHTML = `<a class="act" href="https://hpradar.com" target="_blank">HPRadar</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a>`;
+  openCard();
+}
+
+// List stays closed until user opens it
 
 // ═══════════════════════════════════════════════════════════════
 // DRAG & PIN
