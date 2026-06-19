@@ -22,11 +22,8 @@
 
       <span class="spacer"></span>
       <div id="topbar-fixed">
-        <span class="pill" style="--pill-c:var(--port-major)"><span class="n" id="sRoutes">—</span> flights</span>
-        <span class="pill" style="--pill-c:var(--port-medium)"><span class="n" id="sPorts">—</span> ports</span>
-        <span class="pill" style="--pill-c:var(--airport)"><span class="n" id="sAirports">—</span> airports</span>
-        <span class="pill" style="--pill-c:#94a3b8"><span class="n" id="sShips">—</span> ships</span>
-        <span class="pill" style="--pill-c:#f59e0b"><span class="n" id="sCompanies">—</span> operators</span>
+        <div class="chip-group"><span class="chip-icon">🚢</span><span class="pill" style="--pill-c:#10b981"><span class="n" id="sShips">—</span> vessels</span><span class="pill" style="--pill-c:#f97316"><span class="n" id="sPorts">—</span> ports</span><span class="pill" style="--pill-c:#f59e0b"><span class="n" id="sCompanies">—</span> operators</span></div>
+        <div class="chip-group"><span class="chip-icon">✈</span><span class="pill" style="--pill-c:#60a5fa"><span class="n" id="sAircraft">—</span> aircraft</span><span class="pill" style="--pill-c:#a78bfa"><span class="n" id="sAirports">—</span> airports</span><span class="pill" style="--pill-c:#818cf8"><span class="n" id="sAirlines">—</span> airlines</span></div>
         <button class="btn btn-icon" id="theme-tog" onclick="toggleTheme()" title="Toggle theme"></button>
       </div>
     </div>
@@ -57,8 +54,9 @@
       <!-- Left: data list -->
       <div id="vlist">
         <div class="vlist-tabs">
-          <button class="vtab on" data-tab="ports" onclick="setListTab('ports')">Ports</button>
-          <button class="vtab" data-tab="airports" onclick="setListTab('airports')">Airports</button>
+          <button class="vtab on" data-tab="ports" onclick="setListTab('ports')">🚢 Ports</button>
+          <button class="vtab" data-tab="operators" onclick="setListTab('operators')">Operators</button>
+          <button class="vtab" data-tab="airports" onclick="setListTab('airports')">✈ Airports</button>
           <button class="vtab" data-tab="airlines" onclick="setListTab('airlines')">Airlines</button>
         </div>
         <div id="vlistRows" class="vlist-rows"></div>

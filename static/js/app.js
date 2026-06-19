@@ -492,6 +492,7 @@ function renderList() {
   if (!el) return;
   if (listTab === 'ports') renderPortList(el);
   else if (listTab === 'airports') renderAirportList(el);
+  else if (listTab === 'operators') renderOperatorList(el);
   else renderAirlineList(el);
 }
 
@@ -518,6 +519,20 @@ function renderAirportList(el) {
 
 function renderAirlineList(el) {
   el.innerHTML = '<div class="vlist-empty">Use search to find flights by callsign</div>';
+}
+
+async function renderOperatorList(el) {
+  try {
+    const data = await fetch(API + '/v1/companies').then(r => r.json());
+    if (!data || !data.length) { el.innerHTML = '<div class="vlist-empty">No operators</div>'; return; }
+    const sectors = { CS: '📦', TK: '🛢', BC: '⛏', CC: '🚗', RR: '🚛', LNG: '❄', PAX: '🛳', OFF: '🏗' };
+    el.innerHTML = data.sort((a, b) => (b.teu_capacity || b.fleet_size || 0) - (a.teu_capacity || a.fleet_size || 0)).map(c => {
+      const flag = c.country_code ? `<span class="fi fi-${c.country_code.toLowerCase()}"></span>` : '';
+      const icon = sectors[c.sector.split('/')[0]] || '🚢';
+      const stat = c.teu_capacity ? `${(c.teu_capacity/1000).toFixed(0)}k TEU` : `${c.fleet_size} ships`;
+      return `<div class="vrow"><span class="vdot" style="background:${c.sector==='CS'?'#10b981':c.sector==='TK'?'#f97316':'#94a3b8'}"></span><div class="vmain"><div class="vname">${flag} ${c.name}</div><div class="vmeta">${icon} ${c.sector} · ${stat}</div></div></div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div class="vlist-empty">Failed to load</div>'; }
 }
 
 function portRowClick(name) {
@@ -796,64 +811,71 @@ async function drawAirLanes(icao) {
 async function loadStats() {
   try {
     const s = await fetch(API + '/v1/stats').then(r => r.json());
-    document.getElementById('sRoutes').textContent = (s.aviation?.routes || 0).toLocaleString();
     document.getElementById('sPorts').textContent = (s.maritime?.seaports || 0).toLocaleString();
     document.getElementById('sAirports').textContent = (s.aviation?.airports || 0).toLocaleString();
     document.getElementById('sShips').textContent = (s.maritime?.ships || 0).toLocaleString();
-    const companies = await fetch(API + '/v1/companies').then(r => r.json());
-    document.getElementById('sCompanies').textContent = (companies?.length || 0).toLocaleString();
+    document.getElementById('sAircraft').textContent = (s.aviation?.aircraft || 0).toLocaleString();
+    document.getElementById('sAirlines').textContent = (s.aviation?.airlines || 0).toLocaleString();
+    document.getElementById('sCompanies').textContent = (s.maritime?.companies || 0).toLocaleString();
   } catch (e) {}
 }
 
 function showIntroCard() {
-  document.getElementById('pcardIcon').textContent = '⚓';
+  document.getElementById('pcardIcon').textContent = '🌐';
   document.getElementById('pcardName').innerHTML = 'HPRadar Traffic';
-  document.getElementById('pcardType').textContent = 'Aviation & Maritime Explorer';
-  document.getElementById('pcardMeta').innerHTML = 'Real-time route intelligence · Zero dependencies · Pure Go';
+  document.getElementById('pcardType').textContent = 'v1.5';
+  document.getElementById('pcardMeta').innerHTML = 'Aviation & Maritime Data Explorer';
   document.getElementById('pcardBody').innerHTML = `
-    <div class="sc-section"><div class="st">What you can do</div>
-      <div style="font-size:12px;line-height:1.7;color:var(--text2)">
-        <b>🔍 Search</b> — Type port/ship/flight in search bar<br>
-        <b>🚢 Sea Routes</b> — "Singapore to Rotterdam" for Dijkstra-routed path<br>
-        <b>✈ Air Routes</b> — "VVNB to KLAX" for multi-hop flight connections<br>
-        <b>🗺 Shipping Lanes</b> — CIA + eurostat marnet network (zoom for detail)<br>
-        <b>🏢 Operators</b> — 98 shipping companies, auto-matched to vessels<br>
-        <b>⭐ Notable Ships</b> — 44 world-famous vessels with photos<br>
-        <b>📡 Binary Protocol</b> — HPRA format, 10× smaller than JSON<br>
-        <b>🌐 WebSocket</b> — Real-time binary stream at /ws
+    <div class="sc-section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0">
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px">🚢 Marine</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.8">
+            <div>747k vessels</div>
+            <div>3,630 seaports</div>
+            <div>29.5k sea lanes</div>
+            <div>98 operators</div>
+            <div>44 notable ships</div>
+            <div>Dijkstra routing</div>
+          </div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px">✈ Aviation</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.8">
+            <div>566k aircraft</div>
+            <div>8,001 airports</div>
+            <div>521k flight routes</div>
+            <div>2,111 airlines</div>
+            <div>Multi-hop graph</div>
+            <div>Great-circle arcs</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="sc-section"><div class="st">Data</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11px;color:var(--text2)">
-        <span>521k flight routes</span><span>8k airports</span>
-        <span>747k ship registry</span><span>3.6k seaports</span>
-        <span>29.5k maritime edges</span><span>23k sea distance pairs</span>
-        <span>98 shipping operators</span><span>44 notable vessels</span>
+    <div class="sc-section"><div class="st">Quick Start</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.8">
+        <b>Search:</b> "Singapore to Rotterdam" or "VVNB to KLAX"<br>
+        <b>Click:</b> any port or airport for details + routes<br>
+        <b>Layers:</b> toggle ports, airports, shipping lanes<br>
+        <b>List:</b> browse ports, operators, airports, airlines
       </div>
     </div>
     <div class="sc-section"><div class="st">Connections</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.6">
-        <b>REST API</b> — traffic.hpradar.com/v1/*<br>
-        <b>WebSocket</b> — ws://traffic.hpradar.com/ws<br>
-        <b>Binary</b> — /v1/ports/bin · /v1/airports/bin<br>
-        <b>MCP</b> — AI tool integration at /mcp<br>
-        <b>GeoJSON</b> — /v1/shipping-lanes · /v1/air-lanes/geojson
+        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">REST /v1/*</span>
+        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">WebSocket /ws</span>
+        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">Binary HPRA</span>
+        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">MCP /mcp</span>
+        <span style="display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin:2px;font-size:10px">GeoJSON</span>
       </div>
     </div>
-    <div class="sc-section"><div class="st">Credits</div>
-      <div style="font-size:10px;color:var(--text3);line-height:1.6">
-        Flight routes: <a href="https://adsbdb.com" target="_blank" style="color:var(--text2)">adsbdb.com</a> ·
-        Airports: <a href="https://ourairports.com" target="_blank" style="color:var(--text2)">OurAirports</a> ·
-        Seaports: <a href="https://msi.nga.mil/Publications/WPI" target="_blank" style="color:var(--text2)">NGA WPI</a><br>
-        Ships: <a href="https://www.itu.int" target="_blank" style="color:var(--text2)">ITU List V 2025</a> ·
-        Sea distances: <a href="https://msi.nga.mil/Publications/Distances" target="_blank" style="color:var(--text2)">NGA PUB 151</a><br>
-        Shipping lanes: <a href="https://github.com/newzealandpaul/Shipping-Lanes" target="_blank" style="color:var(--text2)">CIA World Oceans</a> ·
-        Maritime graph: <a href="https://github.com/eurostat/searoute" target="_blank" style="color:var(--text2)">eurostat/searoute</a><br>
-        Airlines: <a href="https://github.com/vradarserver/standing-data" target="_blank" style="color:var(--text2)">VRS Standing Data</a> ·
-        Flags: <a href="https://github.com/lipis/flag-icons" target="_blank" style="color:var(--text2)">flag-icons</a>
+    <div class="sc-section">
+      <div style="font-size:9px;color:var(--text3);line-height:1.5">
+        Data: NGA · ITU · adsbdb · OurAirports · eurostat · VRS · CIA · Alphaliner<br>
+        Built by <a href="https://hpradar.com" target="_blank" style="color:var(--accent)">HPRadar</a> — Zero dependencies, pure Go, 18k req/s
       </div>
     </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="https://hpradar.com" target="_blank">HPRadar</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a>`;
+  document.getElementById('pcardActions').innerHTML = `<a class="act" href="https://hpradar.com" target="_blank">HPRadar.com</a><a class="act" href="${API}/v1/stats" target="_blank">API Stats</a><button class="act" onclick="closeCard()">Explore Map</button>`;
   openCard();
 }
 
