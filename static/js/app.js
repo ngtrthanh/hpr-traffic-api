@@ -573,7 +573,7 @@ buildLayersMenu(); buildMapMenu(); buildRegionMenu(); buildSettingsMenu();
 // ═══════════════════════════════════════════════════════════════
 // LIST PANEL
 // ═══════════════════════════════════════════════════════════════
-let listOpen = false, listTab = 'ports';
+let listOpen = false, listTab = 'discover';
 
 function toggleList() {
   const el = document.getElementById('vlist');
@@ -590,27 +590,39 @@ let listDomain = 'marine';
 
 function setDomain(domain) {
   listDomain = domain;
+  // Show domain/sub tabs
+  const domainBar = document.querySelector('.vlist-domain');
+  const subBar = document.getElementById('vlistSubTabs');
+  if (domainBar) domainBar.style.display = '';
+  if (subBar) subBar.style.display = '';
   document.querySelectorAll('.vlist-domain .vtab').forEach(t => t.classList.toggle('on', t.dataset.domain === domain));
   const subEl = document.getElementById('vlistSubTabs');
   if (domain === 'marine') {
-    subEl.innerHTML = `<button class="vtab on" data-tab="ports" onclick="setListTab('ports')">Ports</button><button class="vtab" data-tab="operators" onclick="setListTab('operators')">Operators</button><button class="vtab" data-tab="ships" onclick="setListTab('ships')">Ships</button>`;
-    setListTab('ports');
+    subEl.innerHTML = `<button class="vtab" data-tab="discover" onclick="setListTab('discover')">⟵</button><button class="vtab on" data-tab="ports" onclick="setListTab('ports')">Ports</button><button class="vtab" data-tab="operators" onclick="setListTab('operators')">Operators</button><button class="vtab" data-tab="ships" onclick="setListTab('ships')">Ships</button>`;
   } else {
-    subEl.innerHTML = `<button class="vtab on" data-tab="airports" onclick="setListTab('airports')">Airports</button><button class="vtab" data-tab="airlines" onclick="setListTab('airlines')">Airlines</button><button class="vtab" data-tab="aircraft" onclick="setListTab('aircraft')">Aircraft</button>`;
-    setListTab('airports');
+    subEl.innerHTML = `<button class="vtab" data-tab="discover" onclick="setListTab('discover')">⟵</button><button class="vtab on" data-tab="airports" onclick="setListTab('airports')">Airports</button><button class="vtab" data-tab="airlines" onclick="setListTab('airlines')">Airlines</button><button class="vtab" data-tab="aircraft" onclick="setListTab('aircraft')">Aircraft</button>`;
   }
 }
 
 function setListTab(tab) {
   listTab = tab;
-  document.querySelectorAll('#vlistSubTabs .vtab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
+  if (tab === 'discover') {
+    // Hide domain/sub tabs for discover mode
+    const domainBar = document.querySelector('.vlist-domain');
+    const subBar = document.getElementById('vlistSubTabs');
+    if (domainBar) domainBar.style.display = 'none';
+    if (subBar) subBar.style.display = 'none';
+  } else {
+    document.querySelectorAll('#vlistSubTabs .vtab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
+  }
   renderList();
 }
 
 function renderList() {
   const el = document.getElementById('vlistRows');
   if (!el) return;
-  if (listTab === 'ports') renderPortList(el);
+  if (listTab === 'discover') renderDiscovery(el);
+  else if (listTab === 'ports') renderPortList(el);
   else if (listTab === 'airports') renderAirportList(el);
   else if (listTab === 'ships') renderShipList(el);
   else if (listTab === 'operators') renderOperatorList(el);
@@ -618,17 +630,96 @@ function renderList() {
   else if (listTab === 'aircraft') renderAircraftList(el);
 }
 
+function renderDiscovery(el) {
+  el.innerHTML = `
+    <div class="discover-panel">
+      <div class="disc-section">
+        <div class="disc-title">🏆 Top Lists</div>
+        <div class="disc-grid">
+          <button class="disc-card" onclick="exploreShips('teu')"><span class="disc-icon">📦</span><span>Container Ships</span></button>
+          <button class="disc-card" onclick="exploreShips('dwt')"><span class="disc-icon">🛢️</span><span>Biggest Tankers</span></button>
+          <button class="disc-card" onclick="explorePorts('teu')"><span class="disc-icon">⚓</span><span>Busiest Ports</span></button>
+          <button class="disc-card" onclick="exploreAirports()"><span class="disc-icon">✈</span><span>Busiest Airports</span></button>
+          <button class="disc-card" onclick="exploreShips('yacht')"><span class="disc-icon">🛳</span><span>Superyachts</span></button>
+          <button class="disc-card" onclick="exploreOperators()"><span class="disc-icon">🏢</span><span>Operators</span></button>
+        </div>
+      </div>
+      <div class="disc-section">
+        <div class="disc-title">📊 By Ship Type</div>
+        <div class="disc-chips">
+          <button class="disc-chip" onclick="exploreByType('CS')">Container</button>
+          <button class="disc-chip" onclick="exploreByType('TK')">Tanker</button>
+          <button class="disc-chip" onclick="exploreByType('BC')">Bulk</button>
+          <button class="disc-chip" onclick="exploreByType('PAX')">Cruise</button>
+          <button class="disc-chip" onclick="exploreByType('LNG')">LNG</button>
+          <button class="disc-chip" onclick="exploreByType('CC')">Car Carrier</button>
+          <button class="disc-chip" onclick="exploreByType('OFF')">Offshore</button>
+          <button class="disc-chip" onclick="exploreByType('YAC')">Yacht</button>
+        </div>
+      </div>
+      <div class="disc-section">
+        <div class="disc-title">🌍 By Region</div>
+        <div class="disc-chips">
+          <button class="disc-chip" onclick="exploreRegion('AS')">Asia</button>
+          <button class="disc-chip" onclick="exploreRegion('EU')">Europe</button>
+          <button class="disc-chip" onclick="exploreRegion('NA')">Americas</button>
+          <button class="disc-chip" onclick="exploreRegion('ME')">Middle East</button>
+          <button class="disc-chip" onclick="exploreRegion('AF')">Africa</button>
+          <button class="disc-chip" onclick="exploreRegion('OC')">Oceania</button>
+        </div>
+      </div>
+      <div class="disc-section">
+        <div class="disc-title">🗺️ Try Searching</div>
+        <div class="disc-examples">
+          <div onclick="document.getElementById('searchInput').value='Singapore to Rotterdam';onSearchInput();document.getElementById('searchInput').focus()">Singapore to Rotterdam</div>
+          <div onclick="document.getElementById('searchInput').value='BAW123';onSearchInput();document.getElementById('searchInput').focus()">BAW123 (flight)</div>
+          <div onclick="document.getElementById('searchInput').value='353136000';onSearchInput();document.getElementById('searchInput').focus()">353136000 (MMSI)</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function exploreOperators() {
+  hideSearchResults();
+  if (!listOpen) toggleList();
+  setDomain('marine');
+  setListTab('operators');
+  renderList();
+}
+function exploreByType(sector) {
+  vtableSort.ships = {key:'dwt',asc:false,filter:sector};
+  hideSearchResults();
+  if (!listOpen) toggleList();
+  setDomain('marine');
+  setListTab('ships');
+  renderList();
+}
+function exploreRegion(region) {
+  vtableSort.ports = {key:'teu_thousands',asc:false,num:true,region:region};
+  hideSearchResults();
+  if (!listOpen) toggleList();
+  setDomain('marine');
+  setListTab('ports');
+  renderList();
+}
+
 function renderPortList(el) {
   if (!portsData) { el.innerHTML = '<div class="vlist-empty">Loading ports...</div>'; return; }
-  const cols = [{key:'name',label:'Port',w:'40%'},{key:'country',label:'Country',w:'20%'},{key:'port_size',label:'Size',w:'15%'},{key:'locode',label:'LOCODE',w:'25%'}];
-  const rows = portsData.features.map(f => f.properties);
-  renderVTable(el, cols, rows, vtableSort.ports || {key:'name',asc:true}, 'ports', r => portRowClick(r.name));
+  let rows = portsData.features.map(f => f.properties);
+  const sort = vtableSort.ports || {key:'name',asc:true};
+  if (sort.region) {
+    const regionZones = {AS:'AS,SEA,EA,SA',EU:'EU,NEU',NA:'NA,CA,SA',ME:'ME,PG',AF:'AF,WA,EA',OC:'OC,AU'};
+    const zones = (regionZones[sort.region]||'').split(',');
+    rows = rows.filter(r => zones.some(z => (r.zone_code||'').includes(z)));
+  }
+  const cols = getColumns('ports');
+  renderVTable(el, cols, rows, sort, 'ports', r => portRowClick(r.name));
 }
 
 function renderAirportList(el) {
   if (!airportsData) { el.innerHTML = '<div class="vlist-empty">Enable Airports layer first</div>'; return; }
-  const cols = [{key:'icao',label:'ICAO',w:'15%'},{key:'name',label:'Name',w:'35%'},{key:'country_code',label:'CC',w:'10%'},{key:'route_count',label:'Flights',w:'15%',num:true},{key:'iata',label:'IATA',w:'12%'}];
   const rows = airportsData.features.map(f => f.properties);
+  const cols = getColumns('airports');
   renderVTable(el, cols, rows, vtableSort.airports || {key:'route_count',asc:false}, 'airports', r => airportRowClick(r.icao));
 }
 
@@ -643,9 +734,11 @@ async function renderShipList(el) {
       window._notableShips = await fetch(API + '/v1/ships/notable').then(r => r.json());
     } catch(e) { el.innerHTML = '<div class="vlist-empty">Failed to load</div>'; return; }
   }
-  const data = window._notableShips;
-  const cols = [{key:'name',label:'Name',w:'30%'},{key:'flag',label:'Flag',w:'10%'},{key:'ship_type',label:'Type',w:'15%'},{key:'dwt',label:'DWT',w:'15%',num:true,fmt:v=>v?(v/1000).toFixed(0)+'k':''},{key:'operator',label:'Operator',w:'20%'}];
-  renderVTable(el, cols, data, vtableSort.ships || {key:'dwt',asc:false}, 'ships', r => {
+  let data = window._notableShips;
+  const sort = vtableSort.ships || {key:'dwt',asc:false};
+  if (sort.filter) data = data.filter(s => s.sector === sort.filter);
+  const cols = getColumns('ships');
+  renderVTable(el, cols, data, sort, 'ships', r => {
     if (r.mmsi) fetch(API+'/v1/ships/'+r.mmsi).then(x=>x.json()).then(s=>showEntityCard('ship',s)).catch(()=>{});
     else showEntityCard('ship', r);
   });
@@ -665,9 +758,75 @@ async function renderOperatorList(el) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VTABLE — unified sortable table renderer
+// VTABLE — unified sortable table with column picker
 // ═══════════════════════════════════════════════════════════════
 const vtableSort = {};
+
+// All available columns per entity type (default: on/off)
+const COL_DEFS = {
+  ports: [
+    {key:'name',label:'Port',w:'35%',on:true},
+    {key:'country',label:'Country',w:'18%',on:true},
+    {key:'port_size',label:'Size',w:'12%',on:true},
+    {key:'locode',label:'LOCODE',w:'18%',on:true},
+    {key:'teu_thousands',label:'TEU(k)',w:'12%',num:true,on:false},
+    {key:'zone_code',label:'Zone',w:'12%',on:false},
+    {key:'max_vessel_size',label:'Max Vessel',w:'15%',on:false},
+    {key:'channel_depth_m',label:'Depth(m)',w:'12%',num:true,on:false},
+  ],
+  airports: [
+    {key:'icao',label:'ICAO',w:'14%',on:true},
+    {key:'name',label:'Name',w:'32%',on:true},
+    {key:'country_code',label:'CC',w:'10%',on:true},
+    {key:'route_count',label:'Flights',w:'14%',num:true,on:true},
+    {key:'iata',label:'IATA',w:'12%',on:true},
+    {key:'city',label:'City',w:'18%',on:false},
+    {key:'type',label:'Type',w:'12%',on:false},
+  ],
+  ships: [
+    {key:'name',label:'Name',w:'25%',on:true},
+    {key:'flag',label:'Flag',w:'8%',on:true},
+    {key:'sector',label:'Sector',w:'10%',on:true},
+    {key:'dwt',label:'DWT',w:'12%',num:true,on:true,fmt:v=>v?(v/1000).toFixed(0)+'k':''},
+    {key:'teu',label:'TEU',w:'10%',num:true,on:false,fmt:v=>v?v.toLocaleString():''},
+    {key:'gt',label:'GT',w:'10%',num:true,on:false,fmt:v=>v?v.toLocaleString():''},
+    {key:'operator',label:'Operator',w:'18%',on:true},
+    {key:'length_m',label:'L(m)',w:'8%',num:true,on:false},
+    {key:'beam_m',label:'B(m)',w:'8%',num:true,on:false},
+    {key:'year_built',label:'Year',w:'8%',num:true,on:false},
+    {key:'builder',label:'Builder',w:'15%',on:false},
+  ],
+  operators: [
+    {key:'name',label:'Operator',w:'28%',on:true},
+    {key:'country_code',label:'CC',w:'10%',on:true},
+    {key:'sector',label:'Sector',w:'12%',on:true},
+    {key:'fleet_size',label:'Fleet',w:'12%',num:true,on:true},
+    {key:'teu_capacity',label:'TEU',w:'16%',num:true,on:true,fmt:v=>v?(v/1000).toFixed(0)+'k':''},
+    {key:'imo_company',label:'IMO Co.',w:'14%',on:false},
+    {key:'parent',label:'Parent',w:'14%',on:false},
+    {key:'website',label:'Web',w:'14%',on:false},
+  ],
+};
+
+function getColumns(tabKey) {
+  const saved = localStorage.getItem('vtcols_' + tabKey);
+  const defs = COL_DEFS[tabKey] || [];
+  if (saved) {
+    const enabled = JSON.parse(saved);
+    return defs.filter(c => enabled.includes(c.key));
+  }
+  return defs.filter(c => c.on);
+}
+
+function toggleColumn(tabKey, key) {
+  const defs = COL_DEFS[tabKey] || [];
+  const current = getColumns(tabKey).map(c => c.key);
+  const idx = current.indexOf(key);
+  if (idx >= 0) current.splice(idx, 1);
+  else current.push(key);
+  localStorage.setItem('vtcols_' + tabKey, JSON.stringify(current));
+  renderList();
+}
 
 function renderVTable(el, cols, rows, sort, tabKey, onRowClick) {
   // Sort
@@ -697,7 +856,7 @@ function renderVTable(el, cols, rows, sort, tabKey, onRowClick) {
     return `<tr class="vrow-tr">${cells}</tr>`;
   }).join('');
 
-  el.innerHTML = `<table class="vtable"><thead><tr>${hdr}</tr></thead><tbody>${tbody}</tbody></table>`;
+  el.innerHTML = `<div class="vtable-toolbar"><span class="vtable-count">${rows.length.toLocaleString()} rows${sort.filter?' · '+sort.filter:''}</span><button class="vtable-gear" onclick="showColPicker('${tabKey}',this)" title="Columns">⚙</button></div><table class="vtable"><thead><tr>${hdr}</tr></thead><tbody>${tbody}</tbody></table>`;
 
   // Click handlers
   el.querySelectorAll('.vrow-tr').forEach((tr, i) => {
@@ -710,6 +869,21 @@ function vtableSortBy(tabKey, key, isNum) {
   if (cur && cur.key === key) cur.asc = !cur.asc;
   else vtableSort[tabKey] = {key, asc: !isNum, num: isNum};
   renderList();
+}
+
+function showColPicker(tabKey, btn) {
+  let pop = document.getElementById('colPickerPop');
+  if (pop) { pop.remove(); return; }
+  const defs = COL_DEFS[tabKey] || [];
+  const active = getColumns(tabKey).map(c => c.key);
+  pop = document.createElement('div');
+  pop.id = 'colPickerPop';
+  pop.className = 'col-picker';
+  pop.innerHTML = '<div class="col-picker-title">Columns</div>' + defs.map(c =>
+    `<label class="col-picker-item"><input type="checkbox" ${active.includes(c.key)?'checked':''} onchange="toggleColumn('${tabKey}','${c.key}')"><span>${c.label}</span></label>`
+  ).join('');
+  btn.parentElement.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', function close(e) { if (!pop.contains(e.target) && e.target !== btn) { pop.remove(); document.removeEventListener('click', close); } }), 0);
 }
 
 function portRowClick(name) {
@@ -849,13 +1023,67 @@ let searchTimeout;
 function onSearchInput() {
   clearTimeout(searchTimeout);
   const q = document.getElementById('searchInput').value.trim();
+  const el = document.getElementById('searchResults');
+  if (q.length === 0) { showSearchSuggestions(); return; }
   if (q.length < 2) { hideSearchResults(); return; }
   searchTimeout = setTimeout(() => doSearch(q), 300);
 }
 function onSearchKey(e) { if (e.key === 'Escape') { hideSearchResults(); document.getElementById('searchInput').blur(); } }
 function hideSearchResults() { document.getElementById('searchResults').style.display = 'none'; }
 
+// ── Smart Suggestions (shown on focus with empty input) ──
+function showSearchSuggestions() {
+  const el = document.getElementById('searchResults');
+  const suggestions = [
+    {icon:'🏆',text:'Biggest container ships',sub:'by TEU capacity',action:()=>exploreShips('teu')},
+    {icon:'🏆',text:'Biggest tankers',sub:'by DWT',action:()=>exploreShips('dwt')},
+    {icon:'⚓',text:'Busiest ports',sub:'by TEU throughput',action:()=>explorePorts('teu')},
+    {icon:'✈',text:'Busiest airports',sub:'by flight count',action:()=>exploreAirports()},
+    {icon:'🛳',text:'Superyachts',sub:'Lürssen fleet with photos',action:()=>exploreShips('yacht')},
+    {icon:'🗺️',text:'Route: type "A to B"',sub:'e.g. Singapore to Rotterdam'},
+    {icon:'🔍',text:'Search by name, MMSI, ICAO, callsign...',sub:'start typing'},
+  ];
+  el.innerHTML = '<div class="sr-head">Explore</div>' + suggestions.map((r,i) =>
+    r.action ? `<div class="sr-item" onmousedown="searchAction(${i})"><span class="sr-icon">${r.icon}</span><div class="vmain"><div class="vname">${r.text}</div><div class="vmeta">${r.sub}</div></div></div>`
+    : `<div class="sr-item sr-hint"><span class="sr-icon">${r.icon}</span><div class="vmain"><div class="vname">${r.text}</div><div class="vmeta">${r.sub}</div></div></div>`
+  ).join('');
+  el.style.display = 'block';
+  window._searchResults = suggestions;
+}
+
+// ── Explore actions ──
+function exploreShips(mode) {
+  hideSearchResults();
+  if (!listOpen) toggleList();
+  setDomain('marine');
+  setListTab('ships');
+  if (mode === 'yacht') vtableSort.ships = {key:'gt',asc:false,filter:'YAC'};
+  else if (mode === 'teu') vtableSort.ships = {key:'teu',asc:false};
+  else vtableSort.ships = {key:'dwt',asc:false};
+  renderList();
+}
+function explorePorts(mode) {
+  hideSearchResults();
+  if (!listOpen) toggleList();
+  setDomain('marine');
+  setListTab('ports');
+  vtableSort.ports = {key:'teu_thousands',asc:false,num:true};
+  renderList();
+}
+function exploreAirports() {
+  hideSearchResults();
+  if (!listOpen) toggleList();
+  setDomain('air');
+  setListTab('airports');
+  vtableSort.airports = {key:'route_count',asc:false};
+  renderList();
+}
+
 async function doSearch(q) {
+  // Explore keyword queries
+  const explore = matchExploreQuery(q);
+  if (explore) { explore(); return; }
+
   // Route search: "X to Y" or "X → Y" or "X > Y"
   const routeMatch = q.match(/^(.+?)\s*(?:to|→|>|->)\s*(.+)$/i);
   if (routeMatch) {
@@ -864,26 +1092,87 @@ async function doSearch(q) {
     return;
   }
   const results = [];
-  // MMSI (9+ digits)
-  if (/^\d{5,}$/.test(q)) {
-    try { const s = await fetch(API + '/v1/ships/' + q).then(r => r.ok ? r.json() : null); if (s) { const sf = s.country_code ? `<span class="fi fi-${s.country_code.toLowerCase()}"></span> ` : ''; results.push({ icon: '🚢', text: `${s.name || q} (${s.mmsi})`, sub: sf + (s.country || ''), action: () => showShipCard(s) }); } } catch (e) {}
-  }
-  // Callsign
-  if (/^[A-Za-z]{2,4}\d/i.test(q)) {
-    try { const r = await fetch(API + '/v1/routes/' + q.toUpperCase()).then(r => r.ok ? r.json() : null); if (r) results.push({ icon: '✈', text: `${r.callsign}: ${r.airport_codes}`, sub: r.airline_code, action: () => showRouteCard(r) }); } catch (e) {}
-  }
-  // Port name search
+  // Unified search via API
   try {
-    const ports = await fetch(API + '/v1/sea-routes/search?q=' + encodeURIComponent(q)).then(r => r.ok ? r.json() : []);
-    if (ports) ports.slice(0, 5).forEach(name => results.push({ icon: '⚓', text: name, sub: 'Sea route port', action: () => flyToPort(name) }));
-  } catch (e) {}
+    const sr = await fetch(API + '/v1/search?q=' + encodeURIComponent(q)).then(r => r.ok ? r.json() : null);
+    if (sr && sr.results) {
+      sr.results.slice(0, 8).forEach(r => {
+        const icons = {port:'⚓',airport:'✈',ship:'🚢',route:'✈',airline:'🏢'};
+        results.push({icon: icons[r.type]||'🔍', text: r.name || r.label, sub: r.detail || r.type, action: () => searchResultAction(r)});
+      });
+    }
+  } catch(e) {}
+
+  // Fallback: direct entity lookups if unified search missed
+  if (results.length === 0) {
+    // MMSI (9+ digits)
+    if (/^\d{5,}$/.test(q)) {
+      try { const s = await fetch(API + '/v1/ships/' + q).then(r => r.ok ? r.json() : null); if (s) results.push({ icon: '🚢', text: s.name || q, sub: 'MMSI ' + s.mmsi, action: () => showEntityCard('ship', s) }); } catch(e) {}
+    }
+    // Callsign
+    if (/^[A-Za-z]{2,4}\d/i.test(q)) {
+      try { const r = await fetch(API + '/v1/routes/' + q.toUpperCase()).then(r => r.ok ? r.json() : null); if (r) results.push({ icon: '✈', text: `${r.callsign}: ${r.airport_codes}`, sub: r.airline_code, action: () => showEntityCard('route', r) }); } catch(e) {}
+    }
+    // Port search
+    try {
+      const ports = await fetch(API + '/v1/sea-routes/search?q=' + encodeURIComponent(q)).then(r => r.ok ? r.json() : []);
+      if (ports) ports.slice(0, 5).forEach(name => results.push({ icon: '⚓', text: name, sub: 'Sea route port', action: () => flyToPort(name) }));
+    } catch(e) {}
+    // Port by name in loaded data
+    if (portsData) {
+      const ql = q.toLowerCase();
+      portsData.features.filter(f => f.properties.name.toLowerCase().includes(ql) || (f.properties.locode||'').toLowerCase().includes(ql)).slice(0, 5).forEach(f => {
+        const p = f.properties;
+        if (!results.find(r => r.text === p.name)) results.push({icon:'⚓', text: p.name, sub: `${p.flag||''} ${p.locode||''} ${p.port_size||''}`, action: () => { map.flyTo({center:f.geometry.coordinates,zoom:7,duration:800}); showEntityCard('port',p); }});
+      });
+    }
+    // Airport by ICAO/IATA/name
+    if (airportsData) {
+      const ql = q.toLowerCase();
+      airportsData.features.filter(f => {
+        const p = f.properties;
+        return (p.icao||'').toLowerCase().includes(ql) || (p.iata||'').toLowerCase().includes(ql) || (p.name||'').toLowerCase().includes(ql);
+      }).slice(0, 5).forEach(f => {
+        const p = f.properties;
+        if (!results.find(r => r.text.includes(p.icao))) results.push({icon:'✈', text: `${p.icao}${p.iata?' / '+p.iata:''}`, sub: `${p.flag||''} ${p.name} · ${p.route_count||0} flights`, action: () => { map.flyTo({center:f.geometry.coordinates,zoom:7,duration:800}); showEntityCard('airport',p); }});
+      });
+    }
+  }
 
   const el = document.getElementById('searchResults');
-  if (results.length === 0) { el.innerHTML = '<div class="sr-item" style="color:var(--text3)">No results</div>'; }
+  if (results.length === 0) { el.innerHTML = '<div class="sr-item" style="color:var(--text3)">No results for "'+q+'"</div>'; }
   else { el.innerHTML = results.map((r, i) => `<div class="sr-item" onmousedown="searchAction(${i})"><span class="sr-icon">${r.icon}</span><div class="vmain"><div class="vname">${r.text}</div><div class="vmeta">${r.sub || ''}</div></div></div>`).join(''); }
   el.style.display = 'block';
   window._searchResults = results;
 }
+
+function matchExploreQuery(q) {
+  const ql = q.toLowerCase();
+  if (/biggest.*ship|largest.*ship|top.*ship/i.test(ql)) return () => exploreShips('dwt');
+  if (/biggest.*container|largest.*container|top.*teu/i.test(ql)) return () => exploreShips('teu');
+  if (/yacht|superyacht|lurssen/i.test(ql)) return () => exploreShips('yacht');
+  if (/busiest.*port|top.*port|biggest.*port/i.test(ql)) return () => explorePorts('teu');
+  if (/busiest.*airport|top.*airport/i.test(ql)) return () => exploreAirports();
+  if (/tanker|vlcc/i.test(ql)) return () => { vtableSort.ships={key:'dwt',asc:false,filter:'TK'}; exploreShips('dwt'); };
+  if (/bulk/i.test(ql)) return () => { vtableSort.ships={key:'dwt',asc:false,filter:'BC'}; exploreShips('dwt'); };
+  if (/cruise|passenger/i.test(ql)) return () => { vtableSort.ships={key:'gt',asc:false,filter:'PAX'}; exploreShips('gt'); };
+  if (/lng|gas/i.test(ql)) return () => { vtableSort.ships={key:'gt',asc:false,filter:'LNG'}; exploreShips('gt'); };
+  return null;
+}
+
+function searchResultAction(r) {
+  hideSearchResults();
+  if (r.type === 'port' && portsData) {
+    const f = portsData.features.find(f => f.properties.locode === r.id || f.properties.name === r.name);
+    if (f) { map.flyTo({center:f.geometry.coordinates,zoom:7,duration:800}); showEntityCard('port',f.properties); return; }
+  }
+  if (r.type === 'airport' && airportsData) {
+    const f = airportsData.features.find(f => f.properties.icao === r.id);
+    if (f) { map.flyTo({center:f.geometry.coordinates,zoom:7,duration:800}); showEntityCard('airport',f.properties); return; }
+  }
+  if (r.type === 'ship' && r.id) { fetch(API+'/v1/ships/'+r.id).then(x=>x.json()).then(s=>showEntityCard('ship',s)).catch(()=>{}); }
+}
+
 function searchAction(i) { const r = window._searchResults[i]; if (r && r.action) r.action(); hideSearchResults(); }
 
 async function searchRoute(fromQ, toQ) {

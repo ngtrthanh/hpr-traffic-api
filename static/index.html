@@ -16,7 +16,7 @@
       <span class="brand"><svg class="brand-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg><span>HPRadar Traffic</span></span>
 
       <div class="search-wrap">
-        <input id="searchInput" class="input" placeholder="Search ports, ships, flights..." oninput="onSearchInput()" onkeydown="onSearchKey(event)" onfocus="onSearchInput()" onblur="setTimeout(hideSearchResults,200)">
+        <input id="searchInput" class="input" placeholder="Explore: biggest ships, Singapore to Rotterdam..." oninput="onSearchInput()" onkeydown="onSearchKey(event)" onfocus="onSearchInput()" onblur="setTimeout(hideSearchResults,200)">
         <div id="searchResults"></div>
       </div>
 
@@ -53,11 +53,11 @@
 
       <!-- Left: data list -->
       <div id="vlist">
-        <div class="vlist-tabs vlist-domain">
+        <div class="vlist-tabs vlist-domain" style="display:none">
           <button class="vtab domain on" data-domain="marine" onclick="setDomain('marine')">🚢 Marine</button>
           <button class="vtab domain" data-domain="air" onclick="setDomain('air')">✈ Aviation</button>
         </div>
-        <div class="vlist-tabs vlist-sub" id="vlistSubTabs">
+        <div class="vlist-tabs vlist-sub" id="vlistSubTabs" style="display:none">
           <button class="vtab on" data-tab="ports" onclick="setListTab('ports')">Ports</button>
           <button class="vtab" data-tab="operators" onclick="setListTab('operators')">Operators</button>
           <button class="vtab" data-tab="ships" onclick="setListTab('ships')">Ships</button>

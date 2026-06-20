@@ -120,12 +120,41 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 .vlist-empty{padding:var(--s5);text-align:center;color:var(--text3);font-size:var(--fs-sm)}
 
 /* ── VTable ── */
+.vtable-toolbar{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border);position:relative}
+.vtable-count{font-size:10px;color:var(--text3)}
+.vtable-gear{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px}
+.vtable-gear:hover{background:var(--surface-2);color:var(--text)}
 .vtable{width:100%;border-collapse:collapse;font-size:var(--fs-xs)}
 .vtable th{position:sticky;top:0;background:var(--surface);padding:6px 8px;text-align:left;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
 .vtable th:hover{color:var(--accent)}
 .vtable td{padding:5px 8px;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
 .vrow-tr{cursor:pointer;transition:background .1s}
 .vrow-tr:hover{background:var(--surface-2)}
+
+/* ── Column Picker ── */
+.col-picker{position:absolute;top:100%;right:0;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:8px;box-shadow:var(--e2);min-width:140px}
+.col-picker-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px;letter-spacing:.5px}
+.col-picker-item{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--text2);padding:3px 0;cursor:pointer}
+.col-picker-item input{width:14px;height:14px;accent-color:var(--accent)}
+
+/* ── Discovery Panel ── */
+.discover-panel{padding:12px}
+.disc-section{margin-bottom:14px}
+.disc-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px}
+.disc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.disc-card{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:11px;color:var(--text);transition:all .15s}
+.disc-card:hover{background:var(--surface-3);border-color:var(--accent);color:var(--accent)}
+.disc-icon{font-size:16px}
+.disc-chips{display:flex;flex-wrap:wrap;gap:5px}
+.disc-chip{padding:4px 10px;font-size:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;cursor:pointer;color:var(--text2);transition:all .15s}
+.disc-chip:hover{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.disc-examples{font-size:11px;color:var(--accent);cursor:pointer}
+.disc-examples div{padding:4px 0;border-bottom:1px solid var(--border)}
+.disc-examples div:hover{color:var(--text)}
+
+/* ── Search suggestions ── */
+.sr-head{font-size:10px;font-weight:700;color:var(--text3);padding:6px 12px 2px;text-transform:uppercase;letter-spacing:.5px}
+.sr-hint{opacity:0.6;cursor:default}
 
 /* ── Detail card (right side, no overlap) ── */
 #pcard{position:absolute;top:var(--map-edge);right:var(--map-edge);width:var(--shipcard-w);max-height:var(--panel-h);pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:var(--fs-sm);transform:translateX(calc(100% + 20px));transition:transform .22s ease;overflow:hidden;z-index:20}
