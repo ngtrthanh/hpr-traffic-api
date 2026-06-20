@@ -103,7 +103,7 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 #vlist.open,#apiguide.open{transform:translateX(0)}
 .vlist-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
 .vlist-tabs::-webkit-scrollbar{display:none}
-.vtab{flex:1 0 auto;padding:8px 10px;font-size:var(--fs-xs);font-weight:700;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px}
+.vtab{flex:1;padding:7px 4px;font-size:10px;font-weight:700;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px;text-align:center}
 .vtab.on{color:var(--accent);border-bottom-color:var(--accent)}
 .vtab:hover:not(.on){color:var(--text2)}
 .vlist-rows{overflow-y:auto;flex:1}

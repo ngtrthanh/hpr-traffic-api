@@ -616,6 +616,7 @@ function renderList() {
   if (!el) return;
   if (listTab === 'ports') renderPortList(el);
   else if (listTab === 'airports') renderAirportList(el);
+  else if (listTab === 'ships') renderShipList(el);
   else if (listTab === 'operators') renderOperatorList(el);
   else renderAirlineList(el);
 }
@@ -636,6 +637,21 @@ function renderAirportList(el) {
 
 function renderAirlineList(el) {
   el.innerHTML = '<div class="vlist-empty">Use search to find flights by callsign</div>';
+}
+
+async function renderShipList(el) {
+  if (!window._notableShips) {
+    el.innerHTML = '<div class="vlist-empty">Loading ships...</div>';
+    try {
+      window._notableShips = await fetch(API + '/v1/ships/notable').then(r => r.json());
+    } catch(e) { el.innerHTML = '<div class="vlist-empty">Failed to load</div>'; return; }
+  }
+  const data = window._notableShips;
+  const cols = [{key:'name',label:'Name',w:'30%'},{key:'flag',label:'Flag',w:'10%'},{key:'ship_type',label:'Type',w:'15%'},{key:'dwt',label:'DWT',w:'15%',num:true,fmt:v=>v?(v/1000).toFixed(0)+'k':''},{key:'operator',label:'Operator',w:'20%'}];
+  renderVTable(el, cols, data, vtableSort.ships || {key:'dwt',asc:false}, 'ships', r => {
+    if (r.mmsi) fetch(API+'/v1/ships/'+r.mmsi).then(x=>x.json()).then(s=>showEntityCard('ship',s)).catch(()=>{});
+    else showEntityCard('ship', r);
+  });
 }
 
 async function renderOperatorList(el) {
