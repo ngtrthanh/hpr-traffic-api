@@ -255,22 +255,23 @@ type ShippingCompany struct {
 }
 
 type NotableShip struct {
-	IMO          string `json:"imo"`
-	MMSI         string `json:"mmsi,omitempty"`
-	Name         string `json:"name"`
-	OperatorCode string `json:"operator_code,omitempty"`
-	TEU          int    `json:"teu,omitempty"`
-	DWT          int    `json:"dwt,omitempty"`
-	GT           int    `json:"gross_tonnage,omitempty"`
-	LengthM      int    `json:"length_m,omitempty"`
-	BeamM        int    `json:"beam_m,omitempty"`
-	YearBuilt    int    `json:"year_built,omitempty"`
-	Builder      string `json:"builder,omitempty"`
-	VesselClass  string `json:"vessel_class,omitempty"`
-	Sector       string `json:"sector"`
-	Status       string `json:"status"`
-	Photo1       string `json:"photo1,omitempty"`
-	Photo2       string `json:"photo2,omitempty"`
+	IMO      string `json:"imo"`
+	MMSI     string `json:"mmsi,omitempty"`
+	Name     string `json:"name"`
+	Flag     string `json:"flag,omitempty"`
+	ShipType string `json:"ship_type,omitempty"`
+	DWT      int    `json:"dwt,omitempty"`
+	GT       int    `json:"gross_tonnage,omitempty"`
+	TEU      int    `json:"teu,omitempty"`
+	LengthM  int    `json:"length_m,omitempty"`
+	BeamM    int    `json:"beam_m,omitempty"`
+	YearBuilt int   `json:"year_built,omitempty"`
+	Builder  string `json:"builder,omitempty"`
+	Operator string `json:"operator,omitempty"`
+	Sector   string `json:"sector"`
+	Status   string `json:"status"`
+	Photo1   string `json:"photo1,omitempty"`
+	Photo2   string `json:"photo2,omitempty"`
 }
 
 // ===================== DATA STORES =====================
@@ -1002,35 +1003,32 @@ func loadNotableShips(path string) error {
 	defer f.Close()
 	r := csv.NewReader(f)
 	r.FieldsPerRecord = -1
-	r.Read() // header
-	notableByMMSI = make(map[string]*NotableShip, 100)
-	notableByName = make(map[string]*NotableShip, 100)
+	r.Read() // header: imo,mmsi,name,flag,ship_type,dwt,gt,teu,length_m,beam_m,year_built,builder,operator,sector,status,photo1,photo2
+	notableByMMSI = make(map[string]*NotableShip, 10000)
+	notableByName = make(map[string]*NotableShip, 10000)
 	for {
 		rec, err := r.Read()
 		if err != nil {
 			break
 		}
-		if len(rec) < 14 {
+		if len(rec) < 15 {
 			continue
 		}
-		teu, _ := strconv.Atoi(rec[4])
 		dwt, _ := strconv.Atoi(rec[5])
 		gt, _ := strconv.Atoi(rec[6])
-		ln, _ := strconv.Atoi(rec[7])
-		bm, _ := strconv.Atoi(rec[8])
-		yr, _ := strconv.Atoi(rec[9])
+		teu, _ := strconv.Atoi(rec[7])
+		ln, _ := strconv.Atoi(strings.Split(rec[8], ".")[0])
+		bm, _ := strconv.Atoi(strings.Split(rec[9], ".")[0])
+		yr, _ := strconv.Atoi(rec[10])
 		ns := &NotableShip{
-			IMO: rec[0], MMSI: rec[1], Name: rec[2], OperatorCode: rec[3],
-			TEU: teu, DWT: dwt, GT: gt, LengthM: ln, BeamM: bm,
-			YearBuilt: yr, Builder: rec[10], VesselClass: rec[11],
-			Sector: rec[12], Status: rec[13],
+			IMO: rec[0], MMSI: rec[1], Name: rec[2], Flag: rec[3],
+			ShipType: rec[4], DWT: dwt, GT: gt, TEU: teu,
+			LengthM: ln, BeamM: bm, YearBuilt: yr,
+			Builder: rec[11], Operator: rec[12],
+			Sector: rec[13], Status: rec[14],
 		}
-		if len(rec) > 14 {
-			ns.Photo1 = rec[14]
-		}
-		if len(rec) > 15 {
-			ns.Photo2 = rec[15]
-		}
+		if len(rec) > 15 { ns.Photo1 = rec[15] }
+		if len(rec) > 16 { ns.Photo2 = rec[16] }
 		notableShips = append(notableShips, ns)
 		if ns.MMSI != "" {
 			notableByMMSI[ns.MMSI] = ns

@@ -5,3 +5,5 @@ update-tool
 port-data/
 docs/
 sample/
+data/imports/
+data/enrichment.db
