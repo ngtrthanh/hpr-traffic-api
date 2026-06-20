@@ -506,25 +506,6 @@ function enrichPort(data) {
     }
   }).catch(() => {});
 }
-  const rows = sr.destinations.slice(0, 20).map(d => `<div class="route-row" onclick="flyToPort('${d.destination}')"><span class="dest">→ ${d.destination}</span><span class="dist">${d.distance_nm} nm</span></div>`).join('');
-  el.innerHTML = `<div class="st">Sea Routes (${sr.destinations.length})</div>${rows}`;
-}
-
-function showAirportCard(p) {
-  document.getElementById('pcardIcon').textContent = '✈';
-  document.getElementById('pcardName').textContent = p.icao + (p.iata ? ' / ' + p.iata : '');
-  document.getElementById('pcardType').textContent = p.route_count + ' flights';
-  document.getElementById('pcardMeta').innerHTML = [p.flag, p.name, p.city].filter(Boolean).join(' · ');
-  document.getElementById('pcardBody').innerHTML = `
-    <div class="sc-section"><div class="st">Airport Details</div>
-      ${cardField('Country', (p.flag || '') + ' ' + (p.country_code || ''))}
-      ${cardField('ICAO', p.icao)}${cardField('IATA', p.iata)}
-      ${cardField('Name', p.name)}${cardField('City', p.city)}
-      ${cardField('Flights', p.route_count)}
-    </div>`;
-  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="toggleAirRoutes('${p.icao}', this)">Show Routes</button><a class="act" href="${API}/v1/airports/${p.icao}" target="_blank">API</a><button class="act" onclick="toggleJson('/v1/airports/${p.icao}', this)">JSON</button>`;
-  openCard();
-}
 
 async function viewJson(path) {
   try {
