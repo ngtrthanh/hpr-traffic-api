@@ -22,6 +22,9 @@ import (
 	"time"
 )
 
+// Version set via -ldflags "-X main.Version=vX.Y.Z"
+var Version = "dev"
+
 //go:embed static/*
 var staticFiles embed.FS
 
@@ -1387,7 +1390,7 @@ func main() {
 	mux.HandleFunc("/v0/online", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]any{"response": map[string]any{
 			"uptime":      int(time.Since(startTime).Seconds()),
-			"api_version": "1.0.0",
+			"api_version": Version,
 		}})
 	})
 
@@ -1404,6 +1407,7 @@ func main() {
 
 	mux.HandleFunc("/v1/stats", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]any{
+			"version": Version,
 			"aviation": map[string]any{
 				"aircraft": len(aircraft),
 				"routes":   len(routes),
@@ -2366,7 +2370,7 @@ func main() {
 	// === MCP v1 ===
 
 	mcpManifest, _ := json.Marshal(map[string]any{
-		"name": "hpr-traffic-api", "version": "1.0.0",
+		"name": "hpr-traffic-api", "version": Version,
 		"description": "Aviation and maritime traffic data API",
 		"tools": []map[string]any{
 			{"name": "lookup_flight_route", "description": "Get origin/destination for a flight callsign", "parameters": map[string]string{"callsign": "string"}},

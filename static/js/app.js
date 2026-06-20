@@ -899,7 +899,7 @@ function showIntroCard() {
   const el = document.getElementById('introcard');
   if (!el) return;
   el.innerHTML = `
-    <div class="sc-head"><div class="sc-title"><span>🌐</span><span class="sc-name">HPRadar Traffic</span><span class="sc-type">v1.5</span></div><div class="sc-meta">Aviation & Maritime Data Explorer</div><button class="close btn-icon" onclick="document.getElementById('introcard').innerHTML=''" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="sc-head"><div class="sc-title"><span>🌐</span><span class="sc-name">HPRadar Traffic</span><span class="sc-type" id="intro-version"></span></div><div class="sc-meta">Aviation & Maritime Data Explorer</div><button class="close btn-icon" onclick="document.getElementById('introcard').innerHTML=''" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="sc-body">
     <div class="sc-section">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0">
@@ -945,6 +945,8 @@ function showIntroCard() {
   // Populate stats from API
   fetch(API + '/v1/stats').then(r => r.json()).then(s => {
     const fmt = n => n >= 1000000 ? (n/1000000).toFixed(0)+'M' : n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'')+'k' : n;
+    const v = document.getElementById('intro-version');
+    if (v && s.version) v.textContent = s.version;
     const m = document.getElementById('intro-marine');
     const a = document.getElementById('intro-air');
     if (m) m.innerHTML = `<div>${fmt(s.maritime?.ships||0)} vessels</div><div>${fmt(s.maritime?.seaports||0)} seaports</div><div>${fmt(s.maritime?.companies||0)} operators</div><div>Dijkstra routing</div><div>29.5k sea lanes</div>`;

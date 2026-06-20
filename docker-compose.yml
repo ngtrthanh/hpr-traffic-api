@@ -2,7 +2,10 @@ name: hpr-api-route
 services:
   api-route-go:
     container_name: hpr-api-route
-    build: .
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION:-dev}
     ports:
       - "5737:8081"
     security_opt:
