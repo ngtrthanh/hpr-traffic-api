@@ -7,6 +7,7 @@ on:
 permissions:
   contents: read
   packages: write
+  repository-projects: write
 
 env:
   REGISTRY: ghcr.io
@@ -74,3 +75,24 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-description:
+    runs-on: ubuntu-latest
+    needs: [container]
+    steps:
+      - name: Update repo description from stats API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          STATS=$(curl -sf https://traffic.hpradar.com/v1/stats || echo '{}')
+          DESC=$(echo "$STATS" | python3 -c "
+          import json,sys
+          s=json.load(sys.stdin)
+          r=s.get('aviation',{}).get('routes',0)
+          sh=s.get('maritime',{}).get('ships',0)
+          p=s.get('maritime',{}).get('seaports',0)
+          a=s.get('aviation',{}).get('airports',0)
+          if r: print(f'High-performance REST + WebSocket API for aviation and maritime traffic data. {r//1000}k routes, {sh//1000}k ships, {p//1000:.1f}k seaports, {a//1000:.1f}k airports. Zero dependencies, pure Go stdlib.')
+          else: print('High-performance REST + WebSocket API for aviation and maritime traffic data. Zero dependencies, pure Go stdlib.')
+          ")
+          gh repo edit ${{ github.repository }} --description "$DESC"
