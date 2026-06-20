@@ -1464,8 +1464,8 @@ func main() {
 		limit := qInt(r, "limit", 50, 200)
 		offset := qInt(r, "offset", 0, len(rts))
 		writeJSON(w, map[string]any{
-			"airport": code, "total_routes": len(rts),
-			"connected_airports": len(connected), "top_connections": conns,
+			"airport": code, "total_flights": len(rts),
+			"destinations": len(connected), "top_connections": conns,
 			"limit": limit, "offset": offset,
 			"routes": paginate(rts, limit, offset),
 		})
