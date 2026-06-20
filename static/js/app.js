@@ -605,9 +605,24 @@ function toggleList() {
   if (listOpen) renderList();
 }
 
+let listDomain = 'marine';
+
+function setDomain(domain) {
+  listDomain = domain;
+  document.querySelectorAll('.vlist-domain .vtab').forEach(t => t.classList.toggle('on', t.dataset.domain === domain));
+  const subEl = document.getElementById('vlistSubTabs');
+  if (domain === 'marine') {
+    subEl.innerHTML = `<button class="vtab on" data-tab="ports" onclick="setListTab('ports')">Ports</button><button class="vtab" data-tab="operators" onclick="setListTab('operators')">Operators</button><button class="vtab" data-tab="ships" onclick="setListTab('ships')">Ships</button>`;
+    setListTab('ports');
+  } else {
+    subEl.innerHTML = `<button class="vtab on" data-tab="airports" onclick="setListTab('airports')">Airports</button><button class="vtab" data-tab="airlines" onclick="setListTab('airlines')">Airlines</button><button class="vtab" data-tab="aircraft" onclick="setListTab('aircraft')">Aircraft</button>`;
+    setListTab('airports');
+  }
+}
+
 function setListTab(tab) {
   listTab = tab;
-  document.querySelectorAll('#vlist .vtab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
+  document.querySelectorAll('#vlistSubTabs .vtab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
   renderList();
 }
 
@@ -618,7 +633,8 @@ function renderList() {
   else if (listTab === 'airports') renderAirportList(el);
   else if (listTab === 'ships') renderShipList(el);
   else if (listTab === 'operators') renderOperatorList(el);
-  else renderAirlineList(el);
+  else if (listTab === 'airlines') renderAirlineList(el);
+  else if (listTab === 'aircraft') renderAircraftList(el);
 }
 
 function renderPortList(el) {
@@ -652,6 +668,10 @@ async function renderShipList(el) {
     if (r.mmsi) fetch(API+'/v1/ships/'+r.mmsi).then(x=>x.json()).then(s=>showEntityCard('ship',s)).catch(()=>{});
     else showEntityCard('ship', r);
   });
+}
+
+function renderAircraftList(el) {
+  el.innerHTML = '<div class="vlist-empty">Use search to find aircraft by hex or registration</div>';
 }
 
 async function renderOperatorList(el) {

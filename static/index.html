@@ -53,12 +53,14 @@
 
       <!-- Left: data list -->
       <div id="vlist">
-        <div class="vlist-tabs">
+        <div class="vlist-tabs vlist-domain">
+          <button class="vtab domain on" data-domain="marine" onclick="setDomain('marine')">🚢 Marine</button>
+          <button class="vtab domain" data-domain="air" onclick="setDomain('air')">✈ Aviation</button>
+        </div>
+        <div class="vlist-tabs vlist-sub" id="vlistSubTabs">
           <button class="vtab on" data-tab="ports" onclick="setListTab('ports')">Ports</button>
-          <button class="vtab" data-tab="airports" onclick="setListTab('airports')">Airports</button>
-          <button class="vtab" data-tab="ships" onclick="setListTab('ships')">Ships</button>
           <button class="vtab" data-tab="operators" onclick="setListTab('operators')">Operators</button>
-          <button class="vtab" data-tab="airlines" onclick="setListTab('airlines')">Airlines</button>
+          <button class="vtab" data-tab="ships" onclick="setListTab('ships')">Ships</button>
         </div>
         <div id="vlistRows" class="vlist-rows"></div>
       </div>
