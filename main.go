@@ -255,6 +255,7 @@ type ShippingCompany struct {
 	Website     string `json:"website,omitempty"`
 	NamePrefix  string `json:"-"`
 	Active      bool   `json:"active"`
+	IMOCompany  string `json:"imo_company,omitempty"`
 }
 
 type NotableShip struct {
@@ -974,6 +975,9 @@ func loadCompanies(path string) error {
 			Code: rec[0], Name: rec[1], FullName: rec[2], CountryCode: rec[3],
 			Sector: rec[4], Parent: rec[5], FleetSize: fleet, TEUCapacity: teu,
 			Website: rec[8], NamePrefix: rec[9], Active: rec[10] == "1",
+		}
+		if len(rec) > 11 {
+			c.IMOCompany = rec[11]
 		}
 		companies = append(companies, c)
 		companyByCode[c.Code] = c

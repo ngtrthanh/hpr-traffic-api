@@ -116,6 +116,14 @@ body{background:var(--bg);font-family:'Inter','Segoe UI',system-ui,-apple-system
 .vrow .vmeta{font-size:var(--fs-xs);color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vlist-empty{padding:var(--s5);text-align:center;color:var(--text3);font-size:var(--fs-sm)}
 
+/* ── VTable ── */
+.vtable{width:100%;border-collapse:collapse;font-size:var(--fs-xs)}
+.vtable th{position:sticky;top:0;background:var(--surface);padding:6px 8px;text-align:left;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+.vtable th:hover{color:var(--accent)}
+.vtable td{padding:5px 8px;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
+.vrow-tr{cursor:pointer;transition:background .1s}
+.vrow-tr:hover{background:var(--surface-2)}
+
 /* ── Detail card (right side, no overlap) ── */
 #pcard{position:absolute;top:var(--map-edge);right:var(--map-edge);width:var(--shipcard-w);max-height:var(--panel-h);pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:var(--fs-sm);transform:translateX(calc(100% + 20px));transition:transform .22s ease;overflow:hidden;z-index:20}
 #pcard.open{transform:translateX(0)}

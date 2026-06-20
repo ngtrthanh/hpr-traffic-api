@@ -299,72 +299,213 @@ function closeCard() { document.getElementById('pcard').classList.remove('open')
 
 function cardField(k, v) { return v ? `<div class="sf"><span class="k">${k}</span><span class="v">${v}</span></div>` : ''; }
 
-function showPortCard(p) {
-  document.getElementById('pcardIcon').textContent = '⚓';
-  document.getElementById('pcardName').textContent = p.name;
-  document.getElementById('pcardType').textContent = p.port_size || 'Seaport';
-  document.getElementById('pcardMeta').innerHTML = [p.flag, p.country, p.locode, p.zone_code].filter(Boolean).join(' · ');
-  const teuStr = p.teu_thousands ? `${p.teu_thousands.toLocaleString()}k TEU` : '';
-  const photoId = 'port-photo-' + Date.now();
-  document.getElementById('pcardBody').innerHTML = `
-    <div class="sc-section" style="padding:0;overflow:hidden;border-radius:var(--r-lg) var(--r-lg) 0 0">
-      <div id="${photoId}" style="height:100px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--border) 100%);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:32px;position:relative;overflow:hidden">⚓</div>
-    </div>
-    <div class="sc-section"><div class="st">Port Details</div>
-      ${cardField('Country', (p.flag || '') + ' ' + (p.country || ''))}
-      ${cardField('LOCODE', p.locode)}${cardField('Zone', p.zone_code)}
-      ${cardField('TEU Throughput', teuStr)}${cardField('Max Vessel', p.max_vessel_size)}
-      ${cardField('Channel Depth', p.channel_depth_m ? p.channel_depth_m + ' m' : '')}
-      ${cardField('Cargo Depth', p.cargo_depth_m ? p.cargo_depth_m + ' m' : '')}
-    </div><div class="sc-section" id="seaRoutesSection" style="display:none"><div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">Loading...</div></div>`;
-  const apiUrl = p.locode ? `/v1/ports/${p.locode}` : (p.wpi_id ? `/v1/ports/${p.wpi_id}` : `/v1/ports/${encodeURIComponent(p.name)}`);
-  document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="togglePortRoutes('${p.name.replace(/'/g,"\\'")}', this)">Show Routes</button><a class="act" href="${API}${apiUrl}" target="_blank">API</a><button class="act" onclick="toggleJson('${apiUrl}', this)">JSON</button>`;
+function showPortCard(p) { showEntityCard('port', p); }
+
+function showAirportCard(p) { showEntityCard('airport', p); }
+
+function showShipCard(s) { showEntityCard('ship', s); }
+
+function showRouteCard(r) { showEntityCard('route', r); }
+
+// ═══════════════════════════════════════════════════════════════
+// UNIFIED VCARD — schema-driven entity renderer
+// ═══════════════════════════════════════════════════════════════
+const ENTITY_SCHEMA = {
+  port: {
+    icon: '⚓', label: d => d.name,
+    subtitle: d => d.port_size || 'Seaport',
+    meta: d => [d.flag, d.country, d.locode, d.zone_code].filter(Boolean).join(' · '),
+    identity: d => ({key: 'locode', value: d.locode}),
+    sections: [
+      {title: 'Port Details', fields: d => [
+        ['Country', (d.flag||'') + ' ' + (d.country||'')], ['LOCODE', d.locode], ['Zone', d.zone_code],
+        ['TEU Throughput', d.teu_thousands ? d.teu_thousands.toLocaleString()+'k TEU' : ''],
+        ['Max Vessel', d.max_vessel_size],
+        ['Channel Depth', d.channel_depth_m ? d.channel_depth_m+' m' : ''],
+        ['Cargo Depth', d.cargo_depth_m ? d.cargo_depth_m+' m' : ''],
+      ]},
+    ],
+    actions: d => {
+      const apiUrl = d.locode ? `/v1/ports/${d.locode}` : `/v1/ports/${encodeURIComponent(d.name)}`;
+      return `<button class="act" onclick="togglePortRoutes('${d.name.replace(/'/g,"\\'")}', this)">Show Routes</button><a class="act" href="${API}${apiUrl}" target="_blank">API</a><button class="act" onclick="toggleJson('${apiUrl}', this)">JSON</button>`;
+    },
+    photo: d => (d.teu_thousands > 500 || d.port_size === 'Major'),
+    enrich: enrichPort,
+  },
+  airport: {
+    icon: '✈', label: d => d.icao + (d.iata ? ' / ' + d.iata : ''),
+    subtitle: d => (d.route_count || 0) + ' flights',
+    meta: d => [d.flag, d.name, d.city].filter(Boolean).join(' · '),
+    identity: d => ({key: 'icao', value: d.icao}),
+    sections: [
+      {title: 'Airport Details', fields: d => [
+        ['Country', (d.flag||'') + ' ' + (d.country_code||'')],
+        ['ICAO', d.icao], ['IATA', d.iata], ['Name', d.name], ['City', d.city],
+        ['Flights', d.route_count],
+      ]},
+    ],
+    actions: d => `<button class="act" onclick="toggleAirRoutes('${d.icao}', this)">Show Routes</button><a class="act" href="${API}/v1/airports/${d.icao}" target="_blank">API</a><button class="act" onclick="toggleJson('/v1/airports/${d.icao}', this)">JSON</button>`,
+  },
+  ship: {
+    icon: '🚢', label: d => d.name || d.mmsi,
+    subtitle: d => d.ship_type ? 'Type ' + d.ship_type : '',
+    meta: d => {
+      const f = d.country_code ? `<span class="fi fi-${d.country_code.toLowerCase()}"></span>` : '';
+      return [f, d.country, 'MMSI ' + d.mmsi].filter(Boolean).join(' · ');
+    },
+    identity: d => ({key: 'mmsi', value: d.mmsi}),
+    sections: d => {
+      const s = [];
+      if (d.operator) s.push({title: 'Operator', fields: () => [
+        ['Company', (d.operator.country_code ? '<span class="fi fi-'+d.operator.country_code.toLowerCase()+'"></span> ' : '') + d.operator.name],
+        ['Sector', d.operator.sector],
+      ]});
+      s.push({title: 'Ship Details', fields: () => [
+        ['MMSI', d.mmsi], ['Call Sign', d.call_sign], ['Name', d.name],
+        ['Country', (d.country_code ? '<span class="fi fi-'+d.country_code.toLowerCase()+'"></span> ' : '') + (d.country||'')],
+        ['Gross Tonnage', d.gross_tonnage ? d.gross_tonnage.toLocaleString() : ''],
+        ['Length', d.length_m ? d.length_m+' m' : ''], ['Beam', d.beam_m ? d.beam_m+' m' : ''],
+        ['Ship Type', d.ship_type], ['Class', d.class],
+      ]});
+      return s;
+    },
+    actions: d => `<a class="act" href="${API}/v1/ships/${d.mmsi}" target="_blank">API</a><button class="act" onclick="viewJson('/v1/ships/${d.mmsi}')">JSON</button>`,
+    dynamic: {title: 'Live Tracking', placeholder: '📡 No live data — connect AIS feed', fields: ['Position','Speed','Heading','Destination','ETA','Draught']},
+  },
+  route: {
+    icon: '✈', label: d => d.callsign,
+    subtitle: d => d.airline_code,
+    meta: d => d.airport_codes,
+    identity: d => ({key: 'callsign', value: d.callsign}),
+    sections: [
+      {title: 'Flight Route', fields: d => [
+        ['Callsign', d.callsign], ['Airline', d.airline_code], ['Number', d.number], ['Route', d.airport_codes],
+      ]},
+    ],
+    actions: d => `<a class="act" href="${API}/v1/routes/${d.callsign}" target="_blank">API</a><button class="act" onclick="viewJson('/v1/routes/${d.callsign}')">JSON</button>`,
+    dynamic: {title: 'Live Flight', placeholder: '📡 No live data — connect ADS-B feed', fields: ['Position','Altitude','Speed','Heading','Squawk']},
+  },
+  company: {
+    icon: '🏢', label: d => d.name,
+    subtitle: d => d.sector,
+    meta: d => {
+      const f = d.country_code ? `<span class="fi fi-${d.country_code.toLowerCase()}"></span>` : '';
+      return [f, d.full_name].filter(Boolean).join(' ');
+    },
+    identity: d => ({key: 'imo_company', value: d.imo_company || d.code}),
+    sections: [
+      {title: 'Company Details', fields: d => [
+        ['Code', d.code], ['IMO Company', d.imo_company],
+        ['Country', (d.country_code ? '<span class="fi fi-'+d.country_code.toLowerCase()+'"></span> ' : '') + (d.country_code||'')],
+        ['Sector', d.sector], ['Parent', d.parent], ['Fleet', d.fleet_size + ' ships'],
+        ['TEU Capacity', d.teu_capacity ? (d.teu_capacity/1000).toFixed(0)+'k TEU' : ''],
+        ['Website', d.website ? `<a href="https://${d.website}" target="_blank">${d.website}</a>` : ''],
+      ]},
+    ],
+    actions: d => `<a class="act" href="${API}/v1/companies" target="_blank">API</a>`,
+    dynamic: {title: 'Fleet Status', placeholder: '📡 No live fleet data', fields: ['At Sea','In Port','Anchored']},
+  },
+};
+
+function showEntityCard(type, data) {
+  const schema = ENTITY_SCHEMA[type];
+  if (!schema) return;
+  document.getElementById('pcardIcon').textContent = schema.icon;
+  document.getElementById('pcardName').textContent = schema.label(data);
+  document.getElementById('pcardType').textContent = schema.subtitle(data);
+  document.getElementById('pcardMeta').innerHTML = schema.meta(data);
+
+  // Build sections
+  const sections = typeof schema.sections === 'function' ? schema.sections(data) : schema.sections;
+  let body = '';
+
+  // Photo placeholder for ports
+  if (schema.photo && schema.photo(data)) {
+    const pid = 'entity-photo-' + Date.now();
+    body += `<div class="sc-section" style="padding:0;overflow:hidden;border-radius:var(--r-lg) var(--r-lg) 0 0"><div id="${pid}" style="height:100px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--border) 100%);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:32px;position:relative;overflow:hidden">${schema.icon}</div></div>`;
+    data._photoId = pid;
+  }
+
+  // Static sections
+  for (const sec of sections) {
+    const fields = (typeof sec.fields === 'function' ? sec.fields(data) : sec.fields)
+      .filter(([,v]) => v).map(([k,v]) => cardField(k, v)).join('');
+    if (fields) body += `<div class="sc-section"><div class="st">${sec.title}</div>${fields}</div>`;
+  }
+
+  // Dynamic placeholder section (for tracker integration)
+  if (schema.dynamic) {
+    const id = data.identity || schema.identity(data);
+    body += `<div class="sc-section sc-dynamic" data-entity-type="${type}" data-entity-key="${id.value}"><div class="st">${schema.dynamic.title}</div><div class="dynamic-placeholder" style="font-size:11px;color:var(--text3);padding:4px 0">${schema.dynamic.placeholder}</div></div>`;
+  }
+
+  document.getElementById('pcardBody').innerHTML = body;
+  document.getElementById('pcardActions').innerHTML = schema.actions(data);
   openCard();
-  // Fetch full port details to enrich card
+
+  // Post-render enrichment
+  if (schema.enrich) schema.enrich(data);
+
+  // Draw arc for routes
+  if (type === 'route' && airportsData && data.airport_codes) {
+    const codes = data.airport_codes.split('-');
+    if (codes.length === 2) {
+      const a1 = airportsData.features.find(f => f.properties.icao === codes[0]);
+      const a2 = airportsData.features.find(f => f.properties.icao === codes[1]);
+      if (a1 && a2) {
+        const src = map.getSource('arcs');
+        if (src) src.setData({type:'FeatureCollection',features:[{type:'Feature',geometry:{type:'LineString',coordinates:[a1.geometry.coordinates,a2.geometry.coordinates]},properties:{}}]});
+      }
+    }
+  }
+}
+
+// Inject live data into card's dynamic section (called by tracker when data arrives)
+function updateEntityLive(type, key, liveData) {
+  const el = document.querySelector(`.sc-dynamic[data-entity-type="${type}"][data-entity-key="${key}"]`);
+  if (!el) return;
+  const fields = Object.entries(liveData).filter(([,v]) => v != null).map(([k,v]) => cardField(k, v)).join('');
+  el.innerHTML = `<div class="st">${ENTITY_SCHEMA[type].dynamic.title}</div>${fields || '<div class="dynamic-placeholder" style="font-size:11px;color:var(--text3)">Waiting for data...</div>'}`;
+}
+
+// Port enrichment (async fetch full details + photo)
+function enrichPort(data) {
+  const apiUrl = data.locode ? `/v1/ports/${data.locode}` : `/v1/ports/${encodeURIComponent(data.name)}`;
   fetch(API + apiUrl).then(r => r.ok ? r.json() : null).then(full => {
     if (!full) return;
     const body = document.getElementById('pcardBody');
     if (!body) return;
-    const section = body.querySelectorAll('.sc-section')[1];
+    const section = body.querySelector('.sc-section:nth-child(2)');
     if (!section) return;
     let extra = '';
     if (full.function) {
-      const fn = full.function;
-      const services = [];
+      const fn = full.function, services = [];
       if (fn[0]==='1') services.push('Seaport');
       if (fn[1]==='2') services.push('Rail terminal');
       if (fn[2]==='3') services.push('Road terminal');
       if (fn[3]==='4') services.push('Airport');
       if (fn[4]==='5') services.push('Postal');
       if (fn[5]==='6') services.push('Multimodal');
-      if (fn[6]==='7') services.push('Fixed transport');
-      if (fn[7]==='B') services.push('Border crossing');
       if (services.length) extra += cardField('Services', services.join(', '));
     }
     if (full.status) {
-      const statusMap = {AI:'Approved (international)',AA:'Approved (national)',AF:'Approved (foreign)',AS:'Approved (subdivision)',RL:'Recognized location',RQ:'Under review',QQ:'Not verified',AC:'Approved (customs)',NGA:'NGA source'};
-      extra += cardField('Status', statusMap[full.status] || full.status);
+      const sm = {AI:'Approved (international)',AA:'Approved (national)',RL:'Recognized',QQ:'Not verified',NGA:'NGA source'};
+      extra += cardField('Status', sm[full.status] || full.status);
     }
     if (extra) section.innerHTML += extra;
-    // Try to load Wikipedia image for major ports
-    if (p.teu_thousands > 500 || p.port_size === 'Major') {
-      const wikiName = (p.name.charAt(0) + p.name.slice(1).toLowerCase()).replace(/ /g, '_');
-      const photoEl = document.getElementById(photoId);
+    // Photo
+    if (data._photoId && (data.teu_thousands > 500 || data.port_size === 'Major')) {
+      const photoEl = document.getElementById(data._photoId);
       if (photoEl) {
+        const wikiName = (data.name.charAt(0) + data.name.slice(1).toLowerCase()).replace(/ /g, '_');
         const img = new Image();
         img.style = 'width:100%;height:100%;object-fit:cover;opacity:0.8';
-        img.onerror = () => {};
         img.src = `https://commons.wikimedia.org/wiki/Special:FilePath/Port_of_${wikiName}.jpg`;
         img.onload = () => { photoEl.innerHTML = ''; photoEl.appendChild(img); };
       }
     }
   }).catch(() => {});
 }
-
-function renderSeaRoutesInCard(sr) {
-  const el = document.getElementById('seaRoutesSection');
-  if (!el) return;
-  if (!sr || !sr.destinations || sr.destinations.length === 0) { el.innerHTML = '<div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">No sea routes found</div>'; return; }
   const rows = sr.destinations.slice(0, 20).map(d => `<div class="route-row" onclick="flyToPort('${d.destination}')"><span class="dest">→ ${d.destination}</span><span class="dist">${d.distance_nm} nm</span></div>`).join('');
   el.innerHTML = `<div class="st">Sea Routes (${sr.destinations.length})</div>${rows}`;
 }
@@ -383,51 +524,6 @@ function showAirportCard(p) {
     </div>`;
   document.getElementById('pcardActions').innerHTML = `<button class="act" onclick="toggleAirRoutes('${p.icao}', this)">Show Routes</button><a class="act" href="${API}/v1/airports/${p.icao}" target="_blank">API</a><button class="act" onclick="toggleJson('/v1/airports/${p.icao}', this)">JSON</button>`;
   openCard();
-}
-
-function showShipCard(s) {
-  document.getElementById('pcardIcon').textContent = '🚢';
-  document.getElementById('pcardName').textContent = s.name || s.mmsi;
-  document.getElementById('pcardType').textContent = s.ship_type ? 'Type ' + s.ship_type : '';
-  const shipFlag = s.country_code ? `<span class="fi fi-${s.country_code.toLowerCase()}"></span>` : '';
-  document.getElementById('pcardMeta').innerHTML = [shipFlag, s.country, 'MMSI ' + s.mmsi].filter(Boolean).join(' · ');
-  const opBadge = s.operator ? `<div class="sc-section"><div class="st">Operator</div>${cardField('Company', (s.operator.country_code ? '<span class=\"fi fi-'+s.operator.country_code.toLowerCase()+'\"></span> ' : '') + s.operator.name)}${cardField('Sector', s.operator.sector)}</div>` : '';
-  document.getElementById('pcardBody').innerHTML = `
-    ${opBadge}
-    <div class="sc-section"><div class="st">Ship Details</div>
-      ${cardField('MMSI', s.mmsi)}${cardField('Call Sign', s.call_sign)}${cardField('Name', s.name)}
-      ${cardField('Country', shipFlag + ' ' + (s.country || ''))}${cardField('Gross Tonnage', s.gross_tonnage ? s.gross_tonnage.toLocaleString() : '')}
-      ${cardField('Length', s.length_m ? s.length_m + ' m' : '')}${cardField('Beam', s.beam_m ? s.beam_m + ' m' : '')}
-      ${cardField('Ship Type', s.ship_type)}${cardField('Class', s.class)}
-    </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="${API}/v1/ships/${s.mmsi}" target="_blank">Try API</a><button class="act" onclick="viewJson('/v1/ships/${s.mmsi}')">View JSON</button>`;
-  openCard();
-}
-
-function showRouteCard(r) {
-  document.getElementById('pcardIcon').textContent = '✈';
-  document.getElementById('pcardName').textContent = r.callsign;
-  document.getElementById('pcardType').textContent = r.airline_code;
-  document.getElementById('pcardMeta').textContent = r.airport_codes;
-  document.getElementById('pcardBody').innerHTML = `
-    <div class="sc-section"><div class="st">Flight Route</div>
-      ${cardField('Callsign', r.callsign)}${cardField('Airline', r.airline_code)}${cardField('Number', r.number)}
-      ${cardField('Route', r.airport_codes)}
-    </div>`;
-  document.getElementById('pcardActions').innerHTML = `<a class="act" href="${API}/v1/routes/${r.callsign}" target="_blank">Try API</a><button class="act" onclick="viewJson('/v1/routes/${r.callsign}')">View JSON</button>`;
-  openCard();
-  // Draw arc if we have airport data
-  if (airportsData && r.airport_codes) {
-    const codes = r.airport_codes.split('-');
-    if (codes.length === 2) {
-      const a1 = airportsData.features.find(f => f.properties.icao === codes[0]);
-      const a2 = airportsData.features.find(f => f.properties.icao === codes[1]);
-      if (a1 && a2) {
-        const src = map.getSource('arcs');
-        if (src) src.setData({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: { type: 'LineString', coordinates: [a1.geometry.coordinates, a2.geometry.coordinates] }, properties: {} }] });
-      }
-    }
-  }
 }
 
 async function viewJson(path) {
@@ -525,24 +621,17 @@ function renderList() {
 }
 
 function renderPortList(el) {
-  if (!el) el = document.getElementById('vlistRows');
-  if (!el) return;
   if (!portsData) { el.innerHTML = '<div class="vlist-empty">Loading ports...</div>'; return; }
-  const sorted = [...portsData.features].sort((a, b) => a.properties.name.localeCompare(b.properties.name));
-  el.innerHTML = sorted.slice(0, 200).map(f => {
-    const p = f.properties;
-    const col = { Major: '#f97316', Large: '#facc15', Medium: '#22d3ee' }[p.port_size] || '#94a3b8';
-    return `<div class="vrow" onclick="portRowClick('${p.name}')"><span class="vdot" style="background:${col}"></span><div class="vmain"><div class="vname">${p.flag || ''} ${p.name}</div><div class="vmeta">${p.country}${p.locode ? ' · ' + p.locode : ''}</div></div></div>`;
-  }).join('');
+  const cols = [{key:'name',label:'Port',w:'40%'},{key:'country',label:'Country',w:'20%'},{key:'port_size',label:'Size',w:'15%'},{key:'locode',label:'LOCODE',w:'25%'}];
+  const rows = portsData.features.map(f => f.properties);
+  renderVTable(el, cols, rows, vtableSort.ports || {key:'name',asc:true}, 'ports', r => portRowClick(r.name));
 }
 
 function renderAirportList(el) {
   if (!airportsData) { el.innerHTML = '<div class="vlist-empty">Enable Airports layer first</div>'; return; }
-  const sorted = [...airportsData.features].sort((a, b) => (b.properties.route_count || 0) - (a.properties.route_count || 0));
-  el.innerHTML = sorted.slice(0, 200).map(f => {
-    const p = f.properties;
-    return `<div class="vrow" onclick="airportRowClick('${p.icao}')"><span class="vdot" style="background:#60a5fa"></span><div class="vmain"><div class="vname">${p.flag || ''} ${p.icao}${p.iata ? ' / ' + p.iata : ''}</div><div class="vmeta">${p.name} · ${p.route_count || 0} routes</div></div></div>`;
-  }).join('');
+  const cols = [{key:'icao',label:'ICAO',w:'15%'},{key:'name',label:'Name',w:'35%'},{key:'country_code',label:'CC',w:'10%'},{key:'route_count',label:'Flights',w:'15%',num:true},{key:'iata',label:'IATA',w:'12%'}];
+  const rows = airportsData.features.map(f => f.properties);
+  renderVTable(el, cols, rows, vtableSort.airports || {key:'route_count',asc:false}, 'airports', r => airportRowClick(r.icao));
 }
 
 function renderAirlineList(el) {
@@ -553,14 +642,57 @@ async function renderOperatorList(el) {
   try {
     const data = await fetch(API + '/v1/companies').then(r => r.json());
     if (!data || !data.length) { el.innerHTML = '<div class="vlist-empty">No operators</div>'; return; }
-    const sectors = { CS: '📦', TK: '🛢', BC: '⛏', CC: '🚗', RR: '🚛', LNG: '❄', PAX: '🛳', OFF: '🏗' };
-    el.innerHTML = data.sort((a, b) => (b.teu_capacity || b.fleet_size || 0) - (a.teu_capacity || a.fleet_size || 0)).map(c => {
-      const flag = c.country_code ? `<span class="fi fi-${c.country_code.toLowerCase()}"></span>` : '';
-      const icon = sectors[c.sector.split('/')[0]] || '🚢';
-      const stat = c.teu_capacity ? `${(c.teu_capacity/1000).toFixed(0)}k TEU` : `${c.fleet_size} ships`;
-      return `<div class="vrow"><span class="vdot" style="background:${c.sector==='CS'?'#10b981':c.sector==='TK'?'#f97316':'#94a3b8'}"></span><div class="vmain"><div class="vname">${flag} ${c.name}</div><div class="vmeta">${icon} ${c.sector} · ${stat}</div></div></div>`;
-    }).join('');
+    const cols = [{key:'name',label:'Operator',w:'30%'},{key:'country_code',label:'CC',w:'10%'},{key:'sector',label:'Sector',w:'12%'},{key:'fleet_size',label:'Fleet',w:'12%',num:true},{key:'teu_capacity',label:'TEU',w:'18%',num:true,fmt:v=>v?(v/1000).toFixed(0)+'k':''}];
+    renderVTable(el, cols, data, vtableSort.operators || {key:'teu_capacity',asc:false}, 'operators', r => showEntityCard('company', r));
   } catch(e) { el.innerHTML = '<div class="vlist-empty">Failed to load</div>'; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VTABLE — unified sortable table renderer
+// ═══════════════════════════════════════════════════════════════
+const vtableSort = {};
+
+function renderVTable(el, cols, rows, sort, tabKey, onRowClick) {
+  // Sort
+  const sorted = [...rows].sort((a, b) => {
+    let va = a[sort.key], vb = b[sort.key];
+    if (sort.num || typeof va === 'number') { va = va || 0; vb = vb || 0; return sort.asc ? va - vb : vb - va; }
+    va = (va || '').toString().toLowerCase(); vb = (vb || '').toString().toLowerCase();
+    return sort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+
+  // Header
+  const hdr = cols.map(c => {
+    const arrow = sort.key === c.key ? (sort.asc ? ' ▲' : ' ▼') : '';
+    return `<th style="width:${c.w}" onclick="vtableSortBy('${tabKey}','${c.key}',${!!c.num})">${c.label}${arrow}</th>`;
+  }).join('');
+
+  // Rows (limit 200)
+  const tbody = sorted.slice(0, 200).map(r => {
+    const flag = r.country_code ? `<span class="fi fi-${r.country_code.toLowerCase()}"></span> ` : (r.flag || '');
+    const cells = cols.map(c => {
+      let v = r[c.key];
+      if (c.fmt) v = c.fmt(v);
+      else if (c.key === 'name' || c.key === 'country') v = flag + (v || '');
+      else if (c.num && v) v = Number(v).toLocaleString();
+      return `<td>${v || ''}</td>`;
+    }).join('');
+    return `<tr class="vrow-tr">${cells}</tr>`;
+  }).join('');
+
+  el.innerHTML = `<table class="vtable"><thead><tr>${hdr}</tr></thead><tbody>${tbody}</tbody></table>`;
+
+  // Click handlers
+  el.querySelectorAll('.vrow-tr').forEach((tr, i) => {
+    tr.onclick = () => onRowClick(sorted[i]);
+  });
+}
+
+function vtableSortBy(tabKey, key, isNum) {
+  const cur = vtableSort[tabKey];
+  if (cur && cur.key === key) cur.asc = !cur.asc;
+  else vtableSort[tabKey] = {key, asc: !isNum, num: isNum};
+  renderList();
 }
 
 function portRowClick(name) {
@@ -847,24 +979,33 @@ function toggleAirRoutes(icao, btn) {
 }
 
 async function togglePortRoutes(name, btn) {
-  const section = document.getElementById('seaRoutesSection');
+  const body = document.getElementById('pcardBody');
+  let section = body && body.querySelector('.sc-sea-routes');
   if (btn.dataset.active) {
-    if (section) section.style.display = 'none';
+    if (section) section.remove();
     clearArcs();
     btn.textContent = 'Show Routes';
     delete btn.dataset.active;
   } else {
     btn.textContent = 'Hide Routes';
     btn.dataset.active = '1';
-    if (section) section.style.display = '';
+    if (!section) {
+      section = document.createElement('div');
+      section.className = 'sc-section sc-sea-routes';
+      section.innerHTML = '<div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">Loading...</div>';
+      if (body) body.appendChild(section);
+    }
     try {
       const sr = await fetch(API + '/v1/sea-routes/from/' + encodeURIComponent(name)).then(r => r.json());
       if (sr && sr.destinations) {
         const port = portsData.features.find(f => f.properties.name === name);
         if (port) drawArcs(port.geometry.coordinates, sr.destinations, name);
+        const dests = sr.destinations.slice(0, 10).map(d => `<div class="sf"><span class="k">${d.destination}</span><span class="v">${d.distance_nm} nm</span></div>`).join('');
+        section.innerHTML = `<div class="st">Sea Routes (${sr.destinations.length})</div>${dests}`;
+      } else {
+        section.innerHTML = '<div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">No routes found</div>';
       }
-      renderSeaRoutesInCard(sr);
-    } catch(e) {}
+    } catch(e) { section.innerHTML = '<div class="st">Sea Routes</div><div style="color:var(--text3);font-size:var(--fs-xs)">Error loading routes</div>'; }
   }
 }
 
