@@ -232,6 +232,7 @@ type SeaRoute struct {
 
 type Ship struct {
 	MMSI         string `json:"mmsi"`
+	IMO          string `json:"imo,omitempty"`
 	CallSign     string `json:"call_sign,omitempty"`
 	Name         string `json:"name"`
 	Country      string `json:"country,omitempty"`
@@ -305,6 +306,7 @@ var (
 	combinedLanesJSON []byte
 	ships          map[string]*Ship
 	shipsList      []*Ship
+	shipsByIMO     map[string]*Ship
 	shipsByCallSign map[string]*Ship
 	companies       []*ShippingCompany
 	companyByCode   map[string]*ShippingCompany
@@ -928,32 +930,48 @@ func loadShips(path string) error {
 	}
 	defer f.Close()
 	r := csv.NewReader(f)
+	r.FieldsPerRecord = -1
+	r.LazyQuotes = true
 	r.Read()
-	ships = make(map[string]*Ship, 750000)
+	ships = make(map[string]*Ship, 770000)
 	shipsByCallSign = make(map[string]*Ship, 700000)
 	for {
 		rec, err := r.Read()
 		if err != nil {
 			break
 		}
-		gt, _ := strconv.Atoi(rec[10])
-		st, _ := strconv.Atoi(rec[16])
-		ln, _ := strconv.Atoi(rec[17])
-		bm, _ := strconv.Atoi(rec[18])
+		if len(rec) < 19 {
+			continue
+		}
+		gt, _ := strconv.Atoi(rec[11])
+		st, _ := strconv.Atoi(rec[17])
+		ln, _ := strconv.Atoi(rec[18])
+		bm := 0
+		if len(rec) > 19 {
+			bm, _ = strconv.Atoi(rec[19])
+		}
+		cls := ""
+		if len(rec) > 8 {
+			cls = rec[8]
+		}
 		s := &Ship{
-			MMSI: rec[0], CallSign: rec[1], Name: rec[3], Country: rec[4],
-			CountryCode: ituCountryCode(rec[4]),
-			GrossTonnage: gt, ShipType: st, LengthM: ln, BeamM: bm, Class: rec[7],
+			MMSI: rec[0], IMO: rec[1], CallSign: rec[2], Name: rec[4], Country: rec[5],
+			CountryCode: ituCountryCode(rec[5]),
+			GrossTonnage: gt, ShipType: st, LengthM: ln, BeamM: bm, Class: cls,
 		}
 		ships[rec[0]] = s
-		if rec[1] != "" {
-			shipsByCallSign[strings.ToUpper(rec[1])] = s
+		if rec[2] != "" {
+			shipsByCallSign[strings.ToUpper(rec[2])] = s
 		}
 	}
 	// Build sorted list for pagination
 	shipsList = make([]*Ship, 0, len(ships))
+	shipsByIMO = make(map[string]*Ship, 15000)
 	for _, s := range ships {
 		shipsList = append(shipsList, s)
+		if s.IMO != "" {
+			shipsByIMO[s.IMO] = s
+		}
 	}
 	sort.Slice(shipsList, func(i, j int) bool { return shipsList[i].GrossTonnage > shipsList[j].GrossTonnage })
 	return nil
@@ -2146,7 +2164,7 @@ func main() {
 		// Try MMSI first
 		if s, ok := ships[id]; ok {
 			resp := map[string]any{
-				"mmsi": s.MMSI, "call_sign": s.CallSign, "name": s.Name,
+				"mmsi": s.MMSI, "imo": s.IMO, "call_sign": s.CallSign, "name": s.Name,
 				"country": s.Country, "country_code": s.CountryCode,
 				"gross_tonnage": s.GrossTonnage, "ship_type": s.ShipType,
 				"length_m": s.LengthM, "beam_m": s.BeamM, "class": s.Class,
@@ -2176,6 +2194,20 @@ func main() {
 				resp["country"] = s.Country
 				resp["country_code"] = s.CountryCode
 				resp["gross_tonnage"] = s.GrossTonnage
+			}
+			writeJSON(w, resp)
+			return
+		}
+		// Try IMO in ITU (enriched from MongoDB AIS)
+		if s, ok := shipsByIMO[id]; ok {
+			resp := map[string]any{
+				"mmsi": s.MMSI, "imo": s.IMO, "call_sign": s.CallSign, "name": s.Name,
+				"country": s.Country, "country_code": s.CountryCode,
+				"gross_tonnage": s.GrossTonnage, "ship_type": s.ShipType,
+				"length_m": s.LengthM, "beam_m": s.BeamM, "class": s.Class,
+			}
+			if op := matchOperator(s.Name); op != nil {
+				resp["operator"] = map[string]any{"code": op.Code, "name": op.Name, "country_code": op.CountryCode, "sector": op.Sector}
 			}
 			writeJSON(w, resp)
 			return
@@ -2223,7 +2255,7 @@ func main() {
 			if countryFilter != "" && s.CountryCode != countryFilter {
 				continue
 			}
-			if nameFilter != "" && !strings.Contains(strings.ToUpper(s.Name), nameFilter) && !strings.Contains(s.MMSI, nameFilter) && !strings.Contains(strings.ToUpper(s.CallSign), nameFilter) {
+			if nameFilter != "" && !strings.Contains(strings.ToUpper(s.Name), nameFilter) && !strings.Contains(s.MMSI, nameFilter) && !strings.Contains(strings.ToUpper(s.CallSign), nameFilter) && !strings.Contains(s.IMO, nameFilter) {
 				continue
 			}
 			filtered = append(filtered, s)
