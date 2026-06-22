@@ -1136,13 +1136,24 @@ async function doSearch(q) {
 
   // Fallback: direct entity lookups if unified search missed
   if (results.length === 0) {
-    // MMSI (9+ digits)
+    // MMSI or IMO (5-9 digits)
     if (/^\d{5,}$/.test(q)) {
-      try { const s = await fetch(API + '/v1/ships/' + q).then(r => r.ok ? r.json() : null); if (s) results.push({ icon: '🚢', text: s.name || q, sub: 'MMSI ' + s.mmsi, action: () => showEntityCard('ship', s) }); } catch(e) {}
+      try { const s = await fetch(API + '/v1/ships/' + q).then(r => r.ok ? r.json() : null); if (s && !s.response) results.push({ icon: '🚢', text: s.name || q, sub: (s.imo ? 'IMO '+s.imo+' · ' : '') + 'MMSI ' + (s.mmsi||q), action: () => showEntityCard('ship', s) }); } catch(e) {}
+      // Also try as partial MMSI in list
+      if (results.length === 0) {
+        try { const sd = await fetch(API + '/v1/ships/list?q=' + q + '&limit=5').then(r => r.ok ? r.json() : null); if (sd && sd.ships) sd.ships.forEach(s => results.push({icon:'🚢', text: s.name, sub: `MMSI:${s.mmsi} GT:${s.gross_tonnage||0}`, action: () => { fetch(API+'/v1/ships/'+s.mmsi).then(x=>x.json()).then(d=>showEntityCard('ship',d)).catch(()=>showEntityCard('ship',s)); }})); } catch(e) {}
+      }
     }
     // Callsign
     if (/^[A-Za-z]{2,4}\d/i.test(q)) {
       try { const r = await fetch(API + '/v1/routes/' + q.toUpperCase()).then(r => r.ok ? r.json() : null); if (r) results.push({ icon: '✈', text: `${r.callsign}: ${r.airport_codes}`, sub: r.airline_code, action: () => showEntityCard('route', r) }); } catch(e) {}
+    }
+    // Ship name search (ITU 746k)
+    if (q.length >= 3 && !/^\d+$/.test(q)) {
+      try {
+        const sd = await fetch(API + '/v1/ships/list?q=' + encodeURIComponent(q) + '&limit=5').then(r => r.ok ? r.json() : null);
+        if (sd && sd.ships) sd.ships.forEach(s => results.push({icon:'🚢', text: s.name, sub: `${s.country_code||''} GT:${s.gross_tonnage||0} MMSI:${s.mmsi}`, action: () => { fetch(API+'/v1/ships/'+s.mmsi).then(x=>x.json()).then(d=>showEntityCard('ship',d)).catch(()=>showEntityCard('ship',s)); }}));
+      } catch(e) {}
     }
     // Port search
     try {

@@ -312,6 +312,7 @@ var (
 	notableShips    []*NotableShip
 	notableByMMSI   map[string]*NotableShip
 	notableByName   map[string]*NotableShip
+	notableByIMO    map[string]*NotableShip
 	startTime   time.Time
 )
 
@@ -1020,6 +1021,7 @@ func loadNotableShips(path string) error {
 	r.Read() // header: imo,mmsi,name,flag,ship_type,dwt,gt,teu,length_m,beam_m,year_built,builder,operator,sector,status,photo1,photo2
 	notableByMMSI = make(map[string]*NotableShip, 10000)
 	notableByName = make(map[string]*NotableShip, 10000)
+	notableByIMO = make(map[string]*NotableShip, 10000)
 	for {
 		rec, err := r.Read()
 		if err != nil {
@@ -1046,6 +1048,9 @@ func loadNotableShips(path string) error {
 		notableShips = append(notableShips, ns)
 		if ns.MMSI != "" {
 			notableByMMSI[ns.MMSI] = ns
+		}
+		if ns.IMO != "" {
+			notableByIMO[ns.IMO] = ns
 		}
 		notableByName[strings.ToUpper(ns.Name)] = ns
 	}
@@ -2137,8 +2142,9 @@ func main() {
 	})
 
 	mux.HandleFunc("/v1/ships/", func(w http.ResponseWriter, r *http.Request) {
-		mmsi := r.URL.Path[len("/v1/ships/"):]
-		if s, ok := ships[mmsi]; ok {
+		id := r.URL.Path[len("/v1/ships/"):]
+		// Try MMSI first
+		if s, ok := ships[id]; ok {
 			resp := map[string]any{
 				"mmsi": s.MMSI, "call_sign": s.CallSign, "name": s.Name,
 				"country": s.Country, "country_code": s.CountryCode,
@@ -2148,16 +2154,33 @@ func main() {
 			if op := matchOperator(s.Name); op != nil {
 				resp["operator"] = map[string]any{"code": op.Code, "name": op.Name, "country_code": op.CountryCode, "sector": op.Sector}
 			}
-			// Notable ship enrichment
-			if ns, ok := notableByMMSI[mmsi]; ok {
+			if ns, ok := notableByMMSI[id]; ok {
 				resp["notable"] = ns
 			} else if ns, ok := notableByName[strings.ToUpper(s.Name)]; ok {
 				resp["notable"] = ns
 			}
 			writeJSON(w, resp)
-		} else {
-			notFound(w, "Ship not found")
+			return
 		}
+		// Try IMO (notable ships)
+		if ns, ok := notableByIMO[id]; ok {
+			resp := map[string]any{
+				"imo": ns.IMO, "mmsi": ns.MMSI, "name": ns.Name, "flag": ns.Flag,
+				"ship_type": ns.ShipType, "dwt": ns.DWT, "gt": ns.GT, "teu": ns.TEU,
+				"length_m": ns.LengthM, "beam_m": ns.BeamM, "year_built": ns.YearBuilt,
+				"builder": ns.Builder, "operator": ns.Operator, "sector": ns.Sector,
+			}
+			// Also pull ITU data if MMSI exists
+			if s, ok := ships[ns.MMSI]; ok {
+				resp["call_sign"] = s.CallSign
+				resp["country"] = s.Country
+				resp["country_code"] = s.CountryCode
+				resp["gross_tonnage"] = s.GrossTonnage
+			}
+			writeJSON(w, resp)
+			return
+		}
+		notFound(w, "Ship not found")
 	})
 
 	// Notable ships endpoint
@@ -2188,6 +2211,14 @@ func main() {
 
 		// Filter
 		var filtered []*Ship
+		// Check if query matches a notable ship IMO — inject at top
+		if nameFilter != "" {
+			if ns, ok := notableByIMO[strings.TrimSpace(string(nameFilter))]; ok && ns.MMSI != "" {
+				if s, ok2 := ships[ns.MMSI]; ok2 {
+					filtered = append(filtered, s)
+				}
+			}
+		}
 		for _, s := range shipsList {
 			if countryFilter != "" && s.CountryCode != countryFilter {
 				continue
