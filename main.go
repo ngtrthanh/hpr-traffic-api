@@ -304,6 +304,7 @@ var (
 	shippingLanesJSON []byte
 	combinedLanesJSON []byte
 	ships          map[string]*Ship
+	shipsList      []*Ship
 	shipsByCallSign map[string]*Ship
 	companies       []*ShippingCompany
 	companyByCode   map[string]*ShippingCompany
@@ -948,6 +949,12 @@ func loadShips(path string) error {
 			shipsByCallSign[strings.ToUpper(rec[1])] = s
 		}
 	}
+	// Build sorted list for pagination
+	shipsList = make([]*Ship, 0, len(ships))
+	for _, s := range ships {
+		shipsList = append(shipsList, s)
+	}
+	sort.Slice(shipsList, func(i, j int) bool { return shipsList[i].GrossTonnage > shipsList[j].GrossTonnage })
 	return nil
 }
 
@@ -2164,6 +2171,71 @@ func main() {
 			result = append(result, ns)
 		}
 		writeJSON(w, result)
+	})
+
+	// Full ship registry (746k) — paginated, sortable, filterable
+	mux.HandleFunc("/v1/ships/list", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		limit := qInt(r, "limit", 50, 500)
+		offset := qInt(r, "offset", 0, len(shipsList))
+		sortKey := q.Get("sort")
+		if sortKey == "" {
+			sortKey = "gt"
+		}
+		desc := q.Get("order") != "asc"
+		countryFilter := strings.ToUpper(q.Get("country"))
+		nameFilter := strings.ToUpper(q.Get("q"))
+
+		// Filter
+		var filtered []*Ship
+		for _, s := range shipsList {
+			if countryFilter != "" && s.CountryCode != countryFilter {
+				continue
+			}
+			if nameFilter != "" && !strings.Contains(strings.ToUpper(s.Name), nameFilter) && !strings.Contains(s.MMSI, nameFilter) && !strings.Contains(strings.ToUpper(s.CallSign), nameFilter) {
+				continue
+			}
+			filtered = append(filtered, s)
+		}
+
+		// Sort
+		sort.Slice(filtered, func(i, j int) bool {
+			switch sortKey {
+			case "name":
+				if desc {
+					return filtered[i].Name > filtered[j].Name
+				}
+				return filtered[i].Name < filtered[j].Name
+			case "length":
+				if desc {
+					return filtered[i].LengthM > filtered[j].LengthM
+				}
+				return filtered[i].LengthM < filtered[j].LengthM
+			case "mmsi":
+				if desc {
+					return filtered[i].MMSI > filtered[j].MMSI
+				}
+				return filtered[i].MMSI < filtered[j].MMSI
+			default: // gt
+				if desc {
+					return filtered[i].GrossTonnage > filtered[j].GrossTonnage
+				}
+				return filtered[i].GrossTonnage < filtered[j].GrossTonnage
+			}
+		})
+
+		total := len(filtered)
+		if offset > total {
+			offset = total
+		}
+		end := offset + limit
+		if end > total {
+			end = total
+		}
+		writeJSON(w, map[string]any{
+			"total": total, "offset": offset, "limit": limit,
+			"ships": filtered[offset:end],
+		})
 	})
 
 	// === Companies v1 ===

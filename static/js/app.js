@@ -728,20 +728,39 @@ function renderAirlineList(el) {
 }
 
 async function renderShipList(el) {
-  if (!window._notableShips) {
-    el.innerHTML = '<div class="vlist-empty">Loading ships...</div>';
-    try {
-      window._notableShips = await fetch(API + '/v1/ships/notable').then(r => r.json());
-    } catch(e) { el.innerHTML = '<div class="vlist-empty">Failed to load</div>'; return; }
-  }
-  let data = window._notableShips;
-  const sort = vtableSort.ships || {key:'dwt',asc:false};
-  if (sort.filter) data = data.filter(s => s.sector === sort.filter);
-  const cols = getColumns('ships');
-  renderVTable(el, cols, data, sort, 'ships', r => {
-    if (r.mmsi) fetch(API+'/v1/ships/'+r.mmsi).then(x=>x.json()).then(s=>showEntityCard('ship',s)).catch(()=>{});
-    else showEntityCard('ship', r);
-  });
+  const sort = vtableSort.ships || {key:'gt',asc:false};
+  const page = window._shipsPage || 0;
+  const limit = 100;
+  const offset = page * limit;
+  const sortMap = {dwt:'gt',teu:'gt',gt:'gt',name:'name',length_m:'length',mmsi:'mmsi'};
+  const apiSort = sortMap[sort.key] || 'gt';
+  const order = sort.asc ? 'asc' : 'desc';
+  let url = `${API}/v1/ships/list?limit=${limit}&offset=${offset}&sort=${apiSort}&order=${order}`;
+  if (sort.filter) url += `&q=${encodeURIComponent(sort.filter)}`;
+  if (sort.country) url += `&country=${sort.country}`;
+
+  el.innerHTML = '<div class="vlist-empty">Loading 746k ships...</div>';
+  try {
+    const data = await fetch(url).then(r => r.json());
+    const cols = getColumns('ships_itu');
+    const totalPages = Math.ceil(data.total / limit);
+
+    // Render table
+    renderVTable(el, cols, data.ships, sort, 'ships', r => {
+      fetch(API+'/v1/ships/'+r.mmsi).then(x=>x.json()).then(s=>showEntityCard('ship',s)).catch(()=>{});
+    });
+
+    // Add pagination bar
+    const pager = document.createElement('div');
+    pager.className = 'vtable-pager';
+    pager.innerHTML = `<button ${page===0?'disabled':''} onclick="shipsPage(${page-1})">◀ Prev</button><span>Page ${page+1} of ${totalPages.toLocaleString()} · ${data.total.toLocaleString()} ships</span><button ${page>=totalPages-1?'disabled':''} onclick="shipsPage(${page+1})">Next ▶</button>`;
+    el.appendChild(pager);
+  } catch(e) { el.innerHTML = '<div class="vlist-empty">Failed to load</div>'; }
+}
+
+function shipsPage(p) {
+  window._shipsPage = Math.max(0, p);
+  renderList();
 }
 
 function renderAircraftList(el) {
@@ -795,6 +814,17 @@ const COL_DEFS = {
     {key:'beam_m',label:'B(m)',w:'8%',num:true,on:false},
     {key:'year_built',label:'Year',w:'8%',num:true,on:false},
     {key:'builder',label:'Builder',w:'15%',on:false},
+  ],
+  ships_itu: [
+    {key:'name',label:'Name',w:'28%',on:true},
+    {key:'country_code',label:'Flag',w:'8%',on:true},
+    {key:'gross_tonnage',label:'GT',w:'12%',num:true,on:true,fmt:v=>v?v.toLocaleString():''},
+    {key:'mmsi',label:'MMSI',w:'14%',on:true},
+    {key:'call_sign',label:'Callsign',w:'12%',on:true},
+    {key:'ship_type',label:'Type',w:'8%',num:true,on:false},
+    {key:'length_m',label:'L(m)',w:'8%',num:true,on:false},
+    {key:'beam_m',label:'B(m)',w:'8%',num:true,on:false},
+    {key:'class',label:'Class',w:'8%',on:false},
   ],
   operators: [
     {key:'name',label:'Operator',w:'28%',on:true},
@@ -868,6 +898,7 @@ function vtableSortBy(tabKey, key, isNum) {
   const cur = vtableSort[tabKey];
   if (cur && cur.key === key) cur.asc = !cur.asc;
   else vtableSort[tabKey] = {key, asc: !isNum, num: isNum};
+  if (tabKey === 'ships') window._shipsPage = 0;
   renderList();
 }
 
@@ -1056,11 +1087,11 @@ function exploreShips(mode) {
   hideSearchResults();
   if (!listOpen) toggleList();
   setDomain('marine');
+  window._shipsPage = 0;
+  if (mode === 'yacht') vtableSort.ships = {key:'gt',asc:false,filter:'YACHT'};
+  else if (mode === 'teu') vtableSort.ships = {key:'gt',asc:false};
+  else vtableSort.ships = {key:'gt',asc:false};
   setListTab('ships');
-  if (mode === 'yacht') vtableSort.ships = {key:'gt',asc:false,filter:'YAC'};
-  else if (mode === 'teu') vtableSort.ships = {key:'teu',asc:false};
-  else vtableSort.ships = {key:'dwt',asc:false};
-  renderList();
 }
 function explorePorts(mode) {
   hideSearchResults();
