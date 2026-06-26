@@ -346,9 +346,7 @@ type SeaDistancePort struct {
 }
 
 var (
-	aircraft    map[string]Aircraft
-	regToModeS  map[string]string
-	nNumToModeS map[string]string
+
 	airlines    map[string]Airline
 	airports    map[string]Airport
 	routes      map[string]Route
@@ -363,10 +361,10 @@ var (
 	seaDistancePorts  map[string]SeaDistancePort
 	shippingLanesJSON []byte
 	combinedLanesJSON []byte
-	ships          map[string]*Ship
-	shipsList      []*Ship
-	shipsByIMO     map[string]*Ship
-	shipsByCallSign map[string]*Ship
+
+
+
+
 	companies       []*ShippingCompany
 	companyByCode   map[string]*ShippingCompany
 	companyPrefixes []struct{ prefix, code string }
@@ -380,32 +378,10 @@ var (
 // ===================== LOADERS =====================
 
 func loadAircraft(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
+	if err := loadAircraftToWarm(path); err != nil {
 		return err
 	}
-	defer f.Close()
-	r := csv.NewReader(f)
-	r.Read()
-	aircraft = make(map[string]Aircraft, 620000)
-	regToModeS = make(map[string]string, 620000)
-	nNumToModeS = make(map[string]string, 300000)
-	for {
-		rec, err := r.Read()
-		if err != nil {
-			break
-		}
-		ac := Aircraft{
-			ModeS: rec[0], Registration: rec[1], ICAOType: rec[2], ShortType: rec[3],
-			Manufacturer: rec[4], Model: rec[5], Owner: rec[6], Year: rec[7],
-			Mil: rec[8] == "1", PIA: rec[9] == "1", LADD: rec[10] == "1",
-		}
-		aircraft[rec[0]] = ac
-		regToModeS[rec[1]] = rec[0]
-		if strings.HasPrefix(rec[1], "N") {
-			nNumToModeS[rec[1]] = rec[0]
-		}
-	}
+	// regToModeS and nNumToModeS now served by SQLite warm lookup
 	return nil
 }
 
@@ -983,57 +959,7 @@ func dijkstraRoute(from, to nodeID) ([][2]float64, float64, []string) {
 
 
 func loadShips(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	r := csv.NewReader(f)
-	r.FieldsPerRecord = -1
-	r.LazyQuotes = true
-	r.Read()
-	ships = make(map[string]*Ship, 770000)
-	shipsByCallSign = make(map[string]*Ship, 700000)
-	for {
-		rec, err := r.Read()
-		if err != nil {
-			break
-		}
-		if len(rec) < 19 {
-			continue
-		}
-		gt, _ := strconv.Atoi(rec[11])
-		st, _ := strconv.Atoi(rec[17])
-		ln, _ := strconv.Atoi(rec[18])
-		bm := 0
-		if len(rec) > 19 {
-			bm, _ = strconv.Atoi(rec[19])
-		}
-		cls := ""
-		if len(rec) > 8 {
-			cls = rec[8]
-		}
-		s := &Ship{
-			MMSI: rec[0], IMO: rec[1], CallSign: rec[2], Name: rec[4], Country: rec[5],
-			CountryCode: ituCountryCode(rec[5]),
-			GrossTonnage: gt, ShipType: st, LengthM: ln, BeamM: bm, Class: cls,
-		}
-		ships[rec[0]] = s
-		if rec[2] != "" {
-			shipsByCallSign[strings.ToUpper(rec[2])] = s
-		}
-	}
-	// Build sorted list for pagination
-	shipsList = make([]*Ship, 0, len(ships))
-	shipsByIMO = make(map[string]*Ship, 15000)
-	for _, s := range ships {
-		shipsList = append(shipsList, s)
-		if s.IMO != "" {
-			shipsByIMO[s.IMO] = s
-		}
-	}
-	sort.Slice(shipsList, func(i, j int) bool { return shipsList[i].GrossTonnage > shipsList[j].GrossTonnage })
-	return nil
+	return loadShipsToWarm(path)
 }
 
 func loadCompanies(path string) error {
@@ -1349,6 +1275,11 @@ func buildAirportsBinary() []byte {
 // ===================== MAIN =====================
 
 func main() {
+	// Initialize warm SQLite store
+	if err := initWarmStore(); err != nil {
+		log.Fatalf("Failed to init warm store: %v", err)
+	}
+
 	for _, l := range []struct {
 		name string
 		fn   func(string) error
@@ -1416,7 +1347,7 @@ func main() {
 	fmt.Printf("  combined lanes: %d CIA + %d marnet-local features\n", len(ciaGJ.Features), len(marnetGJ.Features))
 
 	fmt.Printf("Loaded: %d aircraft, %d airlines, %d airports, %d routes, %d seaports, %d sea-route origins, %d ships\n",
-		len(aircraft), len(airlines), len(airports), len(routes), len(seaports), len(seaRoutesByOrigin), len(ships))
+		warmAircraftCount, len(airlines), len(airports), len(routes), len(seaports), len(seaRoutesByOrigin), warmShipCount)
 
 	mux := http.NewServeMux()
 
@@ -1424,13 +1355,13 @@ func main() {
 
 	mux.HandleFunc("/v0/aircraft/", func(w http.ResponseWriter, r *http.Request) {
 		key := strings.ToUpper(r.URL.Path[len("/v0/aircraft/"):])
-		ac, ok := aircraft[key]
-		if !ok {
-			if ms, found := regToModeS[key]; found {
-				ac, ok = aircraft[ms]
+		ac := warmLookupAircraft(key)
+		if ac == nil {
+			if ms := warmRegToModeS(key); ms != "" {
+				ac = warmLookupAircraft(ms)
 			}
 		}
-		if ok {
+		if ac != nil {
 			writeJSON(w, map[string]any{"response": map[string]any{"aircraft": ac}})
 		} else {
 			notFound(w, "unknown aircraft")
@@ -1474,7 +1405,7 @@ func main() {
 		if !strings.HasPrefix(n, "N") {
 			n = "N" + n
 		}
-		if ms, ok := nNumToModeS[n]; ok {
+		if ms := warmRegToModeS(n); ms != "" {
 			writeJSON(w, map[string]any{"response": ms})
 		} else {
 			notFound(w, "unknown n-number")
@@ -1483,7 +1414,7 @@ func main() {
 
 	mux.HandleFunc("/v0/mode-s/", func(w http.ResponseWriter, r *http.Request) {
 		hex := strings.ToUpper(r.URL.Path[len("/v0/mode-s/"):])
-		if ac, ok := aircraft[hex]; ok {
+		if ac := warmLookupAircraft(hex); ac != nil {
 			writeJSON(w, map[string]any{"response": ac.Registration})
 		} else {
 			notFound(w, "unknown mode-s")
@@ -1513,13 +1444,13 @@ func main() {
 		writeJSON(w, map[string]any{
 			"version": Version,
 			"aviation": map[string]any{
-				"aircraft": len(aircraft),
+				"aircraft": warmAircraftCount,
 				"routes":   len(routes),
 				"airlines": len(byAirline),
 				"airports": len(airports),
 			},
 			"maritime": map[string]any{
-				"ships":            len(ships),
+				"ships":            warmShipCount,
 				"seaports":         len(seaports),
 				"sea_route_origins": len(seaRoutesByOrigin),
 				"companies":        len(companies),
@@ -2229,7 +2160,7 @@ func main() {
 
 	mux.HandleFunc("/v1/ships/callsign/", func(w http.ResponseWriter, r *http.Request) {
 		cs := strings.ToUpper(r.URL.Path[len("/v1/ships/callsign/"):])
-		if s, ok := shipsByCallSign[cs]; ok {
+		if s := warmLookupShipByCallSign(cs); s != nil {
 			writeJSON(w, s)
 		} else {
 			notFound(w, "Ship not found")
@@ -2240,7 +2171,7 @@ func main() {
 		id := r.URL.Path[len("/v1/ships/"):]
 		accessTracker.Hit("ship:" + id)
 		// Try MMSI first
-		if s, ok := ships[id]; ok {
+		if s := warmLookupShip(id); s != nil {
 			resp := map[string]any{
 				"mmsi": s.MMSI, "imo": s.IMO, "call_sign": s.CallSign, "name": s.Name,
 				"country": s.Country, "country_code": s.CountryCode,
@@ -2267,7 +2198,7 @@ func main() {
 				"builder": ns.Builder, "operator": ns.Operator, "sector": ns.Sector,
 			}
 			// Also pull ITU data if MMSI exists
-			if s, ok := ships[ns.MMSI]; ok {
+			if s := warmLookupShip(ns.MMSI); s != nil {
 				resp["call_sign"] = s.CallSign
 				resp["country"] = s.Country
 				resp["country_code"] = s.CountryCode
@@ -2277,7 +2208,7 @@ func main() {
 			return
 		}
 		// Try IMO in ITU (enriched from MongoDB AIS)
-		if s, ok := shipsByIMO[id]; ok {
+		if s := warmLookupShipByIMO(id); s != nil {
 			resp := map[string]any{
 				"mmsi": s.MMSI, "imo": s.IMO, "call_sign": s.CallSign, "name": s.Name,
 				"country": s.Country, "country_code": s.CountryCode,
@@ -2310,72 +2241,19 @@ func main() {
 	mux.HandleFunc("/v1/ships/list", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
 		limit := qInt(r, "limit", 50, 500)
-		offset := qInt(r, "offset", 0, len(shipsList))
+		offset := qInt(r, "offset", 0, 1000000)
 		sortKey := q.Get("sort")
 		if sortKey == "" {
 			sortKey = "gt"
 		}
 		desc := q.Get("order") != "asc"
 		countryFilter := strings.ToUpper(q.Get("country"))
-		nameFilter := strings.ToUpper(q.Get("q"))
+		nameFilter := q.Get("q")
 
-		// Filter
-		var filtered []*Ship
-		// Check if query matches a notable ship IMO — inject at top
-		if nameFilter != "" {
-			if ns, ok := notableByIMO[strings.TrimSpace(string(nameFilter))]; ok && ns.MMSI != "" {
-				if s, ok2 := ships[ns.MMSI]; ok2 {
-					filtered = append(filtered, s)
-				}
-			}
-		}
-		for _, s := range shipsList {
-			if countryFilter != "" && s.CountryCode != countryFilter {
-				continue
-			}
-			if nameFilter != "" && !strings.Contains(strings.ToUpper(s.Name), nameFilter) && !strings.Contains(s.MMSI, nameFilter) && !strings.Contains(strings.ToUpper(s.CallSign), nameFilter) && !strings.Contains(s.IMO, nameFilter) {
-				continue
-			}
-			filtered = append(filtered, s)
-		}
-
-		// Sort
-		sort.Slice(filtered, func(i, j int) bool {
-			switch sortKey {
-			case "name":
-				if desc {
-					return filtered[i].Name > filtered[j].Name
-				}
-				return filtered[i].Name < filtered[j].Name
-			case "length":
-				if desc {
-					return filtered[i].LengthM > filtered[j].LengthM
-				}
-				return filtered[i].LengthM < filtered[j].LengthM
-			case "mmsi":
-				if desc {
-					return filtered[i].MMSI > filtered[j].MMSI
-				}
-				return filtered[i].MMSI < filtered[j].MMSI
-			default: // gt
-				if desc {
-					return filtered[i].GrossTonnage > filtered[j].GrossTonnage
-				}
-				return filtered[i].GrossTonnage < filtered[j].GrossTonnage
-			}
-		})
-
-		total := len(filtered)
-		if offset > total {
-			offset = total
-		}
-		end := offset + limit
-		if end > total {
-			end = total
-		}
+		total, ships := warmListShips(sortKey, desc, countryFilter, nameFilter, offset, limit)
 		writeJSON(w, map[string]any{
 			"total": total, "offset": offset, "limit": limit,
-			"ships": filtered[offset:end],
+			"ships": ships,
 		})
 	})
 
@@ -2444,16 +2322,11 @@ func main() {
 		}
 		// Ships (by MMSI or name prefix)
 		if len(results) < limit {
-			if s, ok := ships[q]; ok {
+			if s := warmLookupShip(q); s != nil {
 				results = append(results, result{"ship", s.Name, s.MMSI, s.CountryCode, 0, 0})
 			} else {
-				count := 0
-				for _, s := range ships {
-					if count >= 5 { break }
-					if strings.Contains(strings.ToUpper(s.Name), qu) {
-						results = append(results, result{"ship", s.Name, s.MMSI, s.CountryCode, 0, 0})
-						count++
-					}
+				for _, s := range warmSearchShips(qu, 5) {
+					results = append(results, result{"ship", s.Name, s.MMSI, s.CountryCode, 0, 0})
 				}
 			}
 		}
@@ -2638,18 +2511,22 @@ func main() {
 			}
 		case "lookup_aircraft":
 			id := strings.ToUpper(ps("id"))
-			if a, ok := aircraft[id]; ok {
+			if a := warmLookupAircraft(id); a != nil {
 				writeJSON(w, a)
-			} else if hex, ok := regToModeS[id]; ok {
-				writeJSON(w, aircraft[hex])
+			} else if hex := warmRegToModeS(id); hex != "" {
+				if a2 := warmLookupAircraft(hex); a2 != nil {
+					writeJSON(w, a2)
+				} else {
+					notFound(w, "Aircraft not found")
+				}
 			} else {
 				notFound(w, "Aircraft not found")
 			}
 		case "lookup_ship":
 			id := strings.ToUpper(ps("id"))
-			if s, ok := ships[id]; ok {
+			if s := warmLookupShip(id); s != nil {
 				writeJSON(w, s)
-			} else if s, ok := shipsByCallSign[id]; ok {
+			} else if s := warmLookupShipByCallSign(id); s != nil {
 				writeJSON(w, s)
 			} else {
 				notFound(w, "Ship not found")
@@ -2778,7 +2655,7 @@ func main() {
 		}
 		results := make([]any, len(req.MMSIs))
 		for i, m := range req.MMSIs {
-			if s, ok := ships[m]; ok {
+			if s := warmLookupShip(m); s != nil {
 				results[i] = s
 			}
 		}

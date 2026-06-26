@@ -164,7 +164,7 @@ func hubDispatch(sess *hubSession, id, tool string, params hubParams) {
 		}
 		result := make(map[string]*Ship, len(mmsis))
 		for _, m := range mmsis {
-			if s, ok := ships[m]; ok {
+			if s := warmLookupShip(m); s != nil {
 				result[m] = s
 			}
 		}
