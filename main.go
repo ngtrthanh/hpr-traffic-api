@@ -146,6 +146,65 @@ func chain(h http.Handler, mw ...func(http.Handler) http.Handler) http.Handler {
 	return h
 }
 
+// ===================== ACCESS TRACKER =====================
+
+// Tracks per-entity access frequency for hot/warm/cold tiering
+type AccessTracker struct {
+	mu     sync.Mutex
+	counts map[string]uint32
+	prev   map[string]uint32 // previous window for decay
+}
+
+var accessTracker = &AccessTracker{
+	counts: make(map[string]uint32, 10000),
+	prev:   make(map[string]uint32, 10000),
+}
+
+func (t *AccessTracker) Hit(key string) {
+	t.mu.Lock()
+	t.counts[key]++
+	t.mu.Unlock()
+}
+
+func (t *AccessTracker) Rotate() map[string]uint32 {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.prev = t.counts
+	t.counts = make(map[string]uint32, len(t.prev))
+	return t.prev
+}
+
+func (t *AccessTracker) TopN(n int) []string {
+	t.mu.Lock()
+	// Merge current + prev for stability
+	merged := make(map[string]uint32, len(t.counts))
+	for k, v := range t.prev {
+		merged[k] = v
+	}
+	for k, v := range t.counts {
+		merged[k] += v
+	}
+	t.mu.Unlock()
+
+	type kv struct {
+		k string
+		v uint32
+	}
+	items := make([]kv, 0, len(merged))
+	for k, v := range merged {
+		items = append(items, kv{k, v})
+	}
+	sort.Slice(items, func(i, j int) bool { return items[i].v > items[j].v })
+	if n > len(items) {
+		n = len(items)
+	}
+	result := make([]string, n)
+	for i := 0; i < n; i++ {
+		result[i] = items[i].k
+	}
+	return result
+}
+
 // ===================== DATA TYPES =====================
 
 type Aircraft struct {
@@ -1315,6 +1374,16 @@ func main() {
 	}
 	startTime = time.Now()
 
+	// Access tracker: rotate counts every hour
+	go func() {
+		for range time.Tick(time.Hour) {
+			stats := accessTracker.Rotate()
+			if len(stats) > 0 {
+				log.Printf("[access] window: %d unique entities accessed", len(stats))
+			}
+		}
+	}()
+
 	// Build combined shipping lanes: CIA (tiers 1-3) + marnet local detail (tier 4)
 	var ciaGJ struct {
 		Features []json.RawMessage `json:"features"`
@@ -1432,6 +1501,7 @@ func main() {
 
 	mux.HandleFunc("/v1/routes/", func(w http.ResponseWriter, r *http.Request) {
 		cs := strings.ToUpper(r.URL.Path[len("/v1/routes/"):])
+		accessTracker.Hit("route:" + cs)
 		if rt, ok := routes[cs]; ok {
 			writeJSON(w, rt)
 		} else {
@@ -1459,6 +1529,11 @@ func main() {
 		})
 	})
 
+	mux.HandleFunc("/v1/access-stats", func(w http.ResponseWriter, r *http.Request) {
+		top := accessTracker.TopN(50)
+		writeJSON(w, map[string]any{"top_entities": top, "tracked_keys": len(accessTracker.counts) + len(accessTracker.prev)})
+	})
+
 	mux.HandleFunc("/v1/airlines/", func(w http.ResponseWriter, r *http.Request) {
 		code := strings.ToUpper(r.URL.Path[len("/v1/airlines/"):])
 		rts := byAirline[code]
@@ -1477,6 +1552,7 @@ func main() {
 
 	mux.HandleFunc("/v1/airports/", func(w http.ResponseWriter, r *http.Request) {
 		code := strings.ToUpper(r.URL.Path[len("/v1/airports/"):])
+		accessTracker.Hit("airport:" + code)
 		rts := byAirport[code]
 		if len(rts) == 0 {
 			notFound(w, "Airport not found")
@@ -1575,6 +1651,7 @@ func main() {
 
 	mux.HandleFunc("/v1/ports/", func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Path[len("/v1/ports/"):]
+		accessTracker.Hit("port:" + id)
 		idU := strings.ToUpper(id)
 		if p, ok := portByLOCODE[idU]; ok {
 			writeJSON(w, p)
@@ -2161,6 +2238,7 @@ func main() {
 
 	mux.HandleFunc("/v1/ships/", func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Path[len("/v1/ships/"):]
+		accessTracker.Hit("ship:" + id)
 		// Try MMSI first
 		if s, ok := ships[id]; ok {
 			resp := map[string]any{
