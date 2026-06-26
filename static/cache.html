@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPRadar — Cache Intelligence</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e14;color:#e0e8f0;font-family:'JetBrains Mono','Fira Code',monospace;font-size:13px;padding:24px;min-height:100vh}
+h1{font-size:18px;color:#00e5ff;margin-bottom:4px}
+.subtitle{color:#7d93b3;font-size:12px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:280px 1fr;gap:20px}
+.panel{background:#111820;border:1px solid #1e2d44;border-radius:10px;padding:16px;overflow:hidden}
+.panel-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7d93b3;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel-title::before{content:'';width:8px;height:8px;border-radius:50%}
+.hot .panel-title::before{background:#ef4444}
+.warm .panel-title::before{background:#f59e0b}
+.cold .panel-title::before{background:#6366f1}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.stat{background:#0a0e14;border:1px solid #1e2d44;border-radius:6px;padding:10px}
+.stat-val{font-size:22px;font-weight:700;color:#00e5ff}
+.stat-label{font-size:10px;color:#7d93b3;margin-top:2px}
+.entity-list{max-height:500px;overflow-y:auto}
+.entity{display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;margin-bottom:4px;transition:all .2s}
+.entity:hover{background:#1a2233}
+.entity-bar{height:6px;border-radius:3px;transition:width .5s ease}
+.entity-icon{font-size:16px;width:24px;text-align:center}
+.entity-info{flex:1;min-width:0}
+.entity-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entity-meta{font-size:10px;color:#7d93b3}
+.entity-score{font-size:14px;font-weight:700;min-width:40px;text-align:right}
+.hot-score{color:#ef4444}
+.warm-score{color:#f59e0b}
+.cold-score{color:#6366f1}
+.bar-container{flex:1;background:#0a0e14;border-radius:3px;height:6px;overflow:hidden}
+.bar-hot{background:linear-gradient(90deg,#ef4444,#f97316)}
+.bar-warm{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.bar-cold{background:linear-gradient(90deg,#6366f1,#818cf8)}
+.legend{display:flex;gap:16px;margin-top:16px;font-size:10px;color:#7d93b3}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.thresholds{margin-top:12px;padding:12px;background:#0a0e14;border-radius:6px;font-size:11px;color:#7d93b3;line-height:1.8}
+.thresholds span{color:#00e5ff;font-weight:700}
+.log{margin-top:12px;font-size:10px;color:#7d93b3;max-height:120px;overflow-y:auto}
+.log-entry{padding:2px 0;border-bottom:1px solid #111820}
+.log-promote{color:#10b981}
+.log-demote{color:#f97316}
+.refresh-bar{position:fixed;top:0;left:0;height:2px;background:#00e5ff;transition:width 1s linear}
+.cycle-btn{background:#1e2d44;border:1px solid #2d4a6f;color:#00e5ff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit}
+.cycle-btn:hover{background:#2d4a6f}
+</style>
+</head>
+<body>
+<div class="refresh-bar" id="refreshBar"></div>
+<h1>⚡ Cache Intelligence</h1>
+<div class="subtitle">Self-learning hot/warm/cold tiering — reward & penalty scoring engine</div>
+
+<div class="grid">
+  <div>
+    <div class="panel">
+      <div class="stats" id="stats">
+        <div class="stat"><div class="stat-val" id="sTracked">—</div><div class="stat-label">Tracked</div></div>
+        <div class="stat"><div class="stat-val" id="sHot">—</div><div class="stat-label">Hot (RAM)</div></div>
+        <div class="stat"><div class="stat-val" id="sPromoted">—</div><div class="stat-label">Promoted</div></div>
+        <div class="stat"><div class="stat-val" id="sDemoted">—</div><div class="stat-label">Demoted</div></div>
+      </div>
+      <div class="thresholds">
+        <b>Scoring Rules</b><br>
+        Hit: <span>+10</span> · Subscribe: <span>+50</span> · AIS: <span>+100</span><br>
+        Decay: <span>-1/hr</span><br>
+        Promote: score ≥ <span>100</span> → RAM<br>
+        Demote: score &lt; <span>10</span> → SQLite
+      </div>
+      <div style="margin-top:12px">
+        <button class="cycle-btn" onclick="triggerCycle()">⚡ Trigger Cycle</button>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel hot">
+      <div class="panel-title">Hot Cache (in-memory)</div>
+      <div class="entity-list" id="hotList"></div>
+    </div>
+    <div class="panel warm" style="margin-top:16px">
+      <div class="panel-title">Warm (tracked, not yet promoted)</div>
+      <div class="entity-list" id="warmList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Hot (score ≥ 100)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Warm (10–99)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div> Cold (&lt;10, will evict)</div>
+</div>
+
+<script>
+const API = '';
+const logs = [];
+
+async function refresh() {
+  const bar = document.getElementById('refreshBar');
+  bar.style.width = '0%';
+  setTimeout(() => bar.style.width = '100%', 50);
+
+  const data = await fetch(API + '/v1/access-stats').then(r => r.json());
+  document.getElementById('sTracked').textContent = data.tracked;
+  document.getElementById('sHot').textContent = data.hot;
+  document.getElementById('sPromoted').textContent = data.total_promoted;
+  document.getElementById('sDemoted').textContent = data.total_demoted;
+
+  // Get detailed scores
+  const detail = await fetch(API + '/v1/cache-detail').then(r => r.json()).catch(() => ({entities:[]}));
+  
+  const hotEl = document.getElementById('hotList');
+  const warmEl = document.getElementById('warmList');
+  
+  const hot = detail.entities.filter(e => e.hot);
+  const warm = detail.entities.filter(e => !e.hot);
+  const maxScore = Math.max(...detail.entities.map(e => e.score), 1);
+
+  hotEl.innerHTML = hot.length ? hot.map(e => entityRow(e, maxScore, 'hot')).join('') : '<div style="color:#7d93b3;font-size:11px;padding:8px">No entities promoted yet. Need score ≥ 100 (10+ hits)</div>';
+  warmEl.innerHTML = warm.map(e => entityRow(e, maxScore, e.score >= 10 ? 'warm' : 'cold')).join('');
+}
+
+function entityRow(e, maxScore, tier) {
+  const icons = {ship:'🚢',port:'⚓',airport:'✈',route:'✈'};
+  const [type, id] = e.key.split(':');
+  const icon = icons[type] || '📦';
+  const pct = Math.min(100, (e.score / maxScore) * 100);
+  const cls = tier === 'hot' ? 'bar-hot' : tier === 'warm' ? 'bar-warm' : 'bar-cold';
+  const scoreCls = tier === 'hot' ? 'hot-score' : tier === 'warm' ? 'warm-score' : 'cold-score';
+  return `<div class="entity">
+    <span class="entity-icon">${icon}</span>
+    <div class="entity-info">
+      <div class="entity-name">${id}</div>
+      <div class="entity-meta">${type} · ${e.hits} hits</div>
+      <div class="bar-container"><div class="entity-bar ${cls}" style="width:${pct}%"></div></div>
+    </div>
+    <span class="entity-score ${scoreCls}">${Math.round(e.score)}</span>
+  </div>`;
+}
+
+async function triggerCycle() {
+  const r = await fetch(API + '/v1/cache-cycle').then(r => r.json());
+  const msg = `⚡ Cycle: +${r.promoted} promoted, -${r.demoted} demoted, ${r.evicted} evicted`;
+  logs.unshift({time: new Date().toLocaleTimeString(), msg, cls: r.promoted ? 'log-promote' : r.demoted ? 'log-demote' : ''});
+  renderLog();
+  refresh();
+}
+
+function renderLog() {
+  document.getElementById('log').innerHTML = logs.slice(0, 20).map(l => 
+    `<div class="log-entry ${l.cls}">[${l.time}] ${l.msg}</div>`
+  ).join('');
+}
+
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

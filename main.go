@@ -1574,6 +1574,23 @@ func main() {
 		writeJSON(w, map[string]any{"promoted": promoted, "demoted": demoted, "evicted": evicted})
 	})
 
+	mux.HandleFunc("/v1/cache-detail", func(w http.ResponseWriter, r *http.Request) {
+		accessTracker.mu.Lock()
+		type entry struct {
+			Key   string  `json:"key"`
+			Score float32 `json:"score"`
+			Hits  uint32  `json:"hits"`
+			Hot   bool    `json:"hot"`
+		}
+		entities := make([]entry, 0, len(accessTracker.entities))
+		for k, e := range accessTracker.entities {
+			entities = append(entities, entry{k, e.Score, e.Hits, e.Hot})
+		}
+		accessTracker.mu.Unlock()
+		sort.Slice(entities, func(i, j int) bool { return entities[i].Score > entities[j].Score })
+		writeJSON(w, map[string]any{"entities": entities})
+	})
+
 	mux.HandleFunc("/v1/airlines/", func(w http.ResponseWriter, r *http.Request) {
 		code := strings.ToUpper(r.URL.Path[len("/v1/airlines/"):])
 		rts := byAirline[code]
