@@ -146,53 +146,103 @@ func chain(h http.Handler, mw ...func(http.Handler) http.Handler) http.Handler {
 	return h
 }
 
-// ===================== ACCESS TRACKER =====================
+// ===================== SELF-LEARNING CACHE =====================
 
-// Tracks per-entity access frequency for hot/warm/cold tiering
+const (
+	RewardHit      float32 = 10  // API lookup
+	RewardSubscribe float32 = 50 // WebSocket watch
+	RewardRoute    float32 = 20  // used in route calc
+	RewardAIS      float32 = 100 // live AIS position received
+	PenaltyDecay   float32 = 1   // per hour idle
+	PenaltyStale   float32 = 50  // no AIS in 7 days
+	PromoteThresh  float32 = 100 // score to promote warm→hot
+	DemoteThresh   float32 = 10  // score to demote hot→warm
+)
+
+type ScoredEntity struct {
+	Score   float32
+	Hits    uint32
+	Hot     bool
+}
+
 type AccessTracker struct {
-	mu     sync.Mutex
-	counts map[string]uint32
-	prev   map[string]uint32 // previous window for decay
+	mu       sync.Mutex
+	entities map[string]*ScoredEntity
+	promoted int
+	demoted  int
 }
 
 var accessTracker = &AccessTracker{
-	counts: make(map[string]uint32, 10000),
-	prev:   make(map[string]uint32, 10000),
+	entities: make(map[string]*ScoredEntity, 10000),
 }
 
 func (t *AccessTracker) Hit(key string) {
 	t.mu.Lock()
-	t.counts[key]++
+	e, ok := t.entities[key]
+	if !ok {
+		e = &ScoredEntity{}
+		t.entities[key] = e
+	}
+	e.Score += RewardHit
+	e.Hits++
 	t.mu.Unlock()
 }
 
-func (t *AccessTracker) Rotate() map[string]uint32 {
+func (t *AccessTracker) Reward(key string, points float32) {
+	t.mu.Lock()
+	e, ok := t.entities[key]
+	if !ok {
+		e = &ScoredEntity{}
+		t.entities[key] = e
+	}
+	e.Score += points
+	t.mu.Unlock()
+}
+
+// Cycle: decay scores, promote/demote, garbage collect
+func (t *AccessTracker) Cycle() (promoted, demoted, evicted int) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.prev = t.counts
-	t.counts = make(map[string]uint32, len(t.prev))
-	return t.prev
+
+	for key, e := range t.entities {
+		// Decay
+		e.Score -= PenaltyDecay
+		e.Hits = 0
+
+		// Promote
+		if !e.Hot && e.Score >= PromoteThresh {
+			e.Hot = true
+			promoted++
+			promoteToHot(key)
+		}
+		// Demote
+		if e.Hot && e.Score < DemoteThresh {
+			e.Hot = false
+			demoted++
+			demoteFromHot(key)
+		}
+		// Garbage collect dead entries
+		if e.Score <= 0 && !e.Hot {
+			delete(t.entities, key)
+			evicted++
+		}
+	}
+
+	t.promoted += promoted
+	t.demoted += demoted
+	return
 }
 
 func (t *AccessTracker) TopN(n int) []string {
 	t.mu.Lock()
-	// Merge current + prev for stability
-	merged := make(map[string]uint32, len(t.counts))
-	for k, v := range t.prev {
-		merged[k] = v
-	}
-	for k, v := range t.counts {
-		merged[k] += v
-	}
-	t.mu.Unlock()
-
+	defer t.mu.Unlock()
 	type kv struct {
 		k string
-		v uint32
+		v float32
 	}
-	items := make([]kv, 0, len(merged))
-	for k, v := range merged {
-		items = append(items, kv{k, v})
+	items := make([]kv, 0, len(t.entities))
+	for k, e := range t.entities {
+		items = append(items, kv{k, e.Score})
 	}
 	sort.Slice(items, func(i, j int) bool { return items[i].v > items[j].v })
 	if n > len(items) {
@@ -203,6 +253,59 @@ func (t *AccessTracker) TopN(n int) []string {
 		result[i] = items[i].k
 	}
 	return result
+}
+
+func (t *AccessTracker) Stats() map[string]any {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	hot := 0
+	for _, e := range t.entities {
+		if e.Hot {
+			hot++
+		}
+	}
+	return map[string]any{
+		"tracked":        len(t.entities),
+		"hot":            hot,
+		"total_promoted": t.promoted,
+		"total_demoted":  t.demoted,
+	}
+}
+
+// Promote: load entity from SQLite warm into hot cache
+func promoteToHot(key string) {
+	// key format: "ship:MMSI" or "ship:imo:IMO"
+	parts := strings.SplitN(key, ":", 2)
+	if len(parts) != 2 {
+		return
+	}
+	switch parts[0] {
+	case "ship":
+		if s := warmLookupShip(parts[1]); s != nil {
+			shipCache.Store(parts[1], s)
+			if s.IMO != "" {
+				shipCache.Store("imo:"+s.IMO, s)
+			}
+		}
+	}
+}
+
+// Demote: remove from hot cache (SQLite still has it)
+func demoteFromHot(key string) {
+	parts := strings.SplitN(key, ":", 2)
+	if len(parts) != 2 {
+		return
+	}
+	switch parts[0] {
+	case "ship":
+		if v, ok := shipCache.Load(parts[1]); ok {
+			s := v.(*Ship)
+			shipCache.Delete(parts[1])
+			if s.IMO != "" {
+				shipCache.Delete("imo:" + s.IMO)
+			}
+		}
+	}
 }
 
 // ===================== DATA TYPES =====================
@@ -1305,12 +1408,12 @@ func main() {
 	}
 	startTime = time.Now()
 
-	// Access tracker: rotate counts every hour
+	// Self-learning cache: decay/promote/demote every hour
 	go func() {
 		for range time.Tick(time.Hour) {
-			stats := accessTracker.Rotate()
-			if len(stats) > 0 {
-				log.Printf("[access] window: %d unique entities accessed", len(stats))
+			promoted, demoted, evicted := accessTracker.Cycle()
+			if promoted > 0 || demoted > 0 {
+				log.Printf("[cache] cycle: +%d promoted, -%d demoted, %d evicted", promoted, demoted, evicted)
 			}
 		}
 	}()
@@ -1461,8 +1564,14 @@ func main() {
 	})
 
 	mux.HandleFunc("/v1/access-stats", func(w http.ResponseWriter, r *http.Request) {
-		top := accessTracker.TopN(50)
-		writeJSON(w, map[string]any{"top_entities": top, "tracked_keys": len(accessTracker.counts) + len(accessTracker.prev)})
+		stats := accessTracker.Stats()
+		stats["top_entities"] = accessTracker.TopN(50)
+		writeJSON(w, stats)
+	})
+
+	mux.HandleFunc("/v1/cache-cycle", func(w http.ResponseWriter, r *http.Request) {
+		promoted, demoted, evicted := accessTracker.Cycle()
+		writeJSON(w, map[string]any{"promoted": promoted, "demoted": demoted, "evicted": evicted})
 	})
 
 	mux.HandleFunc("/v1/airlines/", func(w http.ResponseWriter, r *http.Request) {
