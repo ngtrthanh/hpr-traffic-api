@@ -2965,6 +2965,7 @@ func main() {
 	mux.Handle("/css/", fileServer)
 	mux.Handle("/js/", fileServer)
 	mux.Handle("/mapstyles/", fileServer)
+	mux.Handle("/cache.html", fileServer)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" && r.URL.Path != "/index.html" {
 			http.NotFound(w, r)
